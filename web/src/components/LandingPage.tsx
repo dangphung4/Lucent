@@ -1,8 +1,13 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { useAuth } from '../lib/AuthContext';
 
 export function LandingPage() {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
+
   return (
     <div className="flex flex-col">
       {/* Hero Section with Gradient Background */}
@@ -18,16 +23,30 @@ export function LandingPage() {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 min-[400px]:flex-row">
+              {currentUser ? (
+                <Button onClick={() => navigate('/dashboard')} size="lg" className="px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+                  Dashboard
+                </Button>
+              ) : (
               <Link to="/login">
                 <Button size="lg" className="px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
                   Get Started Free
                 </Button>
               </Link>
+              )}
+              {currentUser ? (
+                <Link to="/calendar">
+                <Button size="lg" variant="outline" className="px-8 rounded-full">
+                    Calendar
+                </Button>
+                </Link>
+              ) : (
               <Link to="/login">
                 <Button size="lg" variant="outline" className="px-8 rounded-full">
                   Sign In
                 </Button>
               </Link>
+              )}
             </div>
             
             {/* App Preview Image */}
@@ -324,7 +343,7 @@ export function LandingPage() {
               What Our Users Say
             </h2>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
-              Join thousands of skincare enthusiasts who've improved their routines
+              Join other skincare enthusiasts who've improved their routines
             </p>
           </div>
           
@@ -398,15 +417,21 @@ export function LandingPage() {
                 Ready to transform your skincare routine?
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
-                Join thousands of users who have improved their skin with Skincare Track
+                Join other skincare enthusiasts who've improved their routines
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 min-[400px]:flex-row pt-4">
-              <Link to="/login">
-                <Button size="lg" className="px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
-                  Get Started Free
+              {currentUser ? (
+                <Button onClick={() => navigate('/dashboard')} size="lg" className="px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+                  Go to Dashboard
+                </Button>
+              ) : (
+                <Link to="/login">
+                  <Button size="lg" className="px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+                    Get Started Free
                 </Button>
               </Link>
+              )}
             </div>
           </div>
         </div>
