@@ -9,7 +9,6 @@ import { Input } from './ui/input';
 import { AddJournalEntryDialog } from './AddJournalEntryDialog';
 import { UpdateUsageDialog } from './UpdateUsageDialog';
 import { format } from 'date-fns';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 // Add category icons mapping
@@ -79,8 +78,8 @@ export function Journal() {
       .sort((a, b) => b.date.getTime() - a.date.getTime())[0];
 
     return (
-      <div className="flex items-start gap-4 p-4 rounded-lg border hover:bg-accent/50 transition-colors">
-        <Avatar className="h-12 w-12">
+      <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border bg-card shadow-sm hover:shadow-md hover:bg-accent/5 transition-all">
+        <Avatar className="h-12 w-12 shadow-sm bg-background">
           <div className="flex h-full w-full items-center justify-center rounded-full font-medium">
             {product.category && categoryIcons[product.category] || (
               <div className="bg-primary/10 text-primary">
@@ -89,10 +88,13 @@ export function Journal() {
             )}
           </div>
         </Avatar>
-        <div className="flex-1">
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium">{product.name}</h3>
-            <div className="flex items-center gap-2">
+        <div className="flex-1 w-full min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 className="font-semibold text-foreground">{product.name}</h3>
+              <p className="text-sm text-muted-foreground/80">{product.brand}</p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
               <UpdateUsageDialog
                 productId={product.id}
                 productName={product.name}
@@ -105,21 +107,20 @@ export function Journal() {
               />
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">{product.brand}</p>
-          <div className="mt-2 flex gap-2 flex-wrap">
+          <div className="mt-3 flex flex-wrap gap-2">
             {product.usageDuration > 0 && (
-              <Badge variant="secondary">
+              <Badge variant="secondary" className="h-6 bg-accent/50 text-accent-foreground">
                 <Clock className="h-3 w-3 mr-1" />
                 Using for {formatDuration(product.usageDuration)}
               </Badge>
             )}
             {latestEntry && (
               <>
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="h-6 bg-accent/50 text-accent-foreground">
                   <Star className="h-3 w-3 mr-1" />
                   {latestEntry.rating}/5
                 </Badge>
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="h-6 bg-accent/50 text-accent-foreground">
                   <CalendarIcon className="h-3 w-3 mr-1" />
                   Last reviewed {formatDuration(
                     Math.floor(
@@ -131,12 +132,12 @@ export function Journal() {
             )}
           </div>
           {latestEntry && (
-            <div className="mt-2">
-              <p className="text-sm text-muted-foreground line-clamp-2">{latestEntry.review}</p>
+            <div className="mt-3">
+              <p className="text-sm text-foreground/90">{latestEntry.review}</p>
               {latestEntry.effects.length > 0 && (
-                <div className="flex gap-1 mt-2 flex-wrap">
+                <div className="flex gap-1.5 mt-3 flex-wrap">
                   {latestEntry.effects.map((effect: string, index: number) => (
-                    <Badge key={index} variant="outline" className="text-xs">
+                    <Badge key={index} variant="outline" className="text-xs bg-background shadow-sm">
                       {effect}
                     </Badge>
                   ))}
@@ -158,13 +159,13 @@ export function Journal() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 pb-20 md:pb-6">
-      <div className="space-y-6">
+    <div className="container max-w-3xl mx-auto px-4 py-6 pb-20 md:pb-6">
+      <div className="space-y-8">
         {/* Header Section */}
         <div className="flex flex-col gap-4">
-          <div>
+          <div className="space-y-1">
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Skincare Journal</h1>
-            <p className="text-muted-foreground">
+            <p className="text-base text-muted-foreground/80">
               Track your skincare journey and product experiences
             </p>
           </div>
@@ -176,127 +177,119 @@ export function Journal() {
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
+              className="pl-9 bg-background shadow-sm focus-visible:ring-primary/30"
             />
           </div>
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="bg-card w-full justify-start overflow-auto scrollbar-none">
-            <TabsTrigger value="tracking" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Product Tracking
-            </TabsTrigger>
-            <TabsTrigger value="notes" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Journal Notes
-            </TabsTrigger>
-            <TabsTrigger value="progress" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Progress Log
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <div className="border-b">
+            <TabsList className="w-full h-auto p-0 bg-transparent gap-6">
+              <TabsTrigger 
+                value="tracking" 
+                className="data-[state=active]:bg-transparent data-[state=active]:border-primary data-[state=active]:text-primary font-medium border-b-2 border-transparent rounded-none px-2 py-3 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Product Tracking
+              </TabsTrigger>
+              <TabsTrigger 
+                value="notes" 
+                className="data-[state=active]:bg-transparent data-[state=active]:border-primary data-[state=active]:text-primary font-medium border-b-2 border-transparent rounded-none px-2 py-3 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Journal Notes
+              </TabsTrigger>
+              <TabsTrigger 
+                value="progress" 
+                className="data-[state=active]:bg-transparent data-[state=active]:border-primary data-[state=active]:text-primary font-medium border-b-2 border-transparent rounded-none px-2 py-3 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Progress Log
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* Product Tracking Tab */}
-          <TabsContent value="tracking" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Product Tracking</CardTitle>
-                <CardDescription>
-                  Track your product usage, reviews, and experiences
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  {filteredProducts.map(product => (
-                    <ProductCard key={product.id} product={product} onUpdate={loadData} />
-                  ))}
+          <TabsContent value="tracking" className="space-y-4 mt-6">
+            <div className="grid gap-4">
+              {filteredProducts.length === 0 ? (
+                <div className="text-center py-12 px-4 rounded-lg border bg-muted/30 shadow-sm">
+                  <Beaker className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <p className="font-medium text-foreground">No products found</p>
+                  <p className="text-sm text-muted-foreground/80 mt-1">Try adjusting your search or add some products</p>
                 </div>
-              </CardContent>
-            </Card>
+              ) : (
+                filteredProducts.map(product => (
+                  <div key={product.id}>
+                    <ProductCard product={product} onUpdate={loadData} />
+                  </div>
+                ))
+              )}
+            </div>
           </TabsContent>
 
           {/* Journal Notes Tab */}
-          <TabsContent value="notes" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Journal Notes</CardTitle>
-                <CardDescription>
-                  Track your daily skincare experiences
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  {journalEntries.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                      <p>No journal entries yet</p>
-                      <p className="text-sm">Start by adding a review to any product</p>
-                    </div>
-                  ) : (
-                    journalEntries
-                      .sort((a, b) => b.date.getTime() - a.date.getTime())
-                      .map(entry => {
-                        const product = products.find(p => p.id === entry.productId);
-                        return (
-                          <div
-                            key={entry.id}
-                            className="flex items-start gap-4 p-4 rounded-lg border hover:bg-accent/50 transition-colors"
-                          >
-                            <Avatar className="h-12 w-12">
-                              <div className="flex h-full w-full items-center justify-center rounded-full font-medium">
-                                {product?.category && categoryIcons[product.category] || (
-                                  <div className="bg-primary/10 text-primary">
-                                    <Beaker className="h-5 w-5" />
-                                  </div>
-                                )}
+          <TabsContent value="notes" className="space-y-4 mt-6">
+            <div className="grid gap-4">
+              {journalEntries.length === 0 ? (
+                <div className="text-center py-12 px-4 rounded-lg border bg-muted/30 shadow-sm">
+                  <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+                  <p className="font-medium text-foreground">No journal entries yet</p>
+                  <p className="text-sm text-muted-foreground/80 mt-1">Start by adding a review to any product</p>
+                </div>
+              ) : (
+                journalEntries
+                  .sort((a, b) => b.date.getTime() - a.date.getTime())
+                  .map(entry => {
+                    const product = products.find(p => p.id === entry.productId);
+                    return (
+                      <div key={entry.id}>
+                        <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border bg-card shadow-sm hover:shadow-md hover:bg-accent/5 transition-all">
+                          <Avatar className="h-12 w-12 shadow-sm bg-background">
+                            <div className="flex h-full w-full items-center justify-center rounded-full font-medium">
+                              {product?.category && categoryIcons[product.category] || (
+                                <div className="bg-primary/10 text-primary">
+                                  <Beaker className="h-5 w-5" />
+                                </div>
+                              )}
+                            </div>
+                          </Avatar>
+                          <div className="flex-1 w-full min-w-0">
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                              <div>
+                                <h3 className="font-semibold text-foreground">{product?.name || 'Unknown Product'}</h3>
+                                <p className="text-sm text-muted-foreground/80">{product?.brand}</p>
                               </div>
-                            </Avatar>
-                            <div className="flex-1">
-                              <div className="flex items-center justify-between">
-                                <h3 className="font-medium">{product?.name || 'Unknown Product'}</h3>
-                                <Badge variant="secondary">
-                                  {format(entry.date, 'MMM d, yyyy')}
-                                </Badge>
-                              </div>
-                              <p className="text-sm text-muted-foreground">{product?.brand}</p>
-                              <div className="mt-2">
-                                <p className="text-sm">{entry.review}</p>
-                                {entry.effects.length > 0 && (
-                                  <div className="flex gap-1 mt-2 flex-wrap">
-                                    {entry.effects.map((effect, index) => (
-                                      <Badge key={index} variant="outline" className="text-xs">
-                                        {effect}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
+                              <Badge variant="secondary" className="shrink-0 bg-accent/50 text-accent-foreground shadow-sm">
+                                {format(entry.date, 'MMM d, yyyy')}
+                              </Badge>
+                            </div>
+                            <div className="mt-3">
+                              <p className="text-sm text-foreground/90">{entry.review}</p>
+                              {entry.effects.length > 0 && (
+                                <div className="flex gap-1.5 mt-3 flex-wrap">
+                                  {entry.effects.map((effect, index) => (
+                                    <Badge key={index} variant="outline" className="text-xs bg-background shadow-sm">
+                                      {effect}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
-                        );
-                      })
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                        </div>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
           </TabsContent>
 
           {/* Progress Log Tab */}
-          <TabsContent value="progress" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Progress Log</CardTitle>
-                <CardDescription>
-                  Track your skin progress over time
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Progress tracking coming soon</p>
-                  <p className="text-sm">Track your skin's improvement with photos and notes</p>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="progress" className="space-y-4 mt-6">
+            <div className="text-center py-12 px-4 rounded-lg border bg-muted/30 shadow-sm">
+              <TrendingUp className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+              <p className="font-medium text-foreground">Progress tracking coming soon</p>
+              <p className="text-sm text-muted-foreground/80 mt-1">Track your skin's improvement with photos and notes</p>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
