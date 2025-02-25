@@ -23,13 +23,13 @@ export function MobileHeader() {
           ? 'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60' 
           : 'bg-transparent'}`}
       style={{
-        paddingTop: 'max(env(safe-area-inset-top), 10px)',
+        paddingTop: 'env(safe-area-inset-top)',
         paddingLeft: 'env(safe-area-inset-left)',
         paddingRight: 'env(safe-area-inset-right)'
       }}
     >
       <div className="container px-4 mx-auto">
-        <div className="flex items-center justify-between h-12 mt-6">
+        <div className="flex items-center justify-between h-12 mt-2">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <img src={LucentLogo} alt="Lucent Logo" className="w-8 h-8" />

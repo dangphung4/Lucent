@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Avatar } from './ui/avatar';
 import { Badge } from './ui/badge';
-import { Loader2, Calendar as CalendarIcon, Clock, Star, FileText, TrendingUp, Search, Beaker } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon, Clock, Star, FileText, TrendingUp, Search, Beaker, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 import { getUserProducts, getUserJournalEntries, type Product, type JournalEntry } from '@/lib/db';
@@ -10,6 +10,9 @@ import { AddJournalEntryDialog } from './AddJournalEntryDialog';
 import { UpdateUsageDialog } from './UpdateUsageDialog';
 import { format } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Button } from './ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { SelectProductJournalDialog } from './SelectProductJournalDialog';
 
 // Add category icons mapping
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -39,6 +42,7 @@ export function Journal() {
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   // Load products and journal entries
   const loadData = async () => {
@@ -94,7 +98,7 @@ export function Journal() {
               <h3 className="font-semibold text-foreground">{product.name}</h3>
               <p className="text-sm text-muted-foreground/80">{product.brand}</p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
               <UpdateUsageDialog
                 productId={product.id}
                 productName={product.name}
@@ -104,7 +108,12 @@ export function Journal() {
                 productId={product.id}
                 productName={product.name}
                 onEntryAdded={onUpdate}
-              />
+              >
+                <Button variant="ghost" size="sm" className="whitespace-nowrap">
+                  <FileText className="h-4 w-4 mr-1" />
+                  Add Review
+                </Button>
+              </AddJournalEntryDialog>
             </div>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -184,8 +193,8 @@ export function Journal() {
 
         {/* Main Content */}
         <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="border-b">
-            <TabsList className="w-full h-auto p-0 bg-transparent gap-6">
+          <div className="border-b overflow-x-auto">
+            <TabsList className="w-full h-auto p-0 bg-transparent gap-4 sm:gap-6">
               <TabsTrigger 
                 value="tracking" 
                 className="data-[state=active]:bg-transparent data-[state=active]:border-primary data-[state=active]:text-primary font-medium border-b-2 border-transparent rounded-none px-2 py-3 text-muted-foreground hover:text-foreground transition-colors"
@@ -228,6 +237,53 @@ export function Journal() {
 
           {/* Journal Notes Tab */}
           <TabsContent value="notes" className="space-y-4 mt-6">
+            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between mb-4">
+              <h3 className="text-lg font-medium">Your Journal Entries</h3>
+              
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                {products.length > 0 && (
+                  <div className="w-full sm:w-auto">
+                    <Select 
+                      value={selectedProductId || "all"} 
+                      onValueChange={(value) => setSelectedProductId(value === "all" ? null : value)}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a product" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Products</SelectItem>
+                        {products.map(product => (
+                          <SelectItem key={product.id} value={product.id}>
+                            {product.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                
+                {selectedProductId ? (
+                  <AddJournalEntryDialog
+                    productId={selectedProductId}
+                    productName={products.find(p => p.id === selectedProductId)?.name || ""}
+                    onEntryAdded={loadData}
+                  >
+                    <Button className="w-full sm:w-auto">
+                      <Plus className="h-4 w-4 mr-2" />
+                      New Journal Entry
+                    </Button>
+                  </AddJournalEntryDialog>
+                ) : (
+                  <SelectProductJournalDialog onEntryAdded={loadData}>
+                    <Button className="w-full sm:w-auto">
+                      <Plus className="h-4 w-4 mr-2" />
+                      New Journal Entry
+                    </Button>
+                  </SelectProductJournalDialog>
+                )}
+              </div>
+            </div>
+            
             <div className="grid gap-4">
               {journalEntries.length === 0 ? (
                 <div className="text-center py-12 px-4 rounded-lg border bg-muted/30 shadow-sm">
@@ -237,6 +293,7 @@ export function Journal() {
                 </div>
               ) : (
                 journalEntries
+                  .filter(entry => !selectedProductId || entry.productId === selectedProductId)
                   .sort((a, b) => b.date.getTime() - a.date.getTime())
                   .map(entry => {
                     const product = products.find(p => p.id === entry.productId);
@@ -258,9 +315,15 @@ export function Journal() {
                                 <h3 className="font-semibold text-foreground">{product?.name || 'Unknown Product'}</h3>
                                 <p className="text-sm text-muted-foreground/80">{product?.brand}</p>
                               </div>
-                              <Badge variant="secondary" className="shrink-0 bg-accent/50 text-accent-foreground shadow-sm">
-                                {format(entry.date, 'MMM d, yyyy')}
-                              </Badge>
+                              <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
+                                <Badge variant="secondary" className="shrink-0 bg-accent/50 text-accent-foreground shadow-sm">
+                                  {format(entry.date, 'MMM d, yyyy')}
+                                </Badge>
+                                <Badge variant="secondary" className="shrink-0 bg-accent/50 text-accent-foreground shadow-sm">
+                                  <Star className="h-3 w-3 mr-1" />
+                                  {entry.rating}/5
+                                </Badge>
+                              </div>
                             </div>
                             <div className="mt-3">
                               <p className="text-sm text-foreground/90">{entry.review}</p>
@@ -271,6 +334,11 @@ export function Journal() {
                                       {effect}
                                     </Badge>
                                   ))}
+                                </div>
+                              )}
+                              {entry.notes && (
+                                <div className="mt-3 p-3 bg-muted/30 rounded-md">
+                                  <p className="text-sm text-muted-foreground">{entry.notes}</p>
                                 </div>
                               )}
                             </div>

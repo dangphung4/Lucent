@@ -26,7 +26,7 @@ export function MobileNav() {
     <div 
       className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-40 md:hidden"
       style={{
-        paddingBottom: 'max(10px, env(safe-area-inset-bottom))',
+        paddingBottom: 'max(5px, env(safe-area-inset-bottom))',
         paddingLeft: 'env(safe-area-inset-left)',
         paddingRight: 'env(safe-area-inset-right)'
       }}
