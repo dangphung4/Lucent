@@ -1,45 +1,50 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { 
-  User, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword, 
-  signOut, 
+  getAuth, 
   onAuthStateChanged, 
-  signInWithPopup 
+  User, 
+  signOut, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
-import { auth, googleProvider } from './firebase';
+import { app, googleProvider } from './firebase';
 
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
+  logOut: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
-  logOut: () => Promise<void>;
   signInWithGoogle: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType>({
+  currentUser: null,
+  loading: true,
+  logOut: async () => {},
+  signIn: async () => {},
+  signUp: async () => {},
+  signInWithGoogle: async () => {}
+});
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+interface AuthProviderProps {
+  children: ReactNode;
+}
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const auth = getAuth(app);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setLoading(false);
-    });
-
-    return unsubscribe;
-  }, []);
+  const logOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   const signIn = async (email: string, password: string) => {
     await signInWithEmailAndPassword(auth, email, password);
@@ -49,20 +54,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await createUserWithEmailAndPassword(auth, email, password);
   };
 
-  const logOut = async () => {
-    await signOut(auth);
-  };
-
   const signInWithGoogle = async () => {
     await signInWithPopup(auth, googleProvider);
   };
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, [auth]);
+
   const value = {
     currentUser,
     loading,
+    logOut,
     signIn,
     signUp,
-    logOut,
     signInWithGoogle
   };
 
@@ -71,4 +81,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       {!loading && children}
     </AuthContext.Provider>
   );
-}; 
+}
+
+// Custom hook to use the auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+} 
