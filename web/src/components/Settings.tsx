@@ -6,10 +6,10 @@ import { Switch } from './ui/switch';
 import { Label } from './ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useTheme } from '../lib/ThemeProvider';
-import { Moon, Sun, Monitor, User, Bell, LogOut, Key, Download, Trash2, Check, ChevronRight, Loader2 } from 'lucide-react';
+import { Moon, Sun, Monitor, User, Bell, LogOut, Key, Download, Trash2, Check, ChevronRight, Loader2, Image } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Separator } from './ui/separator';
-import { Avatar, AvatarFallback } from './ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
 import { useLocation } from 'react-router-dom';
 import { Input } from './ui/input';
@@ -31,8 +31,10 @@ export function Settings() {
   // Profile update states
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
+  const [photoURL, setPhotoURL] = useState('');
   const [isUpdating, setIsUpdating] = useState(false);
   const [usernameError, setUsernameError] = useState('');
+  const [photoURLError, setPhotoURLError] = useState('');
   
   // Get first name from email or use "there" as fallback
   const firstName = currentUser?.email?.split('@')[0] || 'there';
@@ -42,6 +44,7 @@ export function Settings() {
   useEffect(() => {
     if (currentUser) {
       setDisplayName(currentUser.displayName || defaultDisplayName);
+      setPhotoURL(currentUser.photoURL || '');
       
       if (userProfile) {
         setUsername(userProfile.username || '');
@@ -86,13 +89,29 @@ export function Settings() {
     setUsernameError('');
   };
 
+  // Handle photo URL validation
+  const validatePhotoURL = (value: string) => {
+    if (!value) {
+      setPhotoURLError('');
+      return;
+    }
+    
+    // Simple URL validation using regex
+    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
+    if (!urlPattern.test(value)) {
+      setPhotoURLError('Please enter a valid URL');
+    } else {
+      setPhotoURLError('');
+    }
+  };
+
   // Handle profile update
   const handleProfileUpdate = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!currentUser) return;
     
-    if (usernameError) {
+    if (usernameError || photoURLError) {
       toast.error('Please fix the errors before saving');
       return;
     }
@@ -113,6 +132,7 @@ export function Settings() {
       // Update user profile using the context function
       await updateUserData({
         displayName,
+        photoURL,
         username: username || undefined
       });
       
@@ -183,9 +203,13 @@ export function Settings() {
                   <form onSubmit={handleProfileUpdate} className="space-y-6">
                     <div className="flex flex-col md:flex-row md:items-center gap-4">
                       <Avatar className="h-20 w-20 border-4 border-primary/10">
-                        <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
-                          {displayName.charAt(0)}
-                        </AvatarFallback>
+                        {photoURL ? (
+                          <AvatarImage src={photoURL} alt={displayName} />
+                        ) : (
+                          <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
+                            {displayName.charAt(0)}
+                          </AvatarFallback>
+                        )}
                       </Avatar>
                       <div className="space-y-1 flex-1">
                         <p className="font-medium text-xl">{displayName || defaultDisplayName}</p>
@@ -208,6 +232,30 @@ export function Settings() {
                         <p className="text-xs text-muted-foreground">
                           This is how your name will appear throughout the app
                         </p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="photoURL" className="flex items-center gap-2">
+                          <Image className="h-4 w-4" />
+                          Profile Picture URL
+                        </Label>
+                        <Input 
+                          id="photoURL" 
+                          value={photoURL} 
+                          onChange={(e) => {
+                            setPhotoURL(e.target.value);
+                            validatePhotoURL(e.target.value);
+                          }}
+                          placeholder="https://example.com/your-photo.jpg"
+                          className={photoURLError ? "border-red-500" : ""}
+                        />
+                        {photoURLError ? (
+                          <p className="text-xs text-red-500">{photoURLError}</p>
+                        ) : (
+                          <p className="text-xs text-muted-foreground">
+                            Enter a URL to your profile picture (JPG, PNG, or GIF)
+                          </p>
+                        )}
                       </div>
                       
                       <div className="space-y-2">

@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Avatar } from './ui/avatar';
+import { Avatar, AvatarImage } from './ui/avatar';
 import { useNavigate } from 'react-router-dom';
 
 export function Dashboard() {
@@ -66,7 +66,11 @@ export function Dashboard() {
               </Button>
               <Avatar className="h-10 w-10 border-2 border-white">
                 <div className="flex h-full w-full items-center justify-center bg-primary-foreground text-primary font-medium">
-                  {displayName.charAt(0)}
+                  {currentUser?.photoURL ? (
+                    <AvatarImage src={currentUser.photoURL} alt={displayName} />
+                  ) : (
+                    displayName.charAt(0)
+                  )}
                 </div>
               </Avatar>
             </div>
