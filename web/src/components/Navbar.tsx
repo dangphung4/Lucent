@@ -15,6 +15,22 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Settings, LogOut, User } from 'lucide-react';
 import { toast } from 'sonner';
 
+/**
+ * Navbar component that renders the navigation bar for the application.
+ * It includes links to different sections of the app, user authentication controls,
+ * and a responsive design that adjusts based on the user's scroll position.
+ *
+ * @returns {JSX.Element} The rendered Navbar component.
+ *
+ * @example
+ * // Usage in a React component
+ * import { Navbar } from './Navbar';
+ *
+ * function App() {
+ *   return (
+ *     <div>
+ *       <Navbar />
+ *       {/* Other components */
 export function Navbar() {
   const { currentUser, logOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
