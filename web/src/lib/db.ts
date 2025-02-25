@@ -56,6 +56,20 @@ export interface Routine {
   isActive: boolean;
 }
 
+export interface RoutineCompletion {
+  id: string;
+  userId: string;
+  routineId: string;
+  date: Date;
+  completedSteps: Array<{
+    productId: string;
+    completed: boolean;
+    notes?: string;
+  }>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 /**
  * Get a user profile from Firestore
  */
@@ -275,6 +289,73 @@ export const deleteRoutine = async (routineId: string): Promise<void> => {
     await deleteDoc(routineRef);
   } catch (error) {
     console.error('Error deleting routine:', error);
+    throw error;
+  }
+};
+
+/**
+ * Add a new routine completion record
+ */
+export const addRoutineCompletion = async (completion: Omit<RoutineCompletion, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
+  try {
+    const completionsRef = doc(collection(db, 'routineCompletions'));
+    
+    const completionData = {
+      ...completion,
+      id: completionsRef.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    await setDoc(completionsRef, completionData);
+    return completionsRef.id;
+  } catch (error) {
+    console.error('Error adding routine completion:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get routine completions for a specific date range
+ */
+export const getRoutineCompletions = async (userId: string, startDate: Date, endDate: Date): Promise<RoutineCompletion[]> => {
+  try {
+    const completionsRef = collection(db, 'routineCompletions');
+    const q = query(
+      completionsRef,
+      where('userId', '==', userId),
+      where('date', '>=', startDate),
+      where('date', '<=', endDate)
+    );
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        ...data,
+        date: data.date?.toDate() || new Date(),
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+      } as RoutineCompletion;
+    });
+  } catch (error) {
+    console.error('Error getting routine completions:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update a routine completion record
+ */
+export const updateRoutineCompletion = async (completionId: string, data: Partial<RoutineCompletion>): Promise<void> => {
+  try {
+    const completionRef = doc(db, 'routineCompletions', completionId);
+    await updateDoc(completionRef, {
+      ...data,
+      updatedAt: new Date(),
+    });
+  } catch (error) {
+    console.error('Error updating routine completion:', error);
     throw error;
   }
 };

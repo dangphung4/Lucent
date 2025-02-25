@@ -3,10 +3,10 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { ScrollArea } from './ui/scroll-area';
 import { Avatar } from './ui/avatar';
-import { PlusCircle, Calendar as CalendarIcon, Check } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { useAuth } from '@/lib/AuthContext';
 import {
   CalendarProvider,
   CalendarHeader,
@@ -15,112 +15,182 @@ import {
   CalendarMonthPicker,
   CalendarYearPicker,
   CalendarDatePagination,
-  // CalendarItem,
   Feature,
   Status
 } from './ui/calendar';
+import {
+  getUserRoutines,
+  getUserProducts,
+  getRoutineCompletions,
+  addRoutineCompletion,
+  updateRoutineCompletion,
+  type Routine,
+  type Product,
+  type RoutineCompletion
+} from '@/lib/db';
+import { cn } from '@/lib/utils';
 
-// Mock data for products (would come from a database in a real app)
-const MOCK_PRODUCTS = [
-  { id: 1, name: 'Gentle Cleanser', brand: 'CeraVe', category: 'Cleanser', image: '/placeholder-product.jpg' },
-  { id: 2, name: 'Vitamin C Serum', brand: 'The Ordinary', category: 'Serum', image: '/placeholder-product.jpg' },
-  { id: 3, name: 'Moisturizing Cream', brand: 'La Roche-Posay', category: 'Moisturizer', image: '/placeholder-product.jpg' },
-  { id: 4, name: 'Hyaluronic Acid', brand: 'The Ordinary', category: 'Serum', image: '/placeholder-product.jpg' },
-  { id: 5, name: 'SPF 50 Sunscreen', brand: 'Supergoop', category: 'Sunscreen', image: '/placeholder-product.jpg' },
-];
-
-// Mock statuses for calendar items
+// Status colors for different completion states
 const STATUSES: Status[] = [
-  { id: '1', name: 'Morning', color: '#22c55e' }, // Green
-  { id: '2', name: 'Evening', color: '#8b5cf6' }, // Purple
-  { id: '3', name: 'Both', color: '#3b82f6' },    // Blue
+  { id: 'completed', name: 'Completed', color: '#22c55e' },
+  { id: 'partial', name: 'Partially Complete', color: '#f59e0b' },
+  { id: 'incomplete', name: 'Not Started', color: '#6b7280' },
 ];
-
-// Mock data for routines (would come from a database in a real app)
-const MOCK_ROUTINES: Record<string, { morning: number[], evening: number[] }> = {
-  '2023-05-15': {
-    morning: [1, 2, 3, 5],
-    evening: [1, 4, 3]
-  },
-  '2023-05-16': {
-    morning: [1, 2, 5],
-    evening: [1, 4, 3]
-  }
-};
-
-// Generate features for the calendar
-const generateCalendarFeatures = (): Feature[] => {
-  const features: Feature[] = [];
-  
-  // Convert MOCK_ROUTINES to features
-  Object.entries(MOCK_ROUTINES).forEach(([dateStr, routine]) => {
-    const date = new Date(dateStr);
-    
-    // Determine status based on routines
-    let statusId = '1'; // Default to morning
-    if (routine.morning.length > 0 && routine.evening.length > 0) {
-      statusId = '3'; // Both
-    } else if (routine.evening.length > 0 && routine.morning.length === 0) {
-      statusId = '2'; // Evening only
-    }
-    
-    const status = STATUSES.find(s => s.id === statusId) || STATUSES[0];
-    
-    features.push({
-      id: `routine-${dateStr}`,
-      name: 'Skincare Routine',
-      startAt: date,
-      endAt: date,
-      status
-    });
-  });
-  
-  return features;
-};
 
 export function Calendar() {
+  const { currentUser } = useAuth();
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState<Date>(today);
   const [activeTab, setActiveTab] = useState<'morning' | 'evening'>('morning');
-  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
-  const [features] = useState<Feature[]>(generateCalendarFeatures());
-  
-  // Format date as YYYY-MM-DD for lookup in routines
-  const formatDateKey = (date: Date) => {
-    return date.toISOString().split('T')[0];
-  };
-  
-  // Initialize with today's date
+  const [routines, setRoutines] = useState<Routine[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [completions, setCompletions] = useState<RoutineCompletion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [features, setFeatures] = useState<Feature[]>([]);
+
+  // Load routines and products
   useEffect(() => {
-    handleDateSelect(today);
-  }, []);
-  
-  // Handle date selection
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
+    if (!currentUser?.uid) return;
     
-    // Load products for this date if they exist
-    const dateKey = formatDateKey(date);
-    const routineForDate = MOCK_ROUTINES[dateKey as keyof typeof MOCK_ROUTINES];
-    if (routineForDate) {
-      setSelectedProducts(routineForDate[activeTab]);
-    } else {
-      setSelectedProducts([]);
-    }
-  };
-  
-  // Get product details by ID
-  const getProductById = (id: number) => {
-    return MOCK_PRODUCTS.find(product => product.id === id);
-  };
-  
-  // Toggle product selection
-  const toggleProduct = (productId: number) => {
-    setSelectedProducts(prev => 
-      prev.includes(productId) 
-        ? prev.filter(id => id !== productId)
-        : [...prev, productId]
+    const loadData = async () => {
+      try {
+        const [fetchedRoutines, fetchedProducts] = await Promise.all([
+          getUserRoutines(currentUser.uid),
+          getUserProducts(currentUser.uid)
+        ]);
+        setRoutines(fetchedRoutines);
+        setProducts(fetchedProducts.filter(p => p.status === 'active'));
+      } catch (error) {
+        console.error('Error loading data:', error);
+        toast.error('Error loading routines and products');
+      }
+    };
+    
+    loadData();
+  }, [currentUser]);
+
+  // Load completions for the current month
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+    setLoading(true);
+
+    const loadCompletions = async () => {
+      try {
+        const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+        const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+        
+        const fetchedCompletions = await getRoutineCompletions(
+          currentUser.uid,
+          startOfMonth,
+          endOfMonth
+        );
+        
+        setCompletions(fetchedCompletions);
+        
+        // Generate features for the calendar
+        const newFeatures: Feature[] = fetchedCompletions.map(completion => {
+          const routine = routines.find(r => r.id === completion.routineId);
+          const completedSteps = completion.completedSteps.filter(step => step.completed).length;
+          const totalSteps = completion.completedSteps.length;
+          
+          let status = STATUSES[2]; // Default to incomplete
+          if (completedSteps === totalSteps) {
+            status = STATUSES[0]; // Completed
+          } else if (completedSteps > 0) {
+            status = STATUSES[1]; // Partial
+          }
+          
+          return {
+            id: completion.id,
+            name: routine?.name || 'Routine',
+            startAt: completion.date,
+            endAt: completion.date,
+            status
+          };
+        });
+        
+        setFeatures(newFeatures);
+      } catch (error) {
+        console.error('Error loading completions:', error);
+        toast.error('Error loading routine completions');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadCompletions();
+  }, [currentUser, selectedDate, routines]);
+
+  // Get routines for the selected date and tab
+  const getRoutinesForDate = () => {
+    return routines.filter(routine => 
+      routine.type === activeTab || 
+      (routine.type === 'weekly' && selectedDate.getDay() === 0) // Weekly routines on Sunday
     );
+  };
+
+  // Get completion status for a routine
+  const getRoutineCompletion = (routineId: string) => {
+    return completions.find(completion => 
+      completion.routineId === routineId && 
+      completion.date.toDateString() === selectedDate.toDateString()
+    );
+  };
+
+  // Handle step completion toggle
+  const handleStepToggle = async (routineId: string, productId: string, completed: boolean) => {
+    if (!currentUser?.uid) return;
+    setSaving(true);
+    
+    try {
+      const completion = getRoutineCompletion(routineId);
+      
+      if (!completion) {
+        // Create new completion record
+        const routine = routines.find(r => r.id === routineId);
+        if (!routine) throw new Error('Routine not found');
+        
+        await addRoutineCompletion({
+          userId: currentUser.uid,
+          routineId,
+          date: selectedDate,
+          completedSteps: routine.steps.map(step => ({
+            productId: step.productId,
+            completed: step.productId === productId ? completed : false
+          }))
+        });
+        
+        // Reload completions
+        const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+        const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+        const updatedCompletions = await getRoutineCompletions(currentUser.uid, startOfMonth, endOfMonth);
+        setCompletions(updatedCompletions);
+      } else {
+        // Update existing completion
+        const updatedSteps = completion.completedSteps.map(step => 
+          step.productId === productId ? { ...step, completed } : step
+        );
+        
+        await updateRoutineCompletion(completion.id, {
+          completedSteps: updatedSteps
+        });
+        
+        // Update local state
+        setCompletions(prev => prev.map(c => 
+          c.id === completion?.id 
+            ? { ...c, completedSteps: updatedSteps }
+            : c
+        ));
+      }
+      
+      toast.success('Progress updated');
+    } catch (error) {
+      console.error('Error updating completion:', error);
+      toast.error('Error updating progress');
+    } finally {
+      setSaving(false);
+    }
   };
 
   // Format date for display
@@ -131,7 +201,7 @@ export function Calendar() {
       day: 'numeric' 
     });
   };
-  
+
   // Custom renderer for calendar features
   const renderCalendarFeature = ({ feature }: { feature: Feature }) => {
     return (
@@ -146,7 +216,22 @@ export function Calendar() {
       </div>
     );
   };
-  
+
+  // Handle date selection
+  const handleDateSelect = (date: Date) => {
+    setSelectedDate(date);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-[200px] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const selectedRoutines = getRoutinesForDate();
+
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="grid grid-cols-1 gap-6">
@@ -207,7 +292,7 @@ export function Calendar() {
               {formatDateForDisplay(selectedDate)}
             </CardTitle>
             <CardDescription>
-              Log your skincare products
+              Track your skincare progress
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -218,163 +303,137 @@ export function Calendar() {
               </TabsList>
               
               <TabsContent value="morning" className="space-y-4">
-                {selectedProducts.length > 0 ? (
-                  <div className="space-y-3">
-                    {selectedProducts.map(productId => {
-                      const product = getProductById(productId);
-                      return product ? (
-                        <div 
-                          key={product.id}
-                          className="flex items-center gap-3 p-3 rounded-md border"
-                        >
-                          <Avatar className="h-10 w-10">
-                            <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary font-medium">
-                              {product.category.charAt(0)}
-                            </div>
-                          </Avatar>
-                          <div className="flex-1">
-                            <p className="font-medium">{product.name}</p>
-                            <p className="text-xs text-muted-foreground">{product.brand}</p>
-                          </div>
-                          <Badge variant="secondary">{product.category}</Badge>
+                {selectedRoutines.length > 0 ? (
+                  <div className="space-y-6">
+                    {selectedRoutines.map(routine => {
+                      const completion = getRoutineCompletion(routine.id);
+                      return (
+                        <div key={routine.id} className="space-y-3">
+                          <h3 className="font-medium text-lg">{routine.name}</h3>
+                          {routine.steps.map((step) => {
+                            const product = products.find(p => p.id === step.productId);
+                            const isCompleted = completion?.completedSteps.find(
+                              s => s.productId === step.productId
+                            )?.completed || false;
+                            
+                            return product ? (
+                              <div 
+                                key={step.productId}
+                                className={cn(
+                                  "flex items-center gap-3 p-3 rounded-lg transition-colors",
+                                  "border border-border/50",
+                                  isCompleted ? "bg-primary/10" : "bg-background"
+                                )}
+                              >
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className={cn(
+                                    "h-8 w-8 rounded-full",
+                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90"
+                                  )}
+                                  onClick={() => handleStepToggle(routine.id, step.productId, !isCompleted)}
+                                  disabled={saving}
+                                >
+                                  <Check className={cn(
+                                    "h-4 w-4",
+                                    isCompleted ? "opacity-100" : "opacity-0"
+                                  )} />
+                                </Button>
+                                <Avatar className="h-10 w-10">
+                                  <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary font-medium">
+                                    {product.category?.charAt(0) || '?'}
+                                  </div>
+                                </Avatar>
+                                <div className="flex-1">
+                                  <p className="font-medium">{product.name}</p>
+                                  <p className="text-xs text-muted-foreground">{product.brand}</p>
+                                </div>
+                                {step.notes && (
+                                  <Badge variant="secondary" className="whitespace-nowrap">
+                                    {step.notes}
+                                  </Badge>
+                                )}
+                              </div>
+                            ) : null;
+                          })}
                         </div>
-                      ) : null;
+                      );
                     })}
                   </div>
                 ) : (
                   <div className="text-center py-8 border rounded-md bg-muted/20">
                     <CalendarIcon className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">No products added to your morning routine</p>
+                    <p className="text-muted-foreground">No routines scheduled for this day</p>
                   </div>
                 )}
-                
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full mt-4">
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Add Products
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Morning Routine</DialogTitle>
-                      <DialogDescription>
-                        Select products for your morning routine
-                      </DialogDescription>
-                    </DialogHeader>
-                    <ScrollArea className="h-[300px] mt-4">
-                      <div className="space-y-2">
-                        {MOCK_PRODUCTS.map(product => (
-                          <div 
-                            key={product.id}
-                            className={`flex items-center gap-3 p-3 rounded-md cursor-pointer transition-colors ${
-                              selectedProducts.includes(product.id) 
-                                ? 'bg-primary/10 border-primary border' 
-                                : 'hover:bg-muted border'
-                            }`}
-                            onClick={() => toggleProduct(product.id)}
-                          >
-                            <Avatar className="h-10 w-10">
-                              <div className="bg-muted flex h-full w-full items-center justify-center rounded-full">
-                                {product.category.charAt(0)}
-                              </div>
-                            </Avatar>
-                            <div className="flex-1">
-                              <p className="font-medium">{product.name}</p>
-                              <p className="text-xs text-muted-foreground">{product.brand}</p>
-                            </div>
-                            {selectedProducts.includes(product.id) && (
-                              <Check className="h-5 w-5 text-primary" />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                    <DialogFooter>
-                      <Button type="submit">Save Changes</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
               </TabsContent>
               
               <TabsContent value="evening" className="space-y-4">
-                {selectedProducts.length > 0 ? (
-                  <div className="space-y-3">
-                    {selectedProducts.map(productId => {
-                      const product = getProductById(productId);
-                      return product ? (
-                        <div 
-                          key={product.id}
-                          className="flex items-center gap-3 p-3 rounded-md border"
-                        >
-                          <Avatar className="h-10 w-10">
-                            <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary font-medium">
-                              {product.category.charAt(0)}
-                            </div>
-                          </Avatar>
-                          <div className="flex-1">
-                            <p className="font-medium">{product.name}</p>
-                            <p className="text-xs text-muted-foreground">{product.brand}</p>
-                          </div>
-                          <Badge variant="secondary">{product.category}</Badge>
+                {selectedRoutines.length > 0 ? (
+                  <div className="space-y-6">
+                    {selectedRoutines.map(routine => {
+                      const completion = getRoutineCompletion(routine.id);
+                      return (
+                        <div key={routine.id} className="space-y-3">
+                          <h3 className="font-medium text-lg">{routine.name}</h3>
+                          {routine.steps.map((step) => {
+                            const product = products.find(p => p.id === step.productId);
+                            const isCompleted = completion?.completedSteps.find(
+                              s => s.productId === step.productId
+                            )?.completed || false;
+                            
+                            return product ? (
+                              <div 
+                                key={step.productId}
+                                className={cn(
+                                  "flex items-center gap-3 p-3 rounded-lg transition-colors",
+                                  "border border-border/50",
+                                  isCompleted ? "bg-primary/10" : "bg-background"
+                                )}
+                              >
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className={cn(
+                                    "h-8 w-8 rounded-full",
+                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90"
+                                  )}
+                                  onClick={() => handleStepToggle(routine.id, step.productId, !isCompleted)}
+                                  disabled={saving}
+                                >
+                                  <Check className={cn(
+                                    "h-4 w-4",
+                                    isCompleted ? "opacity-100" : "opacity-0"
+                                  )} />
+                                </Button>
+                                <Avatar className="h-10 w-10">
+                                  <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary font-medium">
+                                    {product.category?.charAt(0) || '?'}
+                                  </div>
+                                </Avatar>
+                                <div className="flex-1">
+                                  <p className="font-medium">{product.name}</p>
+                                  <p className="text-xs text-muted-foreground">{product.brand}</p>
+                                </div>
+                                {step.notes && (
+                                  <Badge variant="secondary" className="whitespace-nowrap">
+                                    {step.notes}
+                                  </Badge>
+                                )}
+                              </div>
+                            ) : null;
+                          })}
                         </div>
-                      ) : null;
+                      );
                     })}
                   </div>
                 ) : (
                   <div className="text-center py-8 border rounded-md bg-muted/20">
                     <CalendarIcon className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">No products added to your evening routine</p>
+                    <p className="text-muted-foreground">No routines scheduled for this day</p>
                   </div>
                 )}
-                
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button className="w-full mt-4">
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Add Products
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                      <DialogTitle>Evening Routine</DialogTitle>
-                      <DialogDescription>
-                        Select products for your evening routine
-                      </DialogDescription>
-                    </DialogHeader>
-                    <ScrollArea className="h-[300px] mt-4">
-                      <div className="space-y-2">
-                        {MOCK_PRODUCTS.map(product => (
-                          <div 
-                            key={product.id}
-                            className={`flex items-center gap-3 p-3 rounded-md cursor-pointer transition-colors ${
-                              selectedProducts.includes(product.id) 
-                                ? 'bg-primary/10 border-primary border' 
-                                : 'hover:bg-muted border'
-                            }`}
-                            onClick={() => toggleProduct(product.id)}
-                          >
-                            <Avatar className="h-10 w-10">
-                              <div className="bg-muted flex h-full w-full items-center justify-center rounded-full">
-                                {product.category.charAt(0)}
-                              </div>
-                            </Avatar>
-                            <div className="flex-1">
-                              <p className="font-medium">{product.name}</p>
-                              <p className="text-xs text-muted-foreground">{product.brand}</p>
-                            </div>
-                            {selectedProducts.includes(product.id) && (
-                              <Check className="h-5 w-5 text-primary" />
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </ScrollArea>
-                    <DialogFooter>
-                      <Button type="submit">Save Changes</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
               </TabsContent>
             </Tabs>
           </CardContent>
