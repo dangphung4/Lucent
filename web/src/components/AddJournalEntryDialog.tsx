@@ -15,10 +15,11 @@ import { Calendar } from './ui/calendarshadcn';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { CalendarIcon, Loader2 } from 'lucide-react';
+import { CalendarIcon, Loader2, Plus, X, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 import { addJournalEntry } from '@/lib/db';
+import { Badge } from './ui/badge';
 
 interface AddJournalEntryDialogProps {
   productId: string;
@@ -38,9 +39,21 @@ export function AddJournalEntryDialog({
   const [date, setDate] = useState<Date>(new Date());
   const [rating, setRating] = useState<number>(0);
   const [review, setReview] = useState('');
-  const [effects, setEffects] = useState('');
+  const [effects, setEffects] = useState<string[]>([]);
+  const [newEffect, setNewEffect] = useState('');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
+
+  const handleAddEffect = () => {
+    if (newEffect.trim() && !effects.includes(newEffect.trim())) {
+      setEffects([...effects, newEffect.trim()]);
+      setNewEffect('');
+    }
+  };
+
+  const handleRemoveEffect = (effectToRemove: string) => {
+    setEffects(effects.filter(effect => effect !== effectToRemove));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,7 +67,7 @@ export function AddJournalEntryDialog({
         date,
         rating,
         review,
-        effects: effects.split(',').map(e => e.trim()).filter(Boolean),
+        effects: effects,
         usageDuration: Math.floor((new Date().getTime() - date.getTime()) / (1000 * 60 * 60 * 24)),
         notes,
         type: 'product'
@@ -68,7 +81,8 @@ export function AddJournalEntryDialog({
       setDate(new Date());
       setRating(0);
       setReview('');
-      setEffects('');
+      setEffects([]);
+      setNewEffect('');
       setNotes('');
     } catch (error) {
       console.error('Error adding product review:', error);
@@ -120,18 +134,26 @@ export function AddJournalEntryDialog({
             </div>
             
             <div className="grid gap-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="rating" className="text-sm font-medium">Rating (0-5)</Label>
-                <Input
-                  id="rating"
-                  type="number"
-                  min="0"
-                  max="5"
-                  step="0.5"
-                  value={rating}
-                  onChange={(e) => setRating(parseFloat(e.target.value))}
-                  className="w-24 text-right"
-                />
+              <Label className="text-sm font-medium">Rating</Label>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Button
+                    key={star}
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "p-0 h-8 w-8",
+                      star <= rating ? "text-amber-500" : "text-muted-foreground/30"
+                    )}
+                    onClick={() => setRating(star)}
+                  >
+                    <Star className="h-5 w-5" fill={star <= rating ? "currentColor" : "none"} />
+                  </Button>
+                ))}
+                <span className="ml-2 text-sm text-muted-foreground">
+                  {rating}/5
+                </span>
               </div>
             </div>
             
@@ -150,16 +172,45 @@ export function AddJournalEntryDialog({
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="effects" className="text-sm font-medium">Effects (comma-separated)</Label>
-              <Input
-                id="effects"
-                placeholder="e.g., hydrating, soothing, brightening"
-                value={effects}
-                onChange={(e) => setEffects(e.target.value)}
-                className="border-muted-foreground/20 focus-visible:ring-primary/30"
-              />
+              <Label className="text-sm font-medium">Effects</Label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {effects.map((effect, index) => (
+                  <Badge key={index} variant="secondary" className="px-2 py-1 gap-1">
+                    {effect}
+                    <button 
+                      type="button" 
+                      onClick={() => handleRemoveEffect(effect)}
+                      className="ml-1 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add effect (e.g., hydrating)"
+                  value={newEffect}
+                  onChange={(e) => setNewEffect(e.target.value)}
+                  className="flex-1"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddEffect();
+                    }
+                  }}
+                />
+                <Button 
+                  type="button" 
+                  size="sm" 
+                  onClick={handleAddEffect}
+                  variant="outline"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
               <p className="text-xs text-muted-foreground mt-1">
-                List the effects you've noticed, separated by commas
+                Add effects you've noticed from using this product
               </p>
             </div>
             

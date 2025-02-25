@@ -14,7 +14,7 @@ import { Calendar } from './ui/calendarshadcn';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { CalendarIcon, Loader2, Trash2, Star } from 'lucide-react';
+import { CalendarIcon, Loader2, Trash2, Star, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 import { updateJournalEntry, deleteJournalEntry, type JournalEntry } from '@/lib/db';
@@ -53,6 +53,10 @@ export function EditDiaryEntryDialog({
   const [date, setDate] = useState<Date>(entry.date);
   const [title, setTitle] = useState(entry.title || 'Diary Entry');
   const [entryText, setEntryText] = useState(entry.review);
+  const [rating, setRating] = useState(entry.rating);
+  const [effects, setEffects] = useState<string[]>(entry.effects || []);
+  const [newEffect, setNewEffect] = useState('');
+  const [notes, setNotes] = useState(entry.notes || '');
   const [saving, setSaving] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   
@@ -69,6 +73,9 @@ export function EditDiaryEntryDialog({
     setDate(entry.date);
     setTitle(entry.title || 'Diary Entry');
     setEntryText(entry.review);
+    setRating(entry.rating);
+    setEffects(entry.effects || []);
+    setNotes(entry.notes || '');
   }, [entry]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,11 +91,16 @@ export function EditDiaryEntryDialog({
       const updateData: Partial<JournalEntry> = {
         date,
         review: entryText,
+        notes,
       };
       
       // Only update title for diary entries
       if (isDiaryEntry) {
         updateData.title = title.trim() || 'Diary Entry';
+      } else {
+        // For product reviews, update rating and effects
+        updateData.rating = rating;
+        updateData.effects = effects;
       }
       
       await updateJournalEntry(entry.id, updateData);
@@ -117,6 +129,17 @@ export function EditDiaryEntryDialog({
       console.error('Error deleting journal entry:', error);
       toast.error(isDiaryEntry ? 'Error deleting diary entry' : 'Error deleting product review');
     }
+  };
+
+  const handleAddEffect = () => {
+    if (newEffect.trim() && !effects.includes(newEffect.trim())) {
+      setEffects([...effects, newEffect.trim()]);
+      setNewEffect('');
+    }
+  };
+
+  const handleRemoveEffect = (effectToRemove: string) => {
+    setEffects(effects.filter(effect => effect !== effectToRemove));
   };
 
   return (
@@ -180,16 +203,29 @@ export function EditDiaryEntryDialog({
                 </div>
               )}
               
-              {!isDiaryEntry && entry.rating > 0 && (
-                <div className="flex items-center gap-2">
+              {!isDiaryEntry && (
+                <div className="grid gap-2">
                   <Label className="text-sm font-medium">Rating</Label>
-                  <Badge variant="secondary" className="bg-accent/50 text-accent-foreground">
-                    <Star className="h-3 w-3 mr-1" />
-                    {entry.rating}/5
-                  </Badge>
-                  <span className="text-xs text-muted-foreground ml-2">
-                    (Rating can be updated in the product review section)
-                  </span>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Button
+                        key={star}
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className={cn(
+                          "p-0 h-8 w-8",
+                          star <= rating ? "text-amber-500" : "text-muted-foreground/30"
+                        )}
+                        onClick={() => setRating(star)}
+                      >
+                        <Star className="h-5 w-5" fill={star <= rating ? "currentColor" : "none"} />
+                      </Button>
+                    ))}
+                    <span className="ml-2 text-sm text-muted-foreground">
+                      {rating}/5
+                    </span>
+                  </div>
                 </div>
               )}
               
@@ -205,7 +241,7 @@ export function EditDiaryEntryDialog({
                   }
                   value={entryText}
                   onChange={(e) => setEntryText(e.target.value)}
-                  className="min-h-[200px] resize-none border-muted-foreground/20 focus-visible:ring-primary/30"
+                  className="min-h-[150px] resize-none border-muted-foreground/20 focus-visible:ring-primary/30"
                   autoFocus
                 />
                 <p className="text-xs text-muted-foreground mt-1">
@@ -215,6 +251,64 @@ export function EditDiaryEntryDialog({
                   }
                 </p>
               </div>
+              
+              {!isDiaryEntry && (
+                <>
+                  <div className="grid gap-2">
+                    <Label className="text-sm font-medium">Effects</Label>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {effects.map((effect, index) => (
+                        <Badge key={index} variant="secondary" className="px-2 py-1 gap-1">
+                          {effect}
+                          <button 
+                            type="button" 
+                            onClick={() => handleRemoveEffect(effect)}
+                            className="ml-1 text-muted-foreground hover:text-foreground"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Add effect (e.g., hydrating)"
+                        value={newEffect}
+                        onChange={(e) => setNewEffect(e.target.value)}
+                        className="flex-1"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddEffect();
+                          }
+                        }}
+                      />
+                      <Button 
+                        type="button" 
+                        size="sm" 
+                        onClick={handleAddEffect}
+                        variant="outline"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Add effects you've noticed from using this product
+                    </p>
+                  </div>
+                  
+                  <div className="grid gap-2">
+                    <Label htmlFor="notes" className="text-sm font-medium">Additional Notes</Label>
+                    <Textarea
+                      id="notes"
+                      placeholder="Any other observations or notes?"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      className="min-h-[80px] resize-none border-muted-foreground/20 focus-visible:ring-primary/30"
+                    />
+                  </div>
+                </>
+              )}
             </div>
             
             <div className="flex items-center justify-between pt-2">
