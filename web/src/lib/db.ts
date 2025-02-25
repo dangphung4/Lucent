@@ -379,7 +379,28 @@ export const updateRoutineCompletion = async (completionId: string, data: Partia
 };
 
 /**
- * Add a new journal entry
+ * Asynchronously adds a new journal entry to the database.
+ *
+ * This function creates a new document in the 'journalEntries' collection
+ * with the provided entry data, automatically generating an ID and timestamps
+ * for the created and updated fields. The type of the entry is determined
+ * based on the productId provided in the entry.
+ *
+ * @param {Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'>} entry - The journal entry data to be added,
+ * which must exclude the 'id', 'createdAt', and 'updatedAt' fields.
+ * @returns {Promise<string>} A promise that resolves to the ID of the newly created journal entry.
+ *
+ * @throws {Error} Throws an error if there is an issue adding the journal entry to the database.
+ *
+ * @example
+ * const newEntry = {
+ *   productId: 'diary-entry',
+ *   content: 'Today was a great day!',
+ * };
+ *
+ * addJournalEntry(newEntry)
+ *   .then(id => console.log('Journal entry added with ID:', id))
+ *   .catch(error => console.error('Failed to add journal entry:', error));
  */
 export const addJournalEntry = async (entry: Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
   try {
