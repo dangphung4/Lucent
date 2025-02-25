@@ -294,7 +294,28 @@ export const deleteRoutine = async (routineId: string): Promise<void> => {
 };
 
 /**
- * Add a new routine completion record
+ * Adds a new routine completion record to the database.
+ *
+ * This function creates a new entry in the 'routineCompletions' collection,
+ * generating a unique ID for the completion record and setting the creation
+ * and update timestamps.
+ *
+ * @param {Omit<RoutineCompletion, 'id' | 'createdAt' | 'updatedAt'>} completion - The completion data to be added,
+ *        excluding the 'id', 'createdAt', and 'updatedAt' fields.
+ * @returns {Promise<string>} A promise that resolves to the ID of the newly created routine completion record.
+ *
+ * @throws {Error} Throws an error if there is an issue adding the routine completion to the database.
+ *
+ * @example
+ * const newCompletion = {
+ *   userId: 'user123',
+ *   routineId: 'routine456',
+ *   completedAt: new Date(),
+ * };
+ *
+ * addRoutineCompletion(newCompletion)
+ *   .then(id => console.log('Routine completion added with ID:', id))
+ *   .catch(error => console.error('Failed to add routine completion:', error));
  */
 export const addRoutineCompletion = async (completion: Omit<RoutineCompletion, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
   try {
@@ -316,7 +337,31 @@ export const addRoutineCompletion = async (completion: Omit<RoutineCompletion, '
 };
 
 /**
- * Get routine completions for a specific date range
+ * Retrieves routine completions for a specified user within a given date range.
+ *
+ * This asynchronous function queries the database for routine completions associated with a specific user ID,
+ * filtering the results based on the provided start and end dates. The results are returned as an array of
+ * `RoutineCompletion` objects.
+ *
+ * @param {string} userId - The unique identifier of the user for whom to retrieve routine completions.
+ * @param {Date} startDate - The start date of the range for which to fetch routine completions.
+ * @param {Date} endDate - The end date of the range for which to fetch routine completions.
+ * @returns {Promise<RoutineCompletion[]>} A promise that resolves to an array of `RoutineCompletion` objects.
+ *
+ * @throws {Error} Throws an error if there is an issue retrieving the data from the database.
+ *
+ * @example
+ * const userId = '12345';
+ * const startDate = new Date('2023-01-01');
+ * const endDate = new Date('2023-01-31');
+ *
+ * getRoutineCompletions(userId, startDate, endDate)
+ *   .then(completions => {
+ *     console.log('Routine Completions:', completions);
+ *   })
+ *   .catch(error => {
+ *     console.error('Error fetching routine completions:', error);
+ *   });
  */
 export const getRoutineCompletions = async (userId: string, startDate: Date, endDate: Date): Promise<RoutineCompletion[]> => {
   try {
@@ -345,7 +390,23 @@ export const getRoutineCompletions = async (userId: string, startDate: Date, end
 };
 
 /**
- * Update a routine completion record
+ * Updates a routine completion record in the database.
+ *
+ * This function takes a completion ID and a partial data object to update the corresponding routine completion record.
+ * It also sets the `updatedAt` field to the current date and time.
+ *
+ * @param {string} completionId - The unique identifier of the routine completion record to be updated.
+ * @param {Partial<RoutineCompletion>} data - An object containing the fields to be updated in the routine completion record.
+ * @returns {Promise<void>} A promise that resolves when the update operation is complete.
+ *
+ * @throws {Error} Throws an error if the update operation fails, which can occur due to issues with database connectivity or invalid data.
+ *
+ * @example
+ * const completionId = '12345';
+ * const updateData = { status: 'completed' };
+ * updateRoutineCompletion(completionId, updateData)
+ *   .then(() => console.log('Routine completion updated successfully'))
+ *   .catch(error => console.error('Failed to update routine completion:', error));
  */
 export const updateRoutineCompletion = async (completionId: string, data: Partial<RoutineCompletion>): Promise<void> => {
   try {
