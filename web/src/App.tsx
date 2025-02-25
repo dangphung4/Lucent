@@ -10,6 +10,7 @@ import { AuthContext, AuthProvider } from './lib/AuthContext';
 import { ThemeProvider } from './lib/ThemeProvider';
 import { Toaster } from './components/ui/sonner';
 import PWABadge from './PWABadge';
+import { Journal } from './components/Journal';
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -66,6 +67,14 @@ function App() {
                     <Dashboard />
                   </ProtectedRoute>
                 } 
+              />
+              <Route
+                path="/journal"
+                element={
+                  <ProtectedRoute>
+                    <Journal />
+                  </ProtectedRoute>
+                }
               />
               <Route path="*" element={<Navigate to="/" />} />
             </Route>

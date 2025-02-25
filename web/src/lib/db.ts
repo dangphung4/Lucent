@@ -36,6 +36,7 @@ export interface Product {
   updatedAt: Date;
   status: 'active' | 'finished';
   wouldRepurchase: boolean;
+  usageDuration: number;
 }
 
 export interface RoutineStep {
@@ -67,6 +68,20 @@ export interface RoutineCompletion {
     completed: boolean;
     notes?: string;
   }>;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface JournalEntry {
+  id: string;
+  userId: string;
+  productId: string;
+  date: Date;
+  rating: number;
+  review: string;
+  effects: string[];
+  usageDuration: number; // in days
+  notes: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -357,6 +372,81 @@ export const updateRoutineCompletion = async (completionId: string, data: Partia
     });
   } catch (error) {
     console.error('Error updating routine completion:', error);
+    throw error;
+  }
+};
+
+/**
+ * Add a new journal entry
+ */
+export const addJournalEntry = async (entry: Omit<JournalEntry, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
+  try {
+    const entriesRef = doc(collection(db, 'journalEntries'));
+    
+    const entryData = {
+      ...entry,
+      id: entriesRef.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    await setDoc(entriesRef, entryData);
+    return entriesRef.id;
+  } catch (error) {
+    console.error('Error adding journal entry:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get journal entries for a user
+ */
+export const getUserJournalEntries = async (userId: string): Promise<JournalEntry[]> => {
+  try {
+    const entriesRef = collection(db, 'journalEntries');
+    const q = query(entriesRef, where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        ...data,
+        date: data.date?.toDate() || new Date(),
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+      } as JournalEntry;
+    });
+  } catch (error) {
+    console.error('Error getting user journal entries:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update a journal entry
+ */
+export const updateJournalEntry = async (entryId: string, data: Partial<JournalEntry>): Promise<void> => {
+  try {
+    const entryRef = doc(db, 'journalEntries', entryId);
+    await updateDoc(entryRef, {
+      ...data,
+      updatedAt: new Date(),
+    });
+  } catch (error) {
+    console.error('Error updating journal entry:', error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a journal entry
+ */
+export const deleteJournalEntry = async (entryId: string): Promise<void> => {
+  try {
+    const entryRef = doc(db, 'journalEntries', entryId);
+    await deleteDoc(entryRef);
+  } catch (error) {
+    console.error('Error deleting journal entry:', error);
     throw error;
   }
 };
