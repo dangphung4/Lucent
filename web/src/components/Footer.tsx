@@ -14,8 +14,8 @@ export function Footer({ className }: FooterProps) {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="flex flex-col gap-2">
             <Link to="/" className="flex items-center gap-2">
-              <img src="/favicon.svg" alt="Skincare Track Logo" className="h-8 w-8" />
-              <span className="text-xl font-bold">Skincare Track</span>
+              <img src="/favicon.svg" alt="Lucent Logo" className="h-8 w-8" />
+              <span className="text-xl font-bold">Lucent</span>
             </Link>
             <p className="text-sm text-muted-foreground">
               Track your skincare routine and see what works best for you
@@ -89,7 +89,7 @@ export function Footer({ className }: FooterProps) {
         <div className="mt-8 border-t pt-8">
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <p className="text-center text-sm text-muted-foreground">
-              © {currentYear} Skincare Track. All rights reserved.
+              © {currentYear} Lucent. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <a 

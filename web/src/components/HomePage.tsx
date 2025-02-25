@@ -15,7 +15,7 @@ export function HomePage() {
   return (
     <div className="space-y-8">
       <div className="rounded-lg border bg-card p-6 shadow-sm">
-        <h1 className="text-2xl font-bold tracking-tight mb-2">Welcome to Skincare Track</h1>
+        <h1 className="text-2xl font-bold tracking-tight mb-2">Welcome to Lucent</h1>
         <p className="text-muted-foreground">
           Track your skincare routine and see what works best for you
         </p>

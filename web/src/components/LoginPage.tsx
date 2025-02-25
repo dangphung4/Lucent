@@ -62,7 +62,7 @@ export function LoginPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20 z-0 opacity-50"></div>
           
           <CardHeader className="relative z-10 text-center space-y-1">
-            <CardTitle className="text-2xl font-bold">Welcome to Skincare Track</CardTitle>
+            <CardTitle className="text-2xl font-bold">Welcome to Lucent</CardTitle>
             <CardDescription>
               Sign in to track your skincare routine and see results
             </CardDescription>

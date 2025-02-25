@@ -27,10 +27,10 @@ export function MobileHeader() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:scale-110">
-              <span className="text-lg font-bold text-primary-foreground">ST</span>
+              <span className="text-lg font-bold text-primary-foreground">L</span>
             </div>
             <span className="text-xl font-bold transition-colors duration-200 group-hover:text-primary">
-              Skincare Track
+                Lucent
             </span>
           </Link>
         </div>

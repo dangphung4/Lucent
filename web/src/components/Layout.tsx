@@ -15,8 +15,8 @@ export function Layout({ children }: LayoutProps) {
       <header className="border-b">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/favicon.svg" alt="Skincare Track Logo" className="h-8 w-8" />
-            <h1 className="text-xl font-bold">Skincare Track</h1>
+            <img src="/favicon.svg" alt="Lucent Logo" className="h-8 w-8" />
+            <h1 className="text-xl font-bold">Lucent</h1>
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
@@ -38,7 +38,7 @@ export function Layout({ children }: LayoutProps) {
       </main>
       <footer className="border-t py-4">
         <div className="container text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Skincare Track
+          © {new Date().getFullYear()} Lucent
         </div>
       </footer>
     </div>
