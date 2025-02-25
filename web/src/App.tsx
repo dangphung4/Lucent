@@ -33,6 +33,32 @@ const ScrollToTop = () => {
   return null;
 };
 
+/**
+ * The main application component that sets up the overall structure of the app.
+ * It wraps the application in various providers such as ThemeProvider and AuthProvider,
+ * and sets up routing using React Router.
+ *
+ * This component includes:
+ * - A theme context for styling.
+ * - An authentication context for managing user sessions.
+ * - A router for navigating between different views of the application.
+ *
+ * The routing structure includes:
+ * - A landing page accessible at the root path ("/").
+ * - A login page accessible at "/login".
+ * - Protected routes for calendar, settings, and dashboard, which require authentication.
+ * - A fallback route that redirects any unknown paths to the landing page.
+ *
+ * @returns {JSX.Element} The rendered application component.
+ *
+ * @example
+ * // Usage of the App component
+ * import React from 'react';
+ * import ReactDOM from 'react-dom';
+ * import App from './App';
+ *
+ * ReactDOM.render(<App />, document.getElementById('root'));
+ */
 function App() {
   return (
     <ThemeProvider>
