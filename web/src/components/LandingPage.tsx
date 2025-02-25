@@ -136,10 +136,9 @@ export function LandingPage() {
               <CardHeader className="pb-2">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
                   </svg>
                 </div>
                 <CardTitle className="text-xl">Daily Routines</CardTitle>
@@ -171,12 +170,54 @@ export function LandingPage() {
               </CardContent>
             </Card>
             
-            <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800 md:col-span-2 lg:col-span-1">
+                 <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
               <div className="h-2 bg-primary"></div>
               <CardHeader className="pb-2">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                </div>
+                <CardTitle className="text-xl">Routine Logging</CardTitle>
+                <CardDescription>
+                  Log all your skincare steps and instructions for others to see
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Log skincare steps
+                  </li>
+                  <li className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Add detailed instructions
+                  </li>
+                  <li className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    Share routines with others
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+            
+            <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
+              <div className="h-2 bg-primary"></div>
+              <CardHeader className="pb-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                    <path d="M2 12h20"></path>
+                    <path d="M16 6l6 6-6 6"></path>
+                    <path d="M8 18l-6-6 6-6"></path>
                   </svg>
                 </div>
                 <CardTitle className="text-xl">Progress Tracking</CardTitle>
@@ -207,6 +248,9 @@ export function LandingPage() {
                 </ul>
               </CardContent>
             </Card>
+            
+            
+
           </div>
         </div>
       </section>
