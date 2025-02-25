@@ -23,7 +23,7 @@ export function MobileHeader() {
           ? 'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60' 
           : 'bg-transparent'}`}
       style={{
-        paddingTop: 'env(safe-area-inset-top)',
+        paddingTop: 'max(env(safe-area-inset-top), 10px)',
         paddingLeft: 'env(safe-area-inset-left)',
         paddingRight: 'env(safe-area-inset-right)'
       }}
