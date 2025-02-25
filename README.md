@@ -5,6 +5,9 @@ Building a progressive web application that allows users to track skincare produ
 
 ## Core Goals
 
+
+1. a log of what I tried 2. a log of what I wanna try 3. review on products on how they made me feel/look 4. how long ive used it 5. a journal for skin care steps to know which order 6. progress section to keep track of progress  
+
 1. **Product Tracking**
    - Log skincare brands and products used
    - Record when products were used (calendar integration)
