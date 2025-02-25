@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { Avatar } from './ui/avatar';
-import { Calendar as CalendarIcon, Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, Sun, Moon, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 import {
@@ -15,7 +15,7 @@ import {
   CalendarMonthPicker,
   CalendarYearPicker,
   CalendarDatePagination,
-  Feature,
+  Feature as BaseFeature,
   Status
 } from './ui/calendar';
 import {
@@ -29,6 +29,14 @@ import {
   type RoutineCompletion
 } from '@/lib/db';
 import { cn } from '@/lib/utils';
+
+// Extend the Feature type to include our custom meta property
+interface Feature extends BaseFeature {
+  meta?: {
+    hasMorning: boolean;
+    hasEvening: boolean;
+  };
+}
 
 // Status colors for different completion states
 const STATUSES: Status[] = [
@@ -122,13 +130,18 @@ export function Calendar() {
             }
           }
           
-          // Create feature for this date
+          // Create feature for this date - using icons instead of text
           newFeatures.push({
             id: `routine-${dateStr}`,
-            name: `${morningCompletions.length > 0 ? '🌅 ' : ''}${eveningCompletions.length > 0 ? '🌙 ' : ''}Routines`,
+            name: '', // Empty name, we'll use icons in the renderer
             startAt: date,
             endAt: date,
-            status
+            status,
+            // Add custom properties for our renderer
+            meta: {
+              hasMorning: morningCompletions.length > 0,
+              hasEvening: eveningCompletions.length > 0
+            }
           });
         });
         
@@ -250,10 +263,14 @@ export function Calendar() {
         
         newFeatures.push({
           id: `routine-${dateStr}`,
-          name: `${morningCompletions.length > 0 ? '🌅 ' : ''}${eveningCompletions.length > 0 ? '🌙 ' : ''}Routines`,
+          name: '',
           startAt: date,
           endAt: date,
-          status
+          status,
+          meta: {
+            hasMorning: morningCompletions.length > 0,
+            hasEvening: eveningCompletions.length > 0
+          }
         });
       });
       
@@ -279,15 +296,17 @@ export function Calendar() {
 
   // Custom renderer for calendar features
   const renderCalendarFeature = ({ feature }: { feature: Feature }) => {
+    // Access our custom meta properties
+    const meta = feature.meta;
+    
     return (
       <div 
         key={feature.id}
-        className="cursor-pointer hover:opacity-80 transition-opacity"
+        className="cursor-pointer hover:opacity-80 transition-opacity flex justify-center items-center gap-1"
         onClick={() => handleDateSelect(feature.endAt)}
       >
-        <div className="flex items-center gap-1">
-          <span className="text-xs truncate">{feature.name}</span>
-        </div>
+        {meta?.hasMorning && <Sun className="h-3 w-3 text-amber-500" />}
+        {meta?.hasEvening && <Moon className="h-3 w-3 text-indigo-500" />}
       </div>
     );
   };
@@ -308,19 +327,19 @@ export function Calendar() {
   const selectedRoutines = getRoutinesForDate();
 
   return (
-    <div className="container mx-auto px-4 py-6">
-      <div className="grid grid-cols-1 gap-6">
+    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {/* Calendar Section */}
-        <Card>
-          <CardHeader className="pb-2">
+        <Card className="overflow-hidden">
+          <CardHeader className="pb-2 px-3 sm:px-6">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl">Skincare Calendar</CardTitle>
-              <CardDescription className="text-sm">
+              <CardTitle className="text-lg sm:text-xl">Skincare Calendar</CardTitle>
+              <CardDescription className="hidden sm:block text-sm">
                 Track your skincare routine
               </CardDescription>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-2 sm:p-4">
             <CalendarProvider 
               className="h-full border rounded-md p-2 bg-card"
               onSelectDate={handleDateSelect}
@@ -328,8 +347,8 @@ export function Calendar() {
             >
               <CalendarDate>
                 <div className="flex items-center gap-2">
-                  <CalendarMonthPicker className="w-32 sm:w-40" />
-                  <CalendarYearPicker start={2020} end={2030} className="w-24 sm:w-32" />
+                  <CalendarMonthPicker className="w-24 sm:w-32" />
+                  <CalendarYearPicker start={2020} end={2030} className="w-20 sm:w-24" />
                 </div>
                 <CalendarDatePagination />
               </CalendarDate>
@@ -337,7 +356,7 @@ export function Calendar() {
               <div className="mt-2">
                 <CalendarHeader />
                 <CalendarBody 
-                  features={features}
+                  features={features as BaseFeature[]}
                   selectedDate={selectedDate}
                   onSelectDate={handleDateSelect}
                 >
@@ -345,9 +364,9 @@ export function Calendar() {
                 </CalendarBody>
               </div>
               
-              <div className="mt-4 flex flex-wrap items-center gap-4 text-xs">
+              <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs">
                 {STATUSES.map(status => (
-                  <div key={status.id} className="flex items-center gap-2">
+                  <div key={status.id} className="flex items-center gap-1.5">
                     <div 
                       className="h-3 w-3 rounded-full" 
                       style={{ backgroundColor: status.color }}
@@ -355,36 +374,50 @@ export function Calendar() {
                     <span>{status.name}</span>
                   </div>
                 ))}
+                <div className="flex items-center gap-1.5 ml-1">
+                  <Sun className="h-3 w-3 text-amber-500" />
+                  <span>Morning</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Moon className="h-3 w-3 text-indigo-500" />
+                  <span>Evening</span>
+                </div>
               </div>
             </CalendarProvider>
           </CardContent>
         </Card>
         
         {/* Routine Section */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">
+        <Card className="overflow-hidden">
+          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
+            <CardTitle className="text-base sm:text-lg">
               {formatDateForDisplay(selectedDate)}
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
               Track your skincare progress
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-3 sm:p-6 pt-0">
             <Tabs defaultValue="morning" onValueChange={(value) => setActiveTab(value as 'morning' | 'evening')}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="morning">Morning</TabsTrigger>
-                <TabsTrigger value="evening">Evening</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="morning" className="flex items-center gap-1.5">
+                  <Sun className="h-3.5 w-3.5" />
+                  <span>Morning</span>
+                </TabsTrigger>
+                <TabsTrigger value="evening" className="flex items-center gap-1.5">
+                  <Moon className="h-3.5 w-3.5" />
+                  <span>Evening</span>
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="morning" className="space-y-4">
                 {selectedRoutines.length > 0 ? (
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     {selectedRoutines.map(routine => {
                       const completion = getRoutineCompletion(routine.id, 'morning');
                       return (
-                        <div key={routine.id} className="space-y-3">
-                          <h3 className="font-medium text-lg">{routine.name}</h3>
+                        <div key={routine.id} className="space-y-2 sm:space-y-3">
+                          <h3 className="font-medium text-base sm:text-lg">{routine.name}</h3>
                           {routine.steps.map((step) => {
                             const product = products.find(p => p.id === step.productId);
                             const isCompleted = completion?.completedSteps.find(
@@ -395,7 +428,7 @@ export function Calendar() {
                               <div 
                                 key={step.productId}
                                 className={cn(
-                                  "flex items-center gap-3 p-3 rounded-lg transition-colors",
+                                  "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors",
                                   "border border-border/50",
                                   isCompleted ? "bg-primary/10" : "bg-background"
                                 )}
@@ -404,28 +437,28 @@ export function Calendar() {
                                   variant="outline"
                                   size="icon"
                                   className={cn(
-                                    "h-8 w-8 rounded-full",
+                                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full",
                                     isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90"
                                   )}
                                   onClick={() => handleStepToggle(routine.id, step.productId, 'morning', !isCompleted)}
                                   disabled={saving}
                                 >
                                   <Check className={cn(
-                                    "h-4 w-4",
+                                    "h-3.5 w-3.5 sm:h-4 sm:w-4",
                                     isCompleted ? "opacity-100" : "opacity-0"
                                   )} />
                                 </Button>
-                                <Avatar className="h-10 w-10">
+                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                                   <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary font-medium">
                                     {product.category?.charAt(0) || '?'}
                                   </div>
                                 </Avatar>
-                                <div className="flex-1">
-                                  <p className="font-medium">{product.name}</p>
-                                  <p className="text-xs text-muted-foreground">{product.brand}</p>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm sm:text-base truncate">{product.name}</p>
+                                  <p className="text-xs text-muted-foreground truncate">{product.brand}</p>
                                 </div>
                                 {step.notes && (
-                                  <Badge variant="secondary" className="whitespace-nowrap">
+                                  <Badge variant="secondary" className="whitespace-nowrap text-xs">
                                     {step.notes}
                                   </Badge>
                                 )}
@@ -437,21 +470,21 @@ export function Calendar() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-8 border rounded-md bg-muted/20">
-                    <CalendarIcon className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">No routines scheduled for this day</p>
+                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20">
+                    <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-muted-foreground text-sm">No routines scheduled for this day</p>
                   </div>
                 )}
               </TabsContent>
               
               <TabsContent value="evening" className="space-y-4">
                 {selectedRoutines.length > 0 ? (
-                  <div className="space-y-6">
+                  <div className="space-y-4 sm:space-y-6">
                     {selectedRoutines.map(routine => {
                       const completion = getRoutineCompletion(routine.id, 'evening');
                       return (
-                        <div key={routine.id} className="space-y-3">
-                          <h3 className="font-medium text-lg">{routine.name}</h3>
+                        <div key={routine.id} className="space-y-2 sm:space-y-3">
+                          <h3 className="font-medium text-base sm:text-lg">{routine.name}</h3>
                           {routine.steps.map((step) => {
                             const product = products.find(p => p.id === step.productId);
                             const isCompleted = completion?.completedSteps.find(
@@ -462,7 +495,7 @@ export function Calendar() {
                               <div 
                                 key={step.productId}
                                 className={cn(
-                                  "flex items-center gap-3 p-3 rounded-lg transition-colors",
+                                  "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors",
                                   "border border-border/50",
                                   isCompleted ? "bg-primary/10" : "bg-background"
                                 )}
@@ -471,28 +504,28 @@ export function Calendar() {
                                   variant="outline"
                                   size="icon"
                                   className={cn(
-                                    "h-8 w-8 rounded-full",
+                                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full",
                                     isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90"
                                   )}
                                   onClick={() => handleStepToggle(routine.id, step.productId, 'evening', !isCompleted)}
                                   disabled={saving}
                                 >
                                   <Check className={cn(
-                                    "h-4 w-4",
+                                    "h-3.5 w-3.5 sm:h-4 sm:w-4",
                                     isCompleted ? "opacity-100" : "opacity-0"
                                   )} />
                                 </Button>
-                                <Avatar className="h-10 w-10">
+                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
                                   <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary font-medium">
                                     {product.category?.charAt(0) || '?'}
                                   </div>
                                 </Avatar>
-                                <div className="flex-1">
-                                  <p className="font-medium">{product.name}</p>
-                                  <p className="text-xs text-muted-foreground">{product.brand}</p>
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-sm sm:text-base truncate">{product.name}</p>
+                                  <p className="text-xs text-muted-foreground truncate">{product.brand}</p>
                                 </div>
                                 {step.notes && (
-                                  <Badge variant="secondary" className="whitespace-nowrap">
+                                  <Badge variant="secondary" className="whitespace-nowrap text-xs">
                                     {step.notes}
                                   </Badge>
                                 )}
@@ -504,9 +537,9 @@ export function Calendar() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-8 border rounded-md bg-muted/20">
-                    <CalendarIcon className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">No routines scheduled for this day</p>
+                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20">
+                    <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-muted-foreground text-sm">No routines scheduled for this day</p>
                   </div>
                 )}
               </TabsContent>
