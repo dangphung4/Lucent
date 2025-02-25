@@ -27,6 +27,23 @@ interface SelectProductJournalDialogProps {
   children?: React.ReactNode;
 }
 
+/**
+ * A dialog component for selecting a product and adding a journal entry.
+ * This component allows users to record their experiences with products.
+ *
+ * @param {Object} props - The properties for the component.
+ * @param {function} props.onEntryAdded - Callback function to be called when a new journal entry is added.
+ * @param {React.ReactNode} props.children - Optional children to be rendered as the dialog trigger.
+ *
+ * @returns {JSX.Element} The rendered dialog component.
+ *
+ * @example
+ * <SelectProductJournalDialog onEntryAdded={() => console.log('Entry added!')}>
+ *   <Button>Add Journal Entry</Button>
+ * </SelectProductJournalDialog>
+ *
+ * @throws {Error} Throws an error if there is an issue loading products or adding a journal entry.
+ */
 export function SelectProductJournalDialog({ 
   onEntryAdded,
   children 
@@ -50,6 +67,29 @@ export function SelectProductJournalDialog({
     }
   }, [open, currentUser]);
 
+  /**
+   * Asynchronously loads products for the current user.
+   *
+   * This function checks if there is a current user. If not, it exits early.
+   * It sets a loading state to true while fetching the user's products from the server.
+   * If the fetch is successful, the products are stored in the state.
+   * If an error occurs during the fetch, it logs the error and displays a toast notification to the user.
+   * Finally, it resets the loading state to false.
+   *
+   * @async
+   * @function loadProducts
+   * @returns {Promise<void>} A promise that resolves when the products are loaded or an error occurs.
+   *
+   * @throws {Error} Throws an error if fetching products fails, which is caught and handled within the function.
+   *
+   * @example
+   * // Load products for the current user
+   * loadProducts().then(() => {
+   *   console.log('Products loaded successfully');
+   * }).catch((error) => {
+   *   console.error('Failed to load products:', error);
+   * });
+   */
   const loadProducts = async () => {
     if (!currentUser) return;
     
@@ -65,6 +105,25 @@ export function SelectProductJournalDialog({
     }
   };
 
+  /**
+   * Handles the submission of a journal entry form.
+   *
+   * This function is triggered when the form is submitted. It prevents the default form submission behavior,
+   * checks for the presence of a current user and product ID, and if valid, it proceeds to add a journal entry.
+   * It also manages the UI state by displaying success or error messages and resetting the form fields after submission.
+   *
+   * @param {React.FormEvent} e - The event object representing the form submission.
+   *
+   * @throws {Error} Throws an error if adding the journal entry fails, which is caught and logged.
+   *
+   * @returns {Promise<void>} A promise that resolves when the journal entry has been successfully added.
+   *
+   * @example
+   * // Example usage in a React component
+   * const onSubmit = (event) => {
+   *   handleSubmit(event);
+   * };
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser?.uid || !productId) {
