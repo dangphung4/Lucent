@@ -47,6 +47,20 @@ const STATUSES: Status[] = [
   { id: 'incomplete', name: 'Not Started', color: '#6b7280' },
 ];
 
+/**
+ * A functional component that renders a skincare calendar.
+ * This component allows users to track their skincare routines
+ * for different times of the day (morning, evening, weekly, custom).
+ * It manages the state for selected date, current month, current year,
+ * active tab, routines, products, completions, and loading states.
+ *
+ * @returns {JSX.Element} The rendered calendar component.
+ *
+ * @example
+ * <Calendar />
+ *
+ * @throws {Error} Throws an error if there is an issue loading data or updating completions.
+ */
 export function Calendar() {
   const { currentUser } = useAuth();
   const today = new Date();
@@ -64,6 +78,25 @@ export function Calendar() {
   // Add global event handler to prevent default behavior
   useEffect(() => {
     // Prevent form submission and link navigation
+    /**
+     * Handles the submission event for a calendar component.
+     *
+     * This function checks if the event target is within the calendar container.
+     * If it is, the default action of the event is prevented, and the event's
+     * propagation is stopped. This is useful for managing user interactions
+     * within a calendar without triggering form submissions or other events.
+     *
+     * @param {Event} e - The event object representing the submission event.
+     *
+     * @returns {boolean} Returns false if the event target is within the calendar
+     * container, indicating that the default action should not proceed.
+     *
+     * @example
+     * // Example usage in an event listener
+     * document.querySelector('form').addEventListener('submit', handleSubmit);
+     *
+     * @throws {TypeError} Throws a TypeError if the event object is not valid.
+     */
     const handleSubmit = (e: Event) => {
       const calendarElement = document.querySelector('.calendar-container');
       if (calendarElement && calendarElement.contains(e.target as Node)) {
@@ -74,6 +107,28 @@ export function Calendar() {
     };
 
     // Prevent clicks from causing navigation
+    /**
+     * Handles click events on the calendar container.
+     *
+     * This function checks if the click event occurred within the
+     * calendar container and whether the target of the click is an
+     * anchor tag. If the target is an anchor tag, the default action
+     * of the event is prevented, and the event propagation is stopped.
+     *
+     * @param {MouseEvent} e - The mouse event object containing
+     *                         information about the click event.
+     *
+     * @returns {boolean | void} Returns false if the click is on an
+     *                           anchor tag, otherwise returns nothing.
+     *
+     * @example
+     * // Example usage:
+     * document.querySelector('.calendar-container').addEventListener('click', handleClick);
+     *
+     * @throws {Error} Throws an error if the event target is not a valid
+     *                 HTMLElement or if there is an issue with querying
+     *                 the calendar container.
+     */
     const handleClick = (e: MouseEvent) => {
       const calendarElement = document.querySelector('.calendar-container');
       if (calendarElement && calendarElement.contains(e.target as Node)) {
@@ -103,6 +158,21 @@ export function Calendar() {
   useEffect(() => {
     const calendarContainer = document.querySelector('.calendar-container');
     if (calendarContainer) {
+      /**
+       * Prevents the default action of a specified event.
+       *
+       * This function takes an event as an argument and calls the `preventDefault` method on it,
+       * which stops the default behavior associated with that event. It also returns `false` to
+       * indicate that the event should not propagate further.
+       *
+       * @param {Event} e - The event object for which the default action should be prevented.
+       * @returns {boolean} Always returns `false` to indicate that the default action has been prevented.
+       *
+       * @example
+       * document.getElementById('myButton').addEventListener('click', preventDefaultForElement);
+       *
+       * @throws {TypeError} Throws an error if the argument is not an instance of Event.
+       */
       const preventDefaultForElement = (e: Event) => {
         e.preventDefault();
         return false;
@@ -500,6 +570,27 @@ export function Calendar() {
   };
 
   // Handle date selection
+  /**
+   * Handles the selection of a date and manages the associated mouse event.
+   *
+   * This function is designed to be called when a date is selected. It prevents
+   * the default behavior of the mouse event and stops its propagation if an event
+   * object is provided. It also ensures that the native event does not propagate
+   * further.
+   *
+   * @param {Date} date - The selected date to be set.
+   * @param {React.MouseEvent} [event] - The optional mouse event associated with the date selection.
+   *
+   * @returns {boolean} Returns false to indicate that no further propagation should occur.
+   *
+   * @example
+   * // Example usage within a React component
+   * const onDateClick = (date) => {
+   *   handleDateSelect(date, event);
+   * };
+   *
+   * @throws {Error} Throws an error if the date parameter is not a valid Date object.
+   */
   const handleDateSelect = (date: Date, event?: React.MouseEvent) => {
     if (event) {
       event.preventDefault();
@@ -517,12 +608,62 @@ export function Calendar() {
   };
 
   // Handle month change from the calendar
+  /**
+   * Updates the current month and year based on the provided values.
+   *
+   * This function is typically used in scenarios where the user selects a new month and year,
+   * such as in a date picker component. It sets the current month and year to the specified values.
+   *
+   * @param {number} month - The new month to set, represented as a number (1-12).
+   * @param {number} year - The new year to set, represented as a four-digit number.
+   *
+   * @throws {Error} Throws an error if the month is not in the range of 1 to 12.
+   *
+   * @example
+   * // Set the current month to March and the year to 2023
+   * handleMonthChange(3, 2023);
+   */
   const handleMonthChange = (month: number, year: number) => {
     setCurrentMonth(month);
     setCurrentYear(year);
   };
 
   // Custom renderer for calendar features
+  /**
+   * Renders a calendar feature component based on the provided feature metadata.
+   * The component displays different icons depending on the metadata properties.
+   *
+   * @param {Object} params - The parameters for rendering the calendar feature.
+   * @param {Feature} params.feature - The feature object containing metadata and other properties.
+   * @returns {JSX.Element} A React element representing the calendar feature with icons.
+   *
+   * The component displays:
+   * - A single icon larger and positioned higher if only one icon is needed.
+   * - Two icons side by side if two icons are needed.
+   * - A 2x2 grid layout if three or four icons are needed.
+   *
+   * Each icon corresponds to a specific property in the feature's metadata:
+   * - `hasMorning`: Displays a sun icon.
+   * - `hasEvening`: Displays a moon icon.
+   * - `hasWeekly`: Displays a calendar icon.
+   * - `hasCustom`: Displays a settings icon.
+   *
+   * @example
+   * const feature = {
+   *   id: '1',
+   *   meta: {
+   *     hasMorning: true,
+   *     hasEvening: false,
+   *     hasWeekly: true,
+   *     hasCustom: false,
+   *   },
+   *   endAt: new Date(),
+   * };
+   *
+   * const calendarElement = renderCalendarFeature({ feature });
+   *
+   * @throws {Error} Throws an error if the feature object is not provided or is invalid.
+   */
   const renderCalendarFeature = ({ feature }: { feature: Feature }) => {
     // Access our custom meta properties
     const meta = feature.meta;
