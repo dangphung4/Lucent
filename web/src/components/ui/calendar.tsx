@@ -116,6 +116,41 @@ export const daysForLocale = (locale: Intl.LocalesArgument, startDay: number) =>
   return weekdays;
 };
 
+/**
+ * A customizable combobox component that allows users to select a value from a dropdown list.
+ *
+ * @param {Object} props - The properties for the Combobox component.
+ * @param {string} props.value - The currently selected value.
+ * @param {function} props.setValue - A function to update the selected value.
+ * @param {Array<{ value: string, label: string }>} props.data - An array of objects representing the options available in the combobox.
+ * @param {Object} props.labels - An object containing label strings for various UI elements.
+ * @param {string} props.labels.button - The label for the button when no value is selected.
+ * @param {string} props.labels.search - The placeholder text for the search input.
+ * @param {string} props.labels.empty - The message displayed when no items match the search.
+ * @param {string} [props.className] - Additional CSS classes to apply to the button.
+ *
+ * @returns {JSX.Element} The rendered Combobox component.
+ *
+ * @example
+ * const options = [
+ *   { value: 'option1', label: 'Option 1' },
+ *   { value: 'option2', label: 'Option 2' }
+ * ];
+ *
+ * const [selectedValue, setSelectedValue] = useState('');
+ *
+ * <Combobox
+ *   value={selectedValue}
+ *   setValue={setSelectedValue}
+ *   data={options}
+ *   labels={{
+ *     button: 'Select an option',
+ *     search: 'Search...',
+ *     empty: 'No options available'
+ *   }}
+ *   className="custom-class"
+ * />
+ */
 const Combobox = ({
   value,
   setValue,
@@ -205,6 +240,28 @@ export type CalendarBodyProps = {
   onSelectDate?: (date: Date, event?: React.MouseEvent) => void;
 };
 
+/**
+ * Renders the body of a calendar, displaying the days of the month along with any associated features.
+ *
+ * @param {Object} props - The properties for the CalendarBody component.
+ * @param {Array} props.features - An array of feature objects to display on specific days.
+ * @param {function} props.children - A render prop function to customize the rendering of features.
+ * @param {Date} props.selectedDate - The currently selected date.
+ * @param {function} props.onSelectDate - Callback function to handle date selection.
+ *
+ * @returns {JSX.Element} The rendered calendar body.
+ *
+ * @example
+ * <CalendarBody
+ *   features={featuresArray}
+ *   selectedDate={new Date(2023, 0, 15)}
+ *   onSelectDate={(date) => console.log(date)}
+ * >
+ *   {({ feature }) => <FeatureComponent feature={feature} />}
+ * </CalendarBody>
+ *
+ * @throws {Error} Throws an error if the features prop is not an array.
+ */
 export const CalendarBody = ({ 
   features, 
   children, 
@@ -350,12 +407,46 @@ export type CalendarMonthPickerProps = {
   className?: string;
 };
 
+/**
+ * A functional component that renders a month picker for selecting a month within a calendar.
+ *
+ * @param {Object} props - The properties for the component.
+ * @param {string} [props.className] - An optional class name to apply to the component for styling.
+ *
+ * @returns {JSX.Element} The rendered month picker component.
+ *
+ * @example
+ * // Example usage of CalendarMonthPicker
+ * <CalendarMonthPicker className="custom-class" />
+ *
+ * @throws {Error} Throws an error if the month value cannot be parsed as an integer.
+ */
 export const CalendarMonthPicker = ({
   className,
 }: CalendarMonthPickerProps) => {
   const { month, setMonth, year } = useCalendar();
   const { locale, onMonthChange } = useContext(CalendarContext);
 
+  /**
+   * Handles the change of the month value.
+   *
+   * This function takes a string representation of a month, converts it to a number,
+   * and updates the current month state. If an optional callback function `onMonthChange`
+   * is provided, it will be invoked with the new month and the current year.
+   *
+   * @param {string} value - The string representation of the month to be changed.
+   * @throws {TypeError} Throws an error if the value cannot be parsed as a number.
+   *
+   * @example
+   * // Example usage:
+   * handleMonthChange("5"); // Changes the month to May (5)
+   *
+   * @example
+   * // Example with callback:
+   * handleMonthChange("3", (newMonth, year) => {
+   *   console.log(`Month changed to ${newMonth} in year ${year}`);
+   * });
+   */
   const handleMonthChange = (value: string) => {
     const newMonth = Number.parseInt(value) as CalendarState['month'];
     setMonth(newMonth);
@@ -390,6 +481,21 @@ export type CalendarYearPickerProps = {
   end: number;
 };
 
+/**
+ * A component that allows users to select a year from a dropdown list.
+ *
+ * @param {Object} props - The properties for the CalendarYearPicker component.
+ * @param {string} [props.className] - Optional additional class names for styling the component.
+ * @param {number} props.start - The starting year of the range.
+ * @param {number} props.end - The ending year of the range.
+ *
+ * @returns {JSX.Element} The rendered CalendarYearPicker component.
+ *
+ * @example
+ * <CalendarYearPicker className="year-picker" start={2000} end={2025} />
+ *
+ * @throws {Error} Throws an error if the provided start year is greater than the end year.
+ */
 export const CalendarYearPicker = ({
   className,
   start,
@@ -398,6 +504,25 @@ export const CalendarYearPicker = ({
   const { year, setYear, month } = useCalendar();
   const { onMonthChange } = useContext(CalendarContext);
 
+  /**
+   * Handles the change of the year value.
+   *
+   * This function takes a string representation of a year, converts it to a number,
+   * and updates the state with the new year. If an optional callback function for
+   * month change is provided, it will be called with the current month and the new year.
+   *
+   * @param {string} value - The new year value as a string.
+   * @throws {Error} Throws an error if the value cannot be parsed as an integer.
+   *
+   * @example
+   * // Example usage:
+   * handleYearChange("2023");
+   *
+   * // If onMonthChange is defined:
+   * const onMonthChange = (month, year) => {
+   *   console.log(`Month changed to ${month} for year ${year}`);
+   * };
+   */
   const handleYearChange = (value: string) => {
     const newYear = Number.parseInt(value);
     setYear(newYear);
@@ -430,12 +555,55 @@ export type CalendarDatePaginationProps = {
   className?: string;
 };
 
+/**
+ * A functional component that provides pagination controls for navigating through calendar months.
+ * It allows users to move to the previous or next month and updates the current month and year accordingly.
+ *
+ * @param {Object} props - The properties for the component.
+ * @param {string} [props.className] - An optional additional class name to apply to the component's container.
+ *
+ * @returns {JSX.Element} The rendered pagination controls for the calendar.
+ *
+ * @example
+ * <CalendarDatePagination className="my-custom-class" />
+ *
+ * @throws {Error} Throws an error if the month or year is invalid during state updates.
+ */
 export const CalendarDatePagination = ({
   className,
 }: CalendarDatePaginationProps) => {
   const { month, year, setMonth, setYear } = useCalendar();
   const { onMonthChange } = useContext(CalendarContext);
 
+  /**
+   * Handles the transition to the previous month in a calendar.
+   * Updates the month and year state accordingly, and invokes the
+   * optional callback function if provided.
+   *
+   * This function checks the current month and adjusts the month
+   * and year values. If the current month is January (0), it sets
+   * the month to December (11) of the previous year. For all other
+   * months, it simply decrements the month while keeping the year
+   * unchanged.
+   *
+   * @throws {Error} Throws an error if the month or year state is
+   *                 invalid or cannot be updated.
+   *
+   * @example
+   * // Assuming the current state is January 2023
+   * handlePreviousMonth();
+   * // The state will be updated to December 2022
+   *
+   * @example
+   * // Assuming the current state is March 2023
+   * handlePreviousMonth();
+   * // The state will be updated to February 2023
+   *
+   * @param {function} [onMonthChange] - Optional callback function
+   *                                      that is called with the new
+   *                                      month and year after the
+   *                                      transition.
+   */
   const handlePreviousMonth = () => {
     let newMonth: CalendarState['month'], newYear: number;
     
@@ -456,6 +624,25 @@ export const CalendarDatePagination = ({
     }
   };
 
+  /**
+   * Handles the transition to the next month in the calendar.
+   * This function updates the current month and year based on the current state.
+   * If the current month is December (11), it resets the month to January (0)
+   * and increments the year by one. Otherwise, it simply increments the month.
+   *
+   * If a callback function `onMonthChange` is provided, it will be called
+   * with the new month and year after the state has been updated.
+   *
+   * @function handleNextMonth
+   * @returns {void} This function does not return a value.
+   *
+   * @example
+   * // Assuming the current month is December (11) and year is 2023,
+   * // calling handleNextMonth will set the month to January (0) and year to 2024.
+   * handleNextMonth();
+   *
+   * @throws {Error} Throws an error if the month or year is not a valid number.
+   */
   const handleNextMonth = () => {
     let newMonth: CalendarState['month'], newYear: number;
     
@@ -551,6 +738,33 @@ export type CalendarProviderProps = {
   onMonthChange?: (month: number, year: number) => void;
 };
 
+/**
+ * A provider component for managing calendar state and functionality.
+ * This component provides context for calendar operations such as date selection,
+ * month and year changes, and localization.
+ *
+ * @param {Object} props - The properties for the CalendarProvider.
+ * @param {React.ReactNode} props.children - The child components to be rendered within the provider.
+ * @param {string} [props.className] - Optional additional class names for styling the component.
+ * @param {function(Date, React.MouseEvent): void} [props.onSelectDate] - Callback function triggered when a date is selected.
+ * @param {Date} [props.selectedDate] - The currently selected date.
+ * @param {function(number, number): void} [props.onMonthChange] - Callback function triggered when the month is changed.
+ * @param {string} [props.locale='en-US'] - The locale for date formatting (default is 'en-US').
+ * @param {number} [props.startDay=0] - The index of the first day of the week (default is 0 for Sunday).
+ *
+ * @throws {Error} Throws an error if the provided date is invalid.
+ *
+ * @returns {JSX.Element} The rendered CalendarProvider component.
+ *
+ * @example
+ * <CalendarProvider
+ *   onSelectDate={(date) => console.log(date)}
+ *   selectedDate={new Date()}
+ *   onMonthChange={(month, year) => console.log(month, year)}
+ * >
+ *   <YourCalendarComponent />
+ * </CalendarProvider>
+ */
 export function CalendarProvider({
   children,
   className,
