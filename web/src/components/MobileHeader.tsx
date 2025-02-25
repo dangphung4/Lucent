@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import LucentLogo from '../assets/lucent-logo.svg';
 
 export function MobileHeader() {
   const [scrolled, setScrolled] = useState(false);
@@ -26,9 +27,7 @@ export function MobileHeader() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:scale-110">
-              <span className="text-lg font-bold text-primary-foreground">L</span>
-            </div>
+            <img src={LucentLogo} alt="Lucent Logo" className="w-8 h-8" />
             <span className="text-xl font-bold transition-colors duration-200 group-hover:text-primary">
                 Lucent
             </span>

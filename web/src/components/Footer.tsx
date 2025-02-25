@@ -11,143 +11,51 @@ export function Footer({ className }: FooterProps) {
   return (
     <footer className={cn("border-t bg-background", className)}>
       <div className="container px-4 py-8 md:px-6 md:py-12">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
-          <div className="flex flex-col gap-2">
-            <Link to="/" className="flex items-center gap-2">
-              <img src="/favicon.svg" alt="Lucent Logo" className="h-8 w-8" />
-              <span className="text-xl font-bold">Lucent</span>
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
+          {/* Brand Section */}
+          <div className="flex flex-col gap-4">
+            <Link to="/" className="flex items-center gap-2 group">
+              <img src="/lucent-logo.svg" alt="Lucent Logo" className="h-8 w-8" />
+              <span className="text-xl font-bold group-hover:text-primary transition-colors">Lucent</span>
             </Link>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground max-w-[300px]">
               Track your skincare routine and see what works best for you
             </p>
           </div>
-          
-          <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-medium">Product</h3>
-            <nav className="flex flex-col gap-2">
-              <Link to="/features" className="text-sm text-muted-foreground hover:text-foreground">
-                Features
-              </Link>
-              <Link to="/how-it-works" className="text-sm text-muted-foreground hover:text-foreground">
-                How It Works
-              </Link>
-              <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground">
-                Get Started
-              </Link>
-            </nav>
-          </div>
-          
-          <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-medium">Resources</h3>
-            <nav className="flex flex-col gap-2">
-              <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground">
+
+          {/* Quick Links */}
+          <div className="flex flex-col gap-4">
+            <h3 className="text-sm font-semibold">Legal</h3>
+            <nav className="flex flex-col gap-3">
+              <Link to="/privacy" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Privacy Policy
               </Link>
-              <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground">
+              <Link to="/terms" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Terms of Service
               </Link>
-              <a 
-                href="https://github.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                GitHub
-              </a>
             </nav>
           </div>
-          
-          <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-medium">Contact</h3>
-            <nav className="flex flex-col gap-2">
+
+          {/* Contact Section */}
+          <div className="flex flex-col gap-4">
+            <h3 className="text-sm font-semibold">Get in Touch</h3>
+            <a 
+              href="mailto:contact@skincaretrack.app" 
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              contact@skincaretrack.app
+            </a>
+            <div className="flex items-center gap-4 mt-2">
               <a 
-                href="mailto:contact@skincaretrack.app" 
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                contact@skincaretrack.app
-              </a>
-              <a 
-                href="https://twitter.com" 
+                href="https://github.com/dangphung4/SKINCAREGOD" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                Twitter
-              </a>
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                Instagram
-              </a>
-            </nav>
-          </div>
-        </div>
-        
-        <div className="mt-8 border-t pt-8">
-          <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
-            <p className="text-center text-sm text-muted-foreground">
-              © {currentYear} Lucent. All rights reserved.
-            </p>
-            <div className="flex items-center gap-4">
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5"
-                >
-                  <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
-                </svg>
-                <span className="sr-only">Twitter</span>
-              </a>
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5"
-                >
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                </svg>
-                <span className="sr-only">Instagram</span>
-              </a>
-              <a 
-                href="https://github.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
+                  width="20"
+                  height="20"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -162,6 +70,13 @@ export function Footer({ className }: FooterProps) {
               </a>
             </div>
           </div>
+        </div>
+        
+        {/* Copyright Section */}
+        <div className="mt-12 pt-6 border-t">
+          <p className="text-center text-sm text-muted-foreground">
+            © {currentYear} Lucent. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
