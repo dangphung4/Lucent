@@ -43,7 +43,14 @@ function App() {
             <Route element={<RootLayout />}>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
-              <Route path="/calendar" element={<Calendar />} />
+              <Route 
+                path="/calendar" 
+                element={
+                  <ProtectedRoute>
+                    <Calendar />
+                  </ProtectedRoute>
+                } 
+              />
               <Route 
                 path="/settings" 
                 element={

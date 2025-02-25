@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../lib/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
@@ -12,7 +13,15 @@ export function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { signIn, signUp, signInWithGoogle } = useAuth();
+  const { signIn, signUp, signInWithGoogle, currentUser } = useAuth();
+  const navigate = useNavigate();
+  
+  // Redirect to dashboard if user is already logged in
+  useEffect(() => {
+    if (currentUser) {
+      navigate('/dashboard');
+    }
+  }, [currentUser, navigate]);
 
   const handleEmailAuth = async (isSignUp: boolean) => {
     setError('');
@@ -24,6 +33,7 @@ export function LoginPage() {
       } else {
         await signIn(email, password);
       }
+      // No need to manually navigate here as the useEffect will handle it
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -37,6 +47,7 @@ export function LoginPage() {
     
     try {
       await signInWithGoogle();
+      // No need to manually navigate here as the useEffect will handle it
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
