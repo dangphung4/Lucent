@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -51,6 +51,8 @@ export function Calendar() {
   const { currentUser } = useAuth();
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState<Date>(today);
+  const [currentMonth, setCurrentMonth] = useState<number>(today.getMonth());
+  const [currentYear, setCurrentYear] = useState<number>(today.getFullYear());
   const [activeTab, setActiveTab] = useState<'morning' | 'evening' | 'weekly' | 'custom'>('morning');
   const [routines, setRoutines] = useState<Routine[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -58,6 +60,61 @@ export function Calendar() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [features, setFeatures] = useState<Feature[]>([]);
+
+  // Add global event handler to prevent default behavior
+  useEffect(() => {
+    // Prevent form submission and link navigation
+    const handleSubmit = (e: Event) => {
+      const calendarElement = document.querySelector('.calendar-container');
+      if (calendarElement && calendarElement.contains(e.target as Node)) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    };
+
+    // Prevent clicks from causing navigation
+    const handleClick = (e: MouseEvent) => {
+      const calendarElement = document.querySelector('.calendar-container');
+      if (calendarElement && calendarElement.contains(e.target as Node)) {
+        // Check if the click is on an anchor tag
+        const target = e.target as HTMLElement;
+        const closestAnchor = target.closest('a');
+        if (closestAnchor) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      }
+    };
+
+    // Add event listeners
+    document.addEventListener('submit', handleSubmit, true);
+    document.addEventListener('click', handleClick, true);
+    
+    // Clean up
+    return () => {
+      document.removeEventListener('submit', handleSubmit, true);
+      document.removeEventListener('click', handleClick, true);
+    };
+  }, []);
+
+  // Prevent the browser's default behavior for the calendar container
+  useEffect(() => {
+    const calendarContainer = document.querySelector('.calendar-container');
+    if (calendarContainer) {
+      const preventDefaultForElement = (e: Event) => {
+        e.preventDefault();
+        return false;
+      };
+      
+      calendarContainer.addEventListener('click', preventDefaultForElement);
+      
+      return () => {
+        calendarContainer.removeEventListener('click', preventDefaultForElement);
+      };
+    }
+  }, []);
 
   // Load routines and products
   useEffect(() => {
@@ -81,135 +138,137 @@ export function Calendar() {
   }, [currentUser]);
 
   // Load completions for the current month
-  useEffect(() => {
+  const loadCompletions = useCallback(async () => {
     if (!currentUser?.uid) return;
+    
     setLoading(true);
-
-    const loadCompletions = async () => {
-      try {
-        const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-        const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
+    try {
+      // Use currentMonth and currentYear instead of selectedDate
+      const startOfMonth = new Date(currentYear, currentMonth, 1);
+      const endOfMonth = new Date(currentYear, currentMonth + 1, 0);
+      
+      const fetchedCompletions = await getRoutineCompletions(
+        currentUser.uid,
+        startOfMonth,
+        endOfMonth
+      );
+      
+      setCompletions(fetchedCompletions);
+      
+      // Generate features for the calendar
+      const newFeatures: Feature[] = [];
+      
+      // Group completions by date
+      const completionsByDate = fetchedCompletions.reduce((acc, completion) => {
+        const dateStr = completion.date.toDateString();
+        if (!acc[dateStr]) {
+          acc[dateStr] = [];
+        }
+        acc[dateStr].push(completion);
+        return acc;
+      }, {} as Record<string, RoutineCompletion[]>);
+      
+      // Create features for each date
+      Object.entries(completionsByDate).forEach(([dateStr, dateCompletions]) => {
+        const date = new Date(dateStr);
+        const morningCompletions = dateCompletions.filter(c => c.type === 'morning');
+        const eveningCompletions = dateCompletions.filter(c => c.type === 'evening');
+        const weeklyCompletions = dateCompletions.filter(c => c.type === 'weekly');
+        const customCompletions = dateCompletions.filter(c => c.type === 'custom');
         
-        const fetchedCompletions = await getRoutineCompletions(
-          currentUser.uid,
-          startOfMonth,
-          endOfMonth
+        const totalSteps = dateCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
+        const completedSteps = dateCompletions.reduce((sum, c) => 
+          sum + c.completedSteps.filter(step => step.completed).length, 0
         );
         
-        setCompletions(fetchedCompletions);
+        // Check if both morning and evening routines exist for this day
+        const hasMorningRoutine = morningCompletions.length > 0;
+        const hasEveningRoutine = eveningCompletions.length > 0;
         
-        // Generate features for the calendar
-        const newFeatures: Feature[] = [];
+        // Calculate completion status for morning and evening separately
+        const morningTotalSteps = morningCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
+        const morningCompletedSteps = morningCompletions.reduce((sum, c) => 
+          sum + c.completedSteps.filter(step => step.completed).length, 0
+        );
+        const isMorningComplete = morningTotalSteps > 0 && morningCompletedSteps === morningTotalSteps;
         
-        // Group completions by date
-        const completionsByDate = fetchedCompletions.reduce((acc, completion) => {
-          const dateStr = completion.date.toDateString();
-          if (!acc[dateStr]) {
-            acc[dateStr] = [];
-          }
-          acc[dateStr].push(completion);
-          return acc;
-        }, {} as Record<string, RoutineCompletion[]>);
+        const eveningTotalSteps = eveningCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
+        const eveningCompletedSteps = eveningCompletions.reduce((sum, c) => 
+          sum + c.completedSteps.filter(step => step.completed).length, 0
+        );
+        const isEveningComplete = eveningTotalSteps > 0 && eveningCompletedSteps === eveningTotalSteps;
         
-        // Create features for each date
-        Object.entries(completionsByDate).forEach(([dateStr, dateCompletions]) => {
-          const date = new Date(dateStr);
-          const morningCompletions = dateCompletions.filter(c => c.type === 'morning');
-          const eveningCompletions = dateCompletions.filter(c => c.type === 'evening');
-          const weeklyCompletions = dateCompletions.filter(c => c.type === 'weekly');
-          const customCompletions = dateCompletions.filter(c => c.type === 'custom');
+        // Calculate completion status for weekly and custom routines
+        const weeklyTotalSteps = weeklyCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
+        const weeklyCompletedSteps = weeklyCompletions.reduce((sum, c) => 
+          sum + c.completedSteps.filter(step => step.completed).length, 0
+        );
+        const isWeeklyComplete = weeklyTotalSteps > 0 && weeklyCompletedSteps === weeklyTotalSteps;
+        
+        const customTotalSteps = customCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
+        const customCompletedSteps = customCompletions.reduce((sum, c) => 
+          sum + c.completedSteps.filter(step => step.completed).length, 0
+        );
+        const isCustomComplete = customTotalSteps > 0 && customCompletedSteps === customTotalSteps;
+        
+        let status = STATUSES[2]; // Default to incomplete
+        
+        if (totalSteps > 0) {
+          // Check if all routine types are complete
+          const hasAllRoutineTypes = hasMorningRoutine && hasEveningRoutine;
+          const allRoutinesComplete = isMorningComplete && isEveningComplete && 
+            (!weeklyTotalSteps || isWeeklyComplete) && 
+            (!customTotalSteps || isCustomComplete);
           
-          const totalSteps = dateCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
-          const completedSteps = dateCompletions.reduce((sum, c) => 
-            sum + c.completedSteps.filter(step => step.completed).length, 0
-          );
-          
-          // Check if both morning and evening routines exist for this day
-          const hasMorningRoutine = morningCompletions.length > 0;
-          const hasEveningRoutine = eveningCompletions.length > 0;
-          
-          // Calculate completion status for morning and evening separately
-          const morningTotalSteps = morningCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
-          const morningCompletedSteps = morningCompletions.reduce((sum, c) => 
-            sum + c.completedSteps.filter(step => step.completed).length, 0
-          );
-          const isMorningComplete = morningTotalSteps > 0 && morningCompletedSteps === morningTotalSteps;
-          
-          const eveningTotalSteps = eveningCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
-          const eveningCompletedSteps = eveningCompletions.reduce((sum, c) => 
-            sum + c.completedSteps.filter(step => step.completed).length, 0
-          );
-          const isEveningComplete = eveningTotalSteps > 0 && eveningCompletedSteps === eveningTotalSteps;
-          
-          // Calculate completion status for weekly and custom routines
-          const weeklyTotalSteps = weeklyCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
-          const weeklyCompletedSteps = weeklyCompletions.reduce((sum, c) => 
-            sum + c.completedSteps.filter(step => step.completed).length, 0
-          );
-          const isWeeklyComplete = weeklyTotalSteps > 0 && weeklyCompletedSteps === weeklyTotalSteps;
-          
-          const customTotalSteps = customCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
-          const customCompletedSteps = customCompletions.reduce((sum, c) => 
-            sum + c.completedSteps.filter(step => step.completed).length, 0
-          );
-          const isCustomComplete = customTotalSteps > 0 && customCompletedSteps === customTotalSteps;
-          
-          let status = STATUSES[2]; // Default to incomplete
-          
-          if (totalSteps > 0) {
-            // Check if all routine types are complete
-            const hasAllRoutineTypes = hasMorningRoutine && hasEveningRoutine;
-            const allRoutinesComplete = isMorningComplete && isEveningComplete && 
-              (!weeklyTotalSteps || isWeeklyComplete) && 
-              (!customTotalSteps || isCustomComplete);
-            
-            if (hasAllRoutineTypes) {
-              // If both morning and evening routines exist for this user
-              if (allRoutinesComplete) {
-                status = STATUSES[0]; // Completed - only when all are complete
-                console.log(`Toggle update - Date ${dateStr}: All routines complete - marking as COMPLETED`);
-              } else if (isMorningComplete || isEveningComplete || isWeeklyComplete || isCustomComplete || completedSteps > 0) {
-                status = STATUSES[1]; // Partially Complete - if any routine type is complete or any steps completed
-                console.log(`Toggle update - Date ${dateStr}: Some routines complete - marking as PARTIAL`);
-              }
-            } else {
-              // If only one routine type exists for this user
-              if (completedSteps === totalSteps) {
-                status = STATUSES[0]; // Completed
-                console.log(`Toggle update - Date ${dateStr}: Single routine type fully complete - marking as COMPLETED`);
-              } else if (completedSteps > 0) {
-                status = STATUSES[1]; // Partial
-                console.log(`Toggle update - Date ${dateStr}: Single routine partially complete - marking as PARTIAL`);
-              }
+          if (hasAllRoutineTypes) {
+            // If both morning and evening routines exist for this user
+            if (allRoutinesComplete) {
+              status = STATUSES[0]; // Completed - only when all are complete
+              console.log(`Toggle update - Date ${dateStr}: All routines complete - marking as COMPLETED`);
+            } else if (isMorningComplete || isEveningComplete || isWeeklyComplete || isCustomComplete || completedSteps > 0) {
+              status = STATUSES[1]; // Partially Complete - if any routine type is complete or any steps completed
+              console.log(`Toggle update - Date ${dateStr}: Some routines complete - marking as PARTIAL`);
+            }
+          } else {
+            // If only one routine type exists for this user
+            if (completedSteps === totalSteps) {
+              status = STATUSES[0]; // Completed
+              console.log(`Toggle update - Date ${dateStr}: Single routine type fully complete - marking as COMPLETED`);
+            } else if (completedSteps > 0) {
+              status = STATUSES[1]; // Partial
+              console.log(`Toggle update - Date ${dateStr}: Single routine partially complete - marking as PARTIAL`);
             }
           }
-          
-          newFeatures.push({
-            id: `routine-${dateStr}`,
-            name: '',
-            startAt: date,
-            endAt: date,
-            status,
-            meta: {
-              hasMorning: morningCompletions.length > 0,
-              hasEvening: eveningCompletions.length > 0,
-              hasWeekly: weeklyCompletions.length > 0,
-              hasCustom: customCompletions.length > 0
-            }
-          });
+        }
+        
+        newFeatures.push({
+          id: `routine-${dateStr}`,
+          name: '',
+          startAt: date,
+          endAt: date,
+          status,
+          meta: {
+            hasMorning: morningCompletions.length > 0,
+            hasEvening: eveningCompletions.length > 0,
+            hasWeekly: weeklyCompletions.length > 0,
+            hasCustom: customCompletions.length > 0
+          }
         });
-        
-        setFeatures(newFeatures);
-      } catch (error) {
-        console.error('Error loading completions:', error);
-        toast.error('Error loading routine completions');
-      } finally {
-        setLoading(false);
-      }
-    };
-    
+      });
+      
+      setFeatures(newFeatures);
+    } catch (error) {
+      console.error('Error loading completions:', error);
+      toast.error('Error loading routine completions');
+    } finally {
+      setLoading(false);
+    }
+  }, [currentUser, currentMonth, currentYear]);
+
+  // Load completions when the month changes
+  useEffect(() => {
     loadCompletions();
-  }, [currentUser, selectedDate]);
+  }, [loadCompletions, currentMonth, currentYear]);
 
   // Get routines for the selected date and tab
   const getRoutinesForDate = () => {
@@ -440,6 +499,29 @@ export function Calendar() {
     });
   };
 
+  // Handle date selection
+  const handleDateSelect = (date: Date, event?: React.MouseEvent) => {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      // Also prevent native event propagation
+      if (event.nativeEvent) {
+        event.nativeEvent.stopImmediatePropagation();
+        event.nativeEvent.preventDefault();
+      }
+    }
+    
+    setSelectedDate(date);
+    return false; // Ensure no further propagation
+  };
+
+  // Handle month change from the calendar
+  const handleMonthChange = (month: number, year: number) => {
+    setCurrentMonth(month);
+    setCurrentYear(year);
+  };
+
   // Custom renderer for calendar features
   const renderCalendarFeature = ({ feature }: { feature: Feature }) => {
     // Access our custom meta properties
@@ -457,7 +539,16 @@ export function Calendar() {
         <div 
           key={feature.id}
           className="cursor-pointer hover:opacity-80 transition-opacity w-full h-full flex flex-col justify-start items-center pt-1.5"
-          onClick={() => handleDateSelect(feature.endAt)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDateSelect(feature.endAt, e);
+            return false;
+          }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            return false;
+          }}
         >
           {meta?.hasMorning && <Sun className="h-3.5 w-3.5 sm:h-4.5 sm:w-4.5 text-amber-500" />}
           {meta?.hasEvening && <Moon className="h-3.5 w-3.5 sm:h-4.5 sm:w-4.5 text-indigo-500" />}
@@ -473,7 +564,16 @@ export function Calendar() {
         <div 
           key={feature.id}
           className="cursor-pointer hover:opacity-80 transition-opacity w-full h-full flex flex-col justify-start items-center pt-1.5"
-          onClick={() => handleDateSelect(feature.endAt)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDateSelect(feature.endAt, e);
+            return false;
+          }}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            return false;
+          }}
         >
           <div className="flex gap-1">
             {meta?.hasMorning && <Sun className="h-3 w-3 sm:h-4 sm:w-4 text-amber-500" />}
@@ -490,7 +590,16 @@ export function Calendar() {
       <div 
         key={feature.id}
         className="cursor-pointer hover:opacity-80 transition-opacity w-full h-full flex flex-col justify-start items-center pt-1"
-        onClick={() => handleDateSelect(feature.endAt)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleDateSelect(feature.endAt, e);
+          return false;
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          return false;
+        }}
       >
         <div className="grid grid-cols-2 gap-0.5 sm:gap-1 -mt-1">
           {meta?.hasMorning && (
@@ -518,11 +627,6 @@ export function Calendar() {
     );
   };
 
-  // Handle date selection
-  const handleDateSelect = (date: Date) => {
-    setSelectedDate(date);
-  };
-
   if (loading) {
     return (
       <div className="min-h-[200px] flex items-center justify-center">
@@ -537,7 +641,7 @@ export function Calendar() {
     <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {/* Calendar Section */}
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden calendar-container">
           <CardHeader className="pb-2 px-3 sm:px-6">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg sm:text-xl">Skincare Calendar</CardTitle>
@@ -547,58 +651,67 @@ export function Calendar() {
             </div>
           </CardHeader>
           <CardContent className="p-2 sm:p-4">
-            <CalendarProvider 
-              className="h-full border rounded-md p-2 bg-card"
-              onSelectDate={handleDateSelect}
-              selectedDate={selectedDate}
+            {/* Wrap the calendar in a form with onSubmit handler to prevent page refresh */}
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                return false;
+              }}
             >
-              <CalendarDate>
-                <div className="flex items-center gap-2">
-                  <CalendarMonthPicker className="w-24 sm:w-32" />
-                  <CalendarYearPicker start={2020} end={2030} className="w-20 sm:w-24" />
-                </div>
-                <CalendarDatePagination />
-              </CalendarDate>
-              
-              <div className="mt-2">
-                <CalendarHeader />
-                <CalendarBody 
-                  features={features as BaseFeature[]}
-                  selectedDate={selectedDate}
-                  onSelectDate={handleDateSelect}
-                >
-                  {renderCalendarFeature}
-                </CalendarBody>
-              </div>
-              
-              <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs">
-                {STATUSES.map(status => (
-                  <div key={status.id} className="flex items-center gap-1.5">
-                    <div 
-                      className="h-3 w-3 rounded-full" 
-                      style={{ backgroundColor: status.color }}
-                    />
-                    <span>{status.name}</span>
+              <CalendarProvider 
+                className="h-full border rounded-md p-2 bg-card"
+                onSelectDate={handleDateSelect}
+                selectedDate={selectedDate}
+                onMonthChange={handleMonthChange}
+              >
+                <CalendarDate>
+                  <div className="flex items-center gap-2">
+                    <CalendarMonthPicker className="w-24 sm:w-32" />
+                    <CalendarYearPicker start={2020} end={2030} className="w-20 sm:w-24" />
                   </div>
-                ))}
-                <div className="flex items-center gap-1.5 ml-1">
-                  <Sun className="h-3 w-3 text-amber-500" />
-                  <span>Morning</span>
+                  <CalendarDatePagination />
+                </CalendarDate>
+                
+                <div className="mt-2">
+                  <CalendarHeader />
+                  <CalendarBody 
+                    features={features as BaseFeature[]}
+                    selectedDate={selectedDate}
+                    onSelectDate={handleDateSelect}
+                  >
+                    {renderCalendarFeature}
+                  </CalendarBody>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Moon className="h-3 w-3 text-indigo-500" />
-                  <span>Evening</span>
+                
+                <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs">
+                  {STATUSES.map(status => (
+                    <div key={status.id} className="flex items-center gap-1.5">
+                      <div 
+                        className="h-3 w-3 rounded-full" 
+                        style={{ backgroundColor: status.color }}
+                      />
+                      <span>{status.name}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center gap-1.5 ml-1">
+                    <Sun className="h-3 w-3 text-amber-500" />
+                    <span>Morning</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Moon className="h-3 w-3 text-indigo-500" />
+                    <span>Evening</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <CalendarIcon className="h-3 w-3 text-green-500" />
+                    <span>Weekly</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Settings className="h-3 w-3 text-purple-500" />
+                    <span>Custom</span>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <CalendarIcon className="h-3 w-3 text-green-500" />
-                  <span>Weekly</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Settings className="h-3 w-3 text-purple-500" />
-                  <span>Custom</span>
-                </div>
-              </div>
-            </CalendarProvider>
+              </CalendarProvider>
+            </form>
           </CardContent>
         </Card>
         

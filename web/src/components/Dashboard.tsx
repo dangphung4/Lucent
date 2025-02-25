@@ -220,7 +220,7 @@ export function Dashboard() {
                     <div className="flex flex-col">
                       <span className="text-amber-600 dark:text-amber-400 text-sm font-medium">Progress</span>
                       <span className="text-3xl font-bold mt-1">0</span>
-                      <span className="text-muted-foreground text-xs mt-1">Photos tracked</span>
+                      <span className="text-muted-foreground text-xs mt-1">Routines completed</span>
                     </div>
                   </CardContent>
                 </Card>
