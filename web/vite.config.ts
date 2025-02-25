@@ -7,18 +7,17 @@ import path from 'path';
 export default defineConfig({
   plugins: [react(), VitePWA({
     registerType: 'autoUpdate',
-    injectRegister: false,
-
-    pwaAssets: {
-      disabled: false,
-      config: true,
-    },
-
+    injectRegister: 'auto',
+    includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
     manifest: {
       name: 'Lucent',
       short_name: 'Lucent',
       description: 'Skincare Tracker',
       theme_color: '#ffffff',
+      background_color: '#ffffff',
+      display: 'standalone',
+      start_url: '/',
+      scope: '/',
       icons: [
         {
           src: '/pwa-64x64.png',
@@ -54,12 +53,28 @@ export default defineConfig({
       globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
       cleanupOutdatedCaches: true,
       clientsClaim: true,
+      skipWaiting: true,
+      runtimeCaching: [
+        {
+          urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'google-fonts-cache',
+            expiration: {
+              maxEntries: 10,
+              maxAgeSeconds: 60 * 60 * 24 * 365 // 365 days
+            },
+            cacheableResponse: {
+              statuses: [0, 200]
+            }
+          }
+        }
+      ]
     },
 
     devOptions: {
-      enabled: false,
+      enabled: true,
       navigateFallback: 'index.html',
-      suppressWarnings: true,
       type: 'module',
     },
   })],
