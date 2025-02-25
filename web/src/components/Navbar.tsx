@@ -16,6 +16,18 @@ import { Settings, LogOut, User } from 'lucide-react';
 import { toast } from 'sonner';
 import LucentLogo from '../assets/lucent-logo.svg';
 
+/**
+ * Navbar component that renders the navigation bar of the application.
+ * It displays links to different sections of the app and handles user authentication state.
+ *
+ * @returns {JSX.Element} The rendered Navbar component.
+ *
+ * @example
+ * // Usage in a parent component
+ * <Navbar />
+ *
+ * @throws {Error} Throws an error if the sign-out process fails.
+ */
 export function Navbar() {
   const { currentUser, logOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
