@@ -318,13 +318,22 @@ export const addRoutineCompletion = async (completion: Omit<RoutineCompletion, '
   try {
     const completionsRef = doc(collection(db, 'routineCompletions'));
     
+    // Ensure date is a proper Firestore timestamp
     const completionData = {
       ...completion,
       id: completionsRef.id,
+      // Make sure the date is set to midnight to ensure consistent date comparisons
+      date: new Date(
+        completion.date.getFullYear(),
+        completion.date.getMonth(),
+        completion.date.getDate(),
+        0, 0, 0
+      ),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     
+    console.log('Adding routine completion:', completionData);
     await setDoc(completionsRef, completionData);
     return completionsRef.id;
   } catch (error) {
@@ -338,24 +347,36 @@ export const addRoutineCompletion = async (completion: Omit<RoutineCompletion, '
  */
 export const getRoutineCompletions = async (userId: string, startDate: Date, endDate: Date): Promise<RoutineCompletion[]> => {
   try {
-    const completionsRef = collection(db, 'routineCompletions');
-    const q = query(
-      completionsRef,
-      where('userId', '==', userId),
-      where('date', '>=', startDate),
-      where('date', '<=', endDate)
-    );
-    const querySnapshot = await getDocs(q);
+    console.log('Fetching completions for date range:', startDate, 'to', endDate);
     
-    return querySnapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        ...data,
-        date: data.date?.toDate() || new Date(),
-        createdAt: data.createdAt?.toDate() || new Date(),
-        updatedAt: data.updatedAt?.toDate() || new Date(),
-      } as RoutineCompletion;
-    });
+    const completionsRef = collection(db, 'routineCompletions');
+    
+    // First, get all completions for the user
+    const userCompletionsQuery = query(
+      completionsRef,
+      where('userId', '==', userId)
+    );
+    
+    const querySnapshot = await getDocs(userCompletionsQuery);
+    
+    // Then filter by date in JavaScript
+    const completions = querySnapshot.docs
+      .map(doc => {
+        const data = doc.data();
+        return {
+          ...data,
+          date: data.date?.toDate() || new Date(),
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+        } as RoutineCompletion;
+      })
+      .filter(completion => {
+        const completionDate = completion.date;
+        return completionDate >= startDate && completionDate <= endDate;
+      });
+    
+    console.log('Found completions:', completions.length);
+    return completions;
   } catch (error) {
     console.error('Error getting routine completions:', error);
     throw error;
