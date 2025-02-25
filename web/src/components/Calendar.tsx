@@ -37,6 +37,20 @@ const STATUSES: Status[] = [
   { id: 'incomplete', name: 'Not Started', color: '#6b7280' },
 ];
 
+/**
+ * Renders the skincare calendar component, allowing users to track their skincare routines.
+ * It manages the state for selected date, active tab (morning/evening), routines, products,
+ * completions, and loading states. The component fetches user-specific data and displays it
+ * in a calendar format.
+ *
+ * @returns {JSX.Element} The rendered calendar component.
+ *
+ * @throws {Error} Throws an error if the routine is not found during completion updates.
+ *
+ * @example
+ * // Usage in a parent component
+ * <Calendar />
+ */
 export function Calendar() {
   const { currentUser } = useAuth();
   const today = new Date();
@@ -53,6 +67,25 @@ export function Calendar() {
   useEffect(() => {
     if (!currentUser?.uid) return;
     
+    /**
+     * Asynchronously loads user routines and products from the server.
+     * It fetches the data concurrently using Promise.all and updates the state
+     * with the retrieved routines and active products.
+     *
+     * @async
+     * @function loadData
+     * @returns {Promise<void>} A promise that resolves when the data has been loaded and the state has been updated.
+     *
+     * @throws {Error} Throws an error if the data fetching fails, which is caught and logged to the console.
+     *
+     * @example
+     * // Usage of loadData function
+     * loadData().then(() => {
+     *   console.log('Data loaded successfully');
+     * }).catch((error) => {
+     *   console.error('Failed to load data:', error);
+     * });
+     */
     const loadData = async () => {
       try {
         const [fetchedRoutines, fetchedProducts] = await Promise.all([
@@ -75,6 +108,23 @@ export function Calendar() {
     if (!currentUser?.uid) return;
     setLoading(true);
 
+    /**
+     * Asynchronously loads routine completions for the current user within the selected month.
+     * It fetches the completions from a data source, processes them to generate features for a calendar,
+     * and updates the state with the fetched completions and generated features.
+     *
+     * @async
+     * @function loadCompletions
+     * @throws {Error} Throws an error if there is an issue fetching the routine completions.
+     *
+     * @example
+     * // Example usage of loadCompletions
+     * loadCompletions()
+     *   .then(() => console.log('Completions loaded successfully'))
+     *   .catch(error => console.error('Failed to load completions:', error));
+     *
+     * @returns {Promise<void>} A promise that resolves when the completions have been successfully loaded and processed.
+     */
     const loadCompletions = async () => {
       try {
         const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
@@ -131,6 +181,26 @@ export function Calendar() {
   };
 
   // Get completion status for a routine
+  /**
+   * Retrieves a completion object for a specific routine on the selected date.
+   *
+   * This function searches through an array of completion objects to find one that matches
+   * the provided routine ID and the currently selected date. If a matching completion is found,
+   * it is returned; otherwise, the function returns undefined.
+   *
+   * @param {string} routineId - The ID of the routine for which to find the completion.
+   * @returns {Completion | undefined} The completion object if found, otherwise undefined.
+   *
+   * @example
+   * const completion = getRoutineCompletion('12345');
+   * if (completion) {
+   *   console.log('Completion found:', completion);
+   * } else {
+   *   console.log('No completion found for the given routine ID.');
+   * }
+   *
+   * @throws {Error} Throws an error if the routineId is not a valid string.
+   */
   const getRoutineCompletion = (routineId: string) => {
     return completions.find(completion => 
       completion.routineId === routineId && 
@@ -139,6 +209,28 @@ export function Calendar() {
   };
 
   // Handle step completion toggle
+  /**
+   * Toggles the completion status of a step in a routine for the current user.
+   *
+   * This asynchronous function checks if the current user is authenticated and
+   * updates the completion status of a specified step in a routine. If no completion
+   * record exists for the routine, it creates a new one. If a record does exist,
+   * it updates the existing completion record with the new status.
+   *
+   * @param {string} routineId - The ID of the routine to update.
+   * @param {string} productId - The ID of the product whose step completion is being toggled.
+   * @param {boolean} completed - The new completion status for the specified step.
+   *
+   * @throws {Error} Throws an error if the routine is not found or if there is an issue
+   *                 during the update process.
+   *
+   * @returns {Promise<void>} A promise that resolves when the operation is complete.
+   *
+   * @example
+   * handleStepToggle('routine123', 'product456', true)
+   *   .then(() => console.log('Step toggled successfully'))
+   *   .catch(error => console.error('Failed to toggle step:', error));
+   */
   const handleStepToggle = async (routineId: string, productId: string, completed: boolean) => {
     if (!currentUser?.uid) return;
     setSaving(true);
@@ -218,6 +310,21 @@ export function Calendar() {
   };
 
   // Handle date selection
+  /**
+   * Handles the selection of a date and updates the selected date state.
+   *
+   * This function is typically used in a date picker component to manage
+   * the user's date selection. When a date is selected, this function is
+   * called to update the internal state with the newly selected date.
+   *
+   * @param {Date} date - The date object representing the selected date.
+   * @throws {Error} Throws an error if the provided date is invalid.
+   *
+   * @example
+   * // Example usage of handleDateSelect
+   * const selectedDate = new Date('2023-10-01');
+   * handleDateSelect(selectedDate);
+   */
   const handleDateSelect = (date: Date) => {
     setSelectedDate(date);
   };
