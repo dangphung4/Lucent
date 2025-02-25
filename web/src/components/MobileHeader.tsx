@@ -29,7 +29,7 @@ export function MobileHeader() {
       }}
     >
       <div className="container px-4 mx-auto">
-        <div className="flex items-center justify-between h-12 mt-3">
+        <div className="flex items-center justify-between h-12 mt-6">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <img src={LucentLogo} alt="Lucent Logo" className="w-8 h-8" />
