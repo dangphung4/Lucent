@@ -40,6 +40,30 @@ interface EditDiaryEntryDialogProps {
   onOpenChange?: (open: boolean) => void;
 }
 
+/**
+ * A dialog component for editing diary entries or product reviews.
+ *
+ * @param {Object} props - The properties for the dialog.
+ * @param {JournalEntry} props.entry - The entry to be edited, containing details such as date, title, and review.
+ * @param {Function} props.onEntryUpdated - Callback function to be called when the entry is successfully updated.
+ * @param {Function} props.onEntryDeleted - Callback function to be called when the entry is successfully deleted.
+ * @param {React.ReactNode} props.children - Child components to be rendered as the dialog trigger.
+ * @param {boolean} props.open - A controlled prop to manage the open state of the dialog.
+ * @param {Function} props.onOpenChange - A function to set the controlled open state.
+ *
+ * @returns {JSX.Element} The rendered dialog component.
+ *
+ * @throws {Error} Throws an error if there is an issue updating or deleting the entry.
+ *
+ * @example
+ * <EditDiaryEntryDialog
+ *   entry={entry}
+ *   onEntryUpdated={() => console.log('Entry updated')}
+ *   onEntryDeleted={() => console.log('Entry deleted')}
+ * >
+ *   <Button>Edit Entry</Button>
+ * </EditDiaryEntryDialog>
+ */
 export function EditDiaryEntryDialog({ 
   entry,
   onEntryUpdated,
@@ -71,6 +95,26 @@ export function EditDiaryEntryDialog({
     setEntryText(entry.review);
   }, [entry]);
 
+  /**
+   * Handles the submission of a journal entry form.
+   *
+   * This asynchronous function prevents the default form submission behavior,
+   * checks for the presence of a current user and validates the entry text.
+   * If validation passes, it prepares the data for updating a journal entry
+   * and calls the appropriate update function. It also manages loading states
+   * and displays success or error messages based on the outcome of the update.
+   *
+   * @param {React.FormEvent} e - The event object from the form submission.
+   * @returns {Promise<void>} - A promise that resolves when the submission process is complete.
+   *
+   * @throws {Error} - Throws an error if there is an issue updating the journal entry.
+   *
+   * @example
+   * // Example usage within a React component
+   * const handleFormSubmit = (event) => {
+   *   handleSubmit(event);
+   * };
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser?.uid) return;
@@ -104,6 +148,30 @@ export function EditDiaryEntryDialog({
     }
   };
 
+  /**
+   * Asynchronously handles the deletion of a journal entry or product review.
+   * This function checks if the current user is authenticated before attempting
+   * to delete the specified entry. It provides feedback to the user via toast notifications
+   * and manages the state of the delete dialog.
+   *
+   * @async
+   * @function handleDelete
+   * @returns {Promise<void>} A promise that resolves when the deletion process is complete.
+   *
+   * @throws {Error} Throws an error if the deletion fails, which is caught and logged.
+   *
+   * @example
+   * // Usage within a component
+   * const onDelete = async () => {
+   *   await handleDelete();
+   * };
+   *
+   * @example
+   * // Example of handling success and error notifications
+   * handleDelete()
+   *   .then(() => console.log('Entry deleted successfully'))
+   *   .catch((error) => console.error('Failed to delete entry', error));
+   */
   const handleDelete = async () => {
     if (!currentUser?.uid) return;
     
