@@ -36,6 +36,15 @@ const formatDuration = (days: number) => {
   return months === 1 ? '1 month' : `${months} months`;
 };
 
+/**
+ * Journal component for tracking skincare products and journal entries.
+ * This component allows users to view, add, and manage their skincare products and journal entries.
+ * It includes functionalities for searching products, filtering journal entries, and displaying product cards.
+ *
+ * @component
+ * @example
+ * <Journal />
+ */
 export function Journal() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('tracking');
@@ -79,6 +88,25 @@ export function Journal() {
   );
   
   // Check if an entry is a diary entry (without specific product details)
+  /**
+   * Determines if a given journal entry is classified as a diary entry.
+   *
+   * This function checks the type of the journal entry and its product ID
+   * to ascertain whether it qualifies as a diary entry. It returns true if
+   * the entry's type is 'diary' or if the product ID is 'diary-entry'.
+   *
+   * @param {JournalEntry} entry - The journal entry to evaluate.
+   * @returns {boolean} True if the entry is a diary entry, false otherwise.
+   *
+   * @example
+   * const entry1 = { type: 'diary', productId: '12345' };
+   * const entry2 = { type: 'note', productId: 'diary-entry' };
+   *
+   * console.log(isDiaryEntry(entry1)); // Output: true
+   * console.log(isDiaryEntry(entry2)); // Output: true
+   *
+   * @throws {TypeError} Throws an error if the provided entry is not of type JournalEntry.
+   */
   const isDiaryEntry = (entry: JournalEntry) => {
     return entry.type === 'diary' || entry.productId === 'diary-entry';
   };
@@ -96,12 +124,56 @@ export function Journal() {
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 
   // Product Card component to reuse across tabs
+  /**
+   * A functional component that renders a product card displaying product details,
+   * usage duration, latest journal entry, and actions for updating usage or adding reviews.
+   *
+   * @param {Object} props - The properties for the ProductCard component.
+   * @param {Product} props.product - The product object containing details such as id, name, brand, category, and usage duration.
+   * @param {Function} props.onUpdate - A callback function that is called when the product usage is updated or a new journal entry is added.
+   *
+   * @returns {JSX.Element} The rendered product card component.
+   *
+   * @example
+   * const product = {
+   *   id: 1,
+   *   name: 'Hydrating Moisturizer',
+   *   brand: 'SkinCare Co.',
+   *   category: 'Moisturizer',
+   *   usageDuration: 30
+   * };
+   *
+   * const handleUpdate = () => {
+   *   console.log('Product usage updated');
+   * };
+   *
+   * <ProductCard product={product} onUpdate={handleUpdate} />
+   */
   const ProductCard = ({ product, onUpdate }: { product: Product, onUpdate: () => void }) => {
     const latestEntry = journalEntries
       .filter(entry => entry.productId === product.id)
       .sort((a, b) => b.date.getTime() - a.date.getTime())[0];
 
     // Determine card color based on product category
+    /**
+     * Retrieves the background color class based on the product's category.
+     * If the product does not have a category, a default background color is returned.
+     *
+     * The function checks the category of the product and returns a corresponding
+     * CSS class for background color that is suitable for both light and dark themes.
+     *
+     * @returns {string} The CSS class for the background color.
+     *
+     * @example
+     * // Assuming product.category is 'Moisturizer'
+     * const colorClass = getCategoryColor(); // Returns 'bg-blue-50/50 dark:bg-blue-950/30'
+     *
+     * @example
+     * // Assuming product.category is undefined
+     * const colorClass = getCategoryColor(); // Returns 'bg-card dark:bg-card'
+     *
+     * @throws {Error} Throws an error if the product object is not defined.
+     */
     const getCategoryColor = () => {
       if (!product.category) return 'bg-card dark:bg-card';
       
@@ -209,6 +281,17 @@ export function Journal() {
   };
 
   // Handle clicking on a journal entry
+  /**
+   * Handles the click event for a journal entry.
+   * This function sets the selected journal entry and opens the edit dialog.
+   *
+   * @param {JournalEntry} entry - The journal entry that was clicked.
+   * @throws {Error} Throws an error if the entry is invalid or undefined.
+   *
+   * @example
+   * // Assuming 'entry' is a valid JournalEntry object
+   * handleEntryClick(entry);
+   */
   const handleEntryClick = (entry: JournalEntry) => {
     setSelectedEntry(entry);
     setEditDialogOpen(true);
