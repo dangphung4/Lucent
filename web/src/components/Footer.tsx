@@ -1,10 +1,15 @@
 import { Link } from 'react-router-dom';
+import { cn } from '../lib/utils';
 
-export function Footer() {
+interface FooterProps {
+  className?: string;
+}
+
+export function Footer({ className }: FooterProps) {
   const currentYear = new Date().getFullYear();
   
   return (
-    <footer className="border-t bg-background">
+    <footer className={cn("border-t bg-background", className)}>
       <div className="container px-4 py-8 md:px-6 md:py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="flex flex-col gap-2">

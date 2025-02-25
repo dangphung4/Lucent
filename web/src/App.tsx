@@ -28,40 +28,24 @@ function AppRoutes() {
   
   return (
     <Routes>
-      <Route path="/" element={
-        <RootLayout>
-          <LandingPage />
-        </RootLayout>
-      } />
-      <Route 
-        path="/login" 
-        element={
-          <RootLayout>
-            {currentUser ? <Navigate to="/dashboard" /> : <LoginPage />}
-          </RootLayout>
-        } 
-      />
-      <Route 
-        path="/dashboard" 
-        element={
-          <ProtectedRoute>
-            <RootLayout>
+      <Route element={<RootLayout />}>
+        <Route path="/" element={<LandingPage />} />
+        <Route 
+          path="/login" 
+          element={currentUser ? <Navigate to="/dashboard" /> : <LoginPage />} 
+        />
+        <Route 
+          path="/dashboard" 
+          element={
+            <ProtectedRoute>
               <Dashboard />
-            </RootLayout>
-          </ProtectedRoute>
-        } 
-      />
-      <Route path="/features" element={
-        <RootLayout>
-          <LandingPage />
-        </RootLayout>
-      } />
-      <Route path="/how-it-works" element={
-        <RootLayout>
-          <LandingPage />
-        </RootLayout>
-      } />
-      <Route path="*" element={<Navigate to="/" />} />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="/features" element={<LandingPage />} />
+        <Route path="/how-it-works" element={<LandingPage />} />
+        <Route path="*" element={<Navigate to="/" />} />
+      </Route>
     </Routes>
   );
 }

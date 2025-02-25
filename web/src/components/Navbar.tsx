@@ -1,136 +1,81 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../lib/AuthContext';
 import { Button } from './ui/button';
 import { ThemeToggle } from './ui/theme-toggle';
 
 export function Navbar() {
   const { currentUser, logOut } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background shadow-sm">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
+    <header 
+      className={`sticky top-0 z-50 w-full transition-all duration-300 hidden md:block ${
+        scrolled 
+          ? 'bg-background/95 backdrop-blur-md shadow-md border-b' 
+          : 'bg-background border-b border-transparent'
+      }`}
+    >
+      <div className="container px-4 mx-auto">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 group">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:scale-110">
               <span className="text-lg font-bold text-primary-foreground">ST</span>
             </div>
-            <span className="text-xl font-bold">Skincare Track</span>
+            <span className="text-xl font-bold transition-colors duration-200 group-hover:text-primary">
+              Skincare Track
+            </span>
           </Link>
-        </div>
 
-        {/* Mobile menu button */}
-        <button
-          className="inline-flex items-center justify-center rounded-md p-2 text-foreground hover:bg-accent hover:text-accent-foreground md:hidden"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-expanded={isMenuOpen}
-        >
-          <span className="sr-only">Toggle menu</span>
-          {isMenuOpen ? (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          ) : (
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-6 w-6"
-            >
-              <line x1="4" y1="12" x2="20" y2="12"></line>
-              <line x1="4" y1="6" x2="20" y2="6"></line>
-              <line x1="4" y1="18" x2="20" y2="18"></line>
-            </svg>
-          )}
-        </button>
-
-        {/* Desktop navigation */}
-        <nav className="hidden md:flex md:items-center md:gap-6">
-          <Link to="/features" className="text-sm font-medium transition-colors hover:text-primary">
-            Features
-          </Link>
-          <Link to="/how-it-works" className="text-sm font-medium transition-colors hover:text-primary">
-            How It Works
-          </Link>
-          {currentUser ? (
+          {/* Desktop Navigation */}
+          <nav className="flex items-center gap-6">
             <div className="flex items-center gap-4">
-              <Link to="/dashboard" className="text-sm font-medium transition-colors hover:text-primary">
-                Dashboard
+              <Link 
+                to="/features" 
+                className={`text-sm font-medium transition-colors hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full ${
+                  location.pathname === '/features' ? 'text-primary after:w-full' : ''
+                }`}
+              >
+                Features
               </Link>
-              <div className="hidden items-center gap-2 lg:flex">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  {currentUser.email?.charAt(0).toUpperCase()}
-                </div>
-                <span className="text-sm">
-                  {currentUser.email?.split('@')[0]}
-                </span>
-              </div>
-              <Button variant="outline" size="sm" onClick={logOut}>
-                Log Out
-              </Button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link to="/login">
-                <Button variant="outline" size="sm">Sign In</Button>
+              <Link 
+                to="/how-it-works" 
+                className={`text-sm font-medium transition-colors hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full ${
+                  location.pathname === '/how-it-works' ? 'text-primary after:w-full' : ''
+                }`}
+              >
+                How It Works
               </Link>
-              <Link to="/login">
-                <Button size="sm">Get Started</Button>
-              </Link>
-            </div>
-          )}
-          <ThemeToggle />
-        </nav>
-      </div>
-
-      {/* Mobile navigation */}
-      {isMenuOpen && (
-        <div className="container md:hidden">
-          <nav className="flex flex-col space-y-4 py-4">
-            <Link 
-              to="/features" 
-              className="text-sm font-medium transition-colors hover:text-primary"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Features
-            </Link>
-            <Link 
-              to="/how-it-works" 
-              className="text-sm font-medium transition-colors hover:text-primary"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              How It Works
-            </Link>
-            {currentUser ? (
-              <>
+              {currentUser && (
                 <Link 
                   to="/dashboard" 
-                  className="text-sm font-medium transition-colors hover:text-primary"
-                  onClick={() => setIsMenuOpen(false)}
+                  className={`text-sm font-medium transition-colors hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full ${
+                    location.pathname === '/dashboard' ? 'text-primary after:w-full' : ''
+                  }`}
                 >
                   Dashboard
                 </Link>
-                <div className="flex items-center justify-between pt-2">
-                  <div className="flex items-center gap-2">
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 pl-2">
+              <ThemeToggle />
+              
+              {currentUser ? (
+                <div className="flex items-center gap-3">
+                  <div className="hidden items-center gap-2 lg:flex">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                       {currentUser.email?.charAt(0).toUpperCase()}
                     </div>
@@ -138,35 +83,40 @@ export function Navbar() {
                       {currentUser.email?.split('@')[0]}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <ThemeToggle />
-                    <Button variant="outline" size="sm" onClick={() => {
-                      logOut();
-                      setIsMenuOpen(false);
-                    }}>
-                      Log Out
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={logOut}
+                    className="rounded-full hover:bg-primary hover:text-primary-foreground transition-colors"
+                  >
+                    Log Out
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link to="/login">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="rounded-full transition-all hover:bg-primary/10"
+                    >
+                      Sign In
                     </Button>
-                  </div>
+                  </Link>
+                  <Link to="/login">
+                    <Button 
+                      size="sm"
+                      className="rounded-full shadow-sm hover:shadow-md transition-all"
+                    >
+                      Get Started
+                    </Button>
+                  </Link>
                 </div>
-              </>
-            ) : (
-              <div className="flex flex-col gap-2 pt-2">
-                <div className="flex items-center justify-between">
-                  <ThemeToggle />
-                  <div className="flex gap-2">
-                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                      <Button variant="outline" size="sm">Sign In</Button>
-                    </Link>
-                    <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                      <Button size="sm">Get Started</Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </nav>
         </div>
-      )}
+      </div>
     </header>
   );
 } 
