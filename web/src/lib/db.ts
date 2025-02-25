@@ -82,8 +82,10 @@ export interface JournalEntry {
   effects: string[];
   usageDuration: number; // in days
   notes: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+  type?: 'diary' | 'product'; // Add type field to distinguish between diary entries and product reviews
+  title?: string; // Add title field for diary entries
 }
 
 /**
@@ -388,6 +390,7 @@ export const addJournalEntry = async (entry: Omit<JournalEntry, 'id' | 'createdA
       id: entriesRef.id,
       createdAt: new Date(),
       updatedAt: new Date(),
+      type: entry.productId === 'diary-entry' ? 'diary' : 'product', // Set type based on productId
     };
     
     await setDoc(entriesRef, entryData);

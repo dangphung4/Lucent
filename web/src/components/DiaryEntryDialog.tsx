@@ -8,71 +8,72 @@ import {
   DialogTitle,
   DialogTrigger,
 } from './ui/dialog';
-import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Calendar } from './ui/calendarshadcn';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { CalendarIcon, Loader2 } from 'lucide-react';
+import { CalendarIcon, Loader2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 import { addJournalEntry } from '@/lib/db';
+import { Input } from './ui/input';
 
-interface AddJournalEntryDialogProps {
-  productId: string;
-  productName: string;
+interface DiaryEntryDialogProps {
+  productId?: string;
+  productName?: string;
   onEntryAdded?: () => void;
   children?: React.ReactNode;
 }
 
-export function AddJournalEntryDialog({ 
-  productId, 
+export function DiaryEntryDialog({ 
+  productId,
   productName,
   onEntryAdded,
   children 
-}: AddJournalEntryDialogProps) {
+}: DiaryEntryDialogProps) {
   const { currentUser } = useAuth();
   const [open, setOpen] = useState(false);
   const [date, setDate] = useState<Date>(new Date());
-  const [rating, setRating] = useState<number>(0);
-  const [review, setReview] = useState('');
-  const [effects, setEffects] = useState('');
-  const [notes, setNotes] = useState('');
+  const [title, setTitle] = useState('');
+  const [entry, setEntry] = useState('');
   const [saving, setSaving] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser?.uid) return;
+    if (!entry.trim()) {
+      toast.error('Please write something in your journal entry');
+      return;
+    }
     
     setSaving(true);
     try {
       await addJournalEntry({
         userId: currentUser.uid,
-        productId,
+        productId: productId || 'diary-entry', // Use a special ID for diary entries without a product
         date,
-        rating,
-        review,
-        effects: effects.split(',').map(e => e.trim()).filter(Boolean),
-        usageDuration: Math.floor((new Date().getTime() - date.getTime()) / (1000 * 60 * 60 * 24)),
-        notes,
-        type: 'product'
+        rating: 0, // Not applicable for diary entries
+        review: entry,
+        effects: [], // Not applicable for diary entries
+        usageDuration: 0, // Not applicable for diary entries
+        notes: '',
+        type: 'diary', // Explicitly set type to diary
+        title: title.trim() || 'Diary Entry' // Use default title if none provided
       });
       
-      toast.success('Product review added');
+      toast.success('Diary entry added');
       setOpen(false);
       onEntryAdded?.();
       
       // Reset form
       setDate(new Date());
-      setRating(0);
-      setReview('');
-      setEffects('');
-      setNotes('');
+      setTitle('');
+      setEntry('');
     } catch (error) {
-      console.error('Error adding product review:', error);
-      toast.error('Error adding product review');
+      console.error('Error adding diary entry:', error);
+      toast.error('Error adding diary entry');
     } finally {
       setSaving(false);
     }
@@ -81,14 +82,21 @@ export function AddJournalEntryDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {children || <Button variant="ghost" size="sm">Add Review</Button>}
+        {children || (
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            New Diary Entry
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle className="text-xl">Add Product Review</DialogTitle>
+            <DialogTitle className="text-xl">Add to Your Skincare Diary</DialogTitle>
             <DialogDescription>
-              Record your experience with {productName}
+              {productName 
+                ? `Write about your experience with ${productName}` 
+                : "Record your thoughts, observations, and skincare journey"}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -120,58 +128,29 @@ export function AddJournalEntryDialog({
             </div>
             
             <div className="grid gap-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="rating" className="text-sm font-medium">Rating (0-5)</Label>
-                <Input
-                  id="rating"
-                  type="number"
-                  min="0"
-                  max="5"
-                  step="0.5"
-                  value={rating}
-                  onChange={(e) => setRating(parseFloat(e.target.value))}
-                  className="w-24 text-right"
-                />
-              </div>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="review" className="text-sm font-medium">Review</Label>
-              <Textarea
-                id="review"
-                placeholder="How did this product work for you?"
-                value={review}
-                onChange={(e) => setReview(e.target.value)}
-                className="min-h-[120px] resize-none border-muted-foreground/20 focus-visible:ring-primary/30"
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Share your thoughts on this product's effectiveness, texture, scent, and how it works for your skin.
-              </p>
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="effects" className="text-sm font-medium">Effects (comma-separated)</Label>
+              <Label htmlFor="title" className="text-sm font-medium">Title</Label>
               <Input
-                id="effects"
-                placeholder="e.g., hydrating, soothing, brightening"
-                value={effects}
-                onChange={(e) => setEffects(e.target.value)}
+                id="title"
+                placeholder="Give your entry a title (optional)"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
                 className="border-muted-foreground/20 focus-visible:ring-primary/30"
               />
-              <p className="text-xs text-muted-foreground mt-1">
-                List the effects you've noticed, separated by commas
-              </p>
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="notes" className="text-sm font-medium">Additional Notes</Label>
+              <Label htmlFor="entry" className="text-sm font-medium">Entry</Label>
               <Textarea
-                id="notes"
-                placeholder="Any other observations or notes?"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                className="min-h-[80px] resize-none border-muted-foreground/20 focus-visible:ring-primary/30"
+                id="entry"
+                placeholder="Dear diary, today my skin felt..."
+                value={entry}
+                onChange={(e) => setEntry(e.target.value)}
+                className="min-h-[200px] resize-none border-muted-foreground/20 focus-visible:ring-primary/30"
+                autoFocus
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Write freely about how your skin feels, what products you used, any changes you've noticed, etc.
+              </p>
             </div>
           </div>
           
@@ -187,12 +166,12 @@ export function AddJournalEntryDialog({
               </Button>
               <Button 
                 type="submit" 
-                disabled={saving}
+                disabled={saving || !entry.trim()}
                 size="sm"
                 className="px-4"
               >
                 {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Save Review
+                Save Entry
               </Button>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Avatar } from './ui/avatar';
 import { Badge } from './ui/badge';
-import { Loader2, Calendar as CalendarIcon, Clock, Star, FileText, TrendingUp, Search, Beaker, Plus } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon, Clock, Star, FileText, TrendingUp, Search, Beaker, Plus, BookOpen, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 import { getUserProducts, getUserJournalEntries, type Product, type JournalEntry } from '@/lib/db';
@@ -12,7 +12,8 @@ import { format } from 'date-fns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Button } from './ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { SelectProductJournalDialog } from './SelectProductJournalDialog';
+import { DiaryEntryDialog } from './DiaryEntryDialog';
+import { EditDiaryEntryDialog } from './EditDiaryEntryDialog';
 
 // Add category icons mapping
 const categoryIcons: Record<string, React.ReactNode> = {
@@ -43,6 +44,8 @@ export function Journal() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   // Load products and journal entries
   const loadData = async () => {
@@ -74,6 +77,23 @@ export function Journal() {
     product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
     product.category?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  
+  // Check if an entry is a diary entry (without specific product details)
+  const isDiaryEntry = (entry: JournalEntry) => {
+    return entry.type === 'diary' || entry.productId === 'diary-entry';
+  };
+
+  // Filter journal entries
+  const filteredJournalEntries = journalEntries
+    .filter(entry => {
+      // For the Journal Notes tab, only show diary entries
+      if (activeTab === 'notes') {
+        return isDiaryEntry(entry) && (!selectedProductId || entry.productId === selectedProductId);
+      }
+      // For other tabs, show all entries that match the selected product
+      return !selectedProductId || entry.productId === selectedProductId;
+    })
+    .sort((a, b) => b.date.getTime() - a.date.getTime());
 
   // Product Card component to reuse across tabs
   const ProductCard = ({ product, onUpdate }: { product: Product, onUpdate: () => void }) => {
@@ -81,55 +101,59 @@ export function Journal() {
       .filter(entry => entry.productId === product.id)
       .sort((a, b) => b.date.getTime() - a.date.getTime())[0];
 
+    // Determine card color based on product category
+    const getCategoryColor = () => {
+      if (!product.category) return 'bg-card dark:bg-card';
+      
+      switch(product.category) {
+        case 'Moisturizer': return 'bg-blue-50/50 dark:bg-blue-950/30';
+        case 'Cleanser': return 'bg-green-50/50 dark:bg-green-950/30';
+        case 'Serum': return 'bg-purple-50/50 dark:bg-purple-950/30';
+        case 'Sunscreen': return 'bg-amber-50/50 dark:bg-amber-950/30';
+        case 'Toner': return 'bg-pink-50/50 dark:bg-pink-950/30';
+        case 'Treatment': return 'bg-red-50/50 dark:bg-red-950/30';
+        case 'Mask': return 'bg-indigo-50/50 dark:bg-indigo-950/30';
+        case 'Oil': return 'bg-orange-50/50 dark:bg-orange-950/30';
+        default: return 'bg-card dark:bg-card';
+      }
+    };
+
     return (
-      <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border bg-card shadow-sm hover:shadow-md hover:bg-accent/5 transition-all">
-        <Avatar className="h-12 w-12 shadow-sm bg-background">
-          <div className="flex h-full w-full items-center justify-center rounded-full font-medium">
-            {product.category && categoryIcons[product.category] || (
-              <div className="bg-primary/10 text-primary">
-                <Beaker className="h-5 w-5" />
-              </div>
-            )}
-          </div>
-        </Avatar>
-        <div className="flex-1 w-full min-w-0">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h3 className="font-semibold text-foreground">{product.name}</h3>
-              <p className="text-sm text-muted-foreground/80">{product.brand}</p>
+      <div className={`relative rounded-lg border shadow-sm hover:shadow-md transition-all ${getCategoryColor()}`}>
+        {/* Header section with icon, title and actions */}
+        <div className="flex items-center gap-3 p-3 border-b">
+          <Avatar className="h-10 w-10 shadow-sm bg-background">
+            <div className="flex h-full w-full items-center justify-center rounded-full font-medium">
+              {product.category && categoryIcons[product.category] || (
+                <div className="bg-primary/10 text-primary">
+                  <Beaker className="h-4 w-4" />
+                </div>
+              )}
             </div>
-            <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
-              <UpdateUsageDialog
-                productId={product.id}
-                productName={product.name}
-                onUsageUpdated={onUpdate}
-              />
-              <AddJournalEntryDialog
-                productId={product.id}
-                productName={product.name}
-                onEntryAdded={onUpdate}
-              >
-                <Button variant="ghost" size="sm" className="whitespace-nowrap">
-                  <FileText className="h-4 w-4 mr-1" />
-                  Add Review
-                </Button>
-              </AddJournalEntryDialog>
-            </div>
+          </Avatar>
+          
+          <div className="flex-1 min-w-0">
+            <h3 className="font-medium text-foreground">{product.name}</h3>
+            <p className="text-xs text-muted-foreground">{product.brand}</p>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
+        </div>
+        
+        {/* Content section */}
+        <div className="p-3">
+          <div className="flex flex-wrap gap-2 mb-3">
             {product.usageDuration > 0 && (
-              <Badge variant="secondary" className="h-6 bg-accent/50 text-accent-foreground">
+              <Badge variant="outline" className="text-xs bg-background shadow-sm">
                 <Clock className="h-3 w-3 mr-1" />
                 Using for {formatDuration(product.usageDuration)}
               </Badge>
             )}
             {latestEntry && (
               <>
-                <Badge variant="secondary" className="h-6 bg-accent/50 text-accent-foreground">
+                <Badge variant="outline" className="text-xs bg-background shadow-sm">
                   <Star className="h-3 w-3 mr-1" />
                   {latestEntry.rating}/5
                 </Badge>
-                <Badge variant="secondary" className="h-6 bg-accent/50 text-accent-foreground">
+                <Badge variant="outline" className="text-xs bg-background shadow-sm">
                   <CalendarIcon className="h-3 w-3 mr-1" />
                   Last reviewed {formatDuration(
                     Math.floor(
@@ -140,11 +164,12 @@ export function Journal() {
               </>
             )}
           </div>
+          
           {latestEntry && (
-            <div className="mt-3">
-              <p className="text-sm text-foreground/90">{latestEntry.review}</p>
+            <div className="mb-3">
+              <p className="text-sm text-foreground/90 line-clamp-2">{latestEntry.review}</p>
               {latestEntry.effects.length > 0 && (
-                <div className="flex gap-1.5 mt-3 flex-wrap">
+                <div className="flex gap-1.5 mt-2 flex-wrap">
                   {latestEntry.effects.map((effect: string, index: number) => (
                     <Badge key={index} variant="outline" className="text-xs bg-background shadow-sm">
                       {effect}
@@ -154,9 +179,39 @@ export function Journal() {
               )}
             </div>
           )}
+          
+          {/* Actions */}
+          <div className="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t">
+            <UpdateUsageDialog
+              productId={product.id}
+              productName={product.name}
+              onUsageUpdated={onUpdate}
+            >
+              <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
+                <Clock className="h-3.5 w-3.5 mr-1" />
+                Update Usage
+              </Button>
+            </UpdateUsageDialog>
+            <AddJournalEntryDialog
+              productId={product.id}
+              productName={product.name}
+              onEntryAdded={onUpdate}
+            >
+              <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
+                <FileText className="h-3.5 w-3.5 mr-1" />
+                Add Review
+              </Button>
+            </AddJournalEntryDialog>
+          </div>
         </div>
       </div>
     );
+  };
+
+  // Handle clicking on a journal entry
+  const handleEntryClick = (entry: JournalEntry) => {
+    setSelectedEntry(entry);
+    setEditDialogOpen(true);
   };
 
   if (loading) {
@@ -237,116 +292,132 @@ export function Journal() {
 
           {/* Journal Notes Tab */}
           <TabsContent value="notes" className="space-y-4 mt-6">
-            <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between mb-4">
-              <h3 className="text-lg font-medium">Your Journal Entries</h3>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
+              </div>
               
-              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                {products.length > 0 && (
-                  <div className="w-full sm:w-auto">
-                    <Select 
-                      value={selectedProductId || "all"} 
-                      onValueChange={(value) => setSelectedProductId(value === "all" ? null : value)}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a product" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Products</SelectItem>
-                        {products.map(product => (
-                          <SelectItem key={product.id} value={product.id}>
-                            {product.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
+                <DiaryEntryDialog 
+                  productId={selectedProductId || undefined}
+                  productName={selectedProductId ? products.find(p => p.id === selectedProductId)?.name : undefined}
+                  onEntryAdded={loadData}
+                >
+                  <Button className="w-full sm:w-auto">
+                    <BookOpen className="h-4 w-4 mr-2" />
+                    New Diary Entry
+                  </Button>
+                </DiaryEntryDialog>
+                <h3 className="text-lg font-medium">Your Journal Entries</h3>
                 
-                {selectedProductId ? (
+                {selectedProductId && (
                   <AddJournalEntryDialog
                     productId={selectedProductId}
                     productName={products.find(p => p.id === selectedProductId)?.name || ""}
                     onEntryAdded={loadData}
                   >
-                    <Button className="w-full sm:w-auto">
+                    <Button variant="outline" className="w-full sm:w-auto">
                       <Plus className="h-4 w-4 mr-2" />
-                      New Journal Entry
+                      Product Review
                     </Button>
                   </AddJournalEntryDialog>
-                ) : (
-                  <SelectProductJournalDialog onEntryAdded={loadData}>
-                    <Button className="w-full sm:w-auto">
-                      <Plus className="h-4 w-4 mr-2" />
-                      New Journal Entry
-                    </Button>
-                  </SelectProductJournalDialog>
                 )}
               </div>
             </div>
             
-            <div className="grid gap-4">
-              {journalEntries.length === 0 ? (
+            <div className="grid gap-4 mt-6">
+              {filteredJournalEntries.length === 0 ? (
                 <div className="text-center py-12 px-4 rounded-lg border bg-muted/30 shadow-sm">
                   <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
                   <p className="font-medium text-foreground">No journal entries yet</p>
-                  <p className="text-sm text-muted-foreground/80 mt-1">Start by adding a review to any product</p>
+                  <p className="text-sm text-muted-foreground/80 mt-1">Start by adding a diary entry or product review</p>
                 </div>
               ) : (
-                journalEntries
-                  .filter(entry => !selectedProductId || entry.productId === selectedProductId)
-                  .sort((a, b) => b.date.getTime() - a.date.getTime())
-                  .map(entry => {
-                    const product = products.find(p => p.id === entry.productId);
-                    return (
-                      <div key={entry.id}>
-                        <div className="flex flex-col sm:flex-row items-start gap-4 p-4 rounded-lg border bg-card shadow-sm hover:shadow-md hover:bg-accent/5 transition-all">
-                          <Avatar className="h-12 w-12 shadow-sm bg-background">
+                filteredJournalEntries.map(entry => {
+                  const product = products.find(p => p.id === entry.productId);
+                  const isSimpleDiaryEntry = isDiaryEntry(entry);
+                  
+                  return (
+                    <div key={entry.id}>
+                      <div 
+                        className={`relative rounded-lg border shadow-sm hover:shadow-md transition-all cursor-pointer group ${isSimpleDiaryEntry ? 'bg-blue-50/30 dark:bg-blue-950/10' : 'bg-card'}`}
+                        onClick={() => handleEntryClick(entry)}
+                      >
+                        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Pencil className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                        
+                        {/* Header section with icon, title and date */}
+                        <div className="flex items-center gap-3 p-3 border-b">
+                          <Avatar className={`h-10 w-10 shadow-sm ${isSimpleDiaryEntry ? 'bg-blue-100 dark:bg-blue-900' : 'bg-background'}`}>
                             <div className="flex h-full w-full items-center justify-center rounded-full font-medium">
-                              {product?.category && categoryIcons[product.category] || (
+                              {isSimpleDiaryEntry ? (
                                 <div className="bg-primary/10 text-primary">
-                                  <Beaker className="h-5 w-5" />
+                                  <BookOpen className="h-4 w-4" />
+                                </div>
+                              ) : product?.category && categoryIcons[product.category] ? (
+                                categoryIcons[product.category]
+                              ) : (
+                                <div className="bg-primary/10 text-primary">
+                                  <Beaker className="h-4 w-4" />
                                 </div>
                               )}
                             </div>
                           </Avatar>
-                          <div className="flex-1 w-full min-w-0">
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                              <div>
-                                <h3 className="font-semibold text-foreground">{product?.name || 'Unknown Product'}</h3>
-                                <p className="text-sm text-muted-foreground/80">{product?.brand}</p>
-                              </div>
-                              <div className="flex flex-wrap gap-2 mt-2 sm:mt-0">
-                                <Badge variant="secondary" className="shrink-0 bg-accent/50 text-accent-foreground shadow-sm">
-                                  {format(entry.date, 'MMM d, yyyy')}
-                                </Badge>
-                                <Badge variant="secondary" className="shrink-0 bg-accent/50 text-accent-foreground shadow-sm">
+                          
+                          <div className="flex-1 min-w-0">
+                            {isSimpleDiaryEntry ? (
+                              <h3 className="font-medium text-foreground">{entry.title || 'Diary Entry'}</h3>
+                            ) : (
+                              <h3 className="font-medium text-foreground">{product?.name || 'Unknown Product'}</h3>
+                            )}
+                          </div>
+                          
+                          <Badge variant="secondary" className="shrink-0 bg-accent/50 text-accent-foreground shadow-sm text-xs">
+                            {format(entry.date, 'MMM d, yyyy')}
+                          </Badge>
+                        </div>
+                        
+                        {/* Content section */}
+                        <div className="p-3">
+                          {!isSimpleDiaryEntry && (
+                            <div className="flex items-center gap-2 mb-2">
+                              <p className="text-xs text-muted-foreground">{product?.brand}</p>
+                              {entry.rating > 0 && (
+                                <Badge variant="outline" className="text-xs bg-background shadow-sm">
                                   <Star className="h-3 w-3 mr-1" />
                                   {entry.rating}/5
                                 </Badge>
-                              </div>
-                            </div>
-                            <div className="mt-3">
-                              <p className="text-sm text-foreground/90">{entry.review}</p>
-                              {entry.effects.length > 0 && (
-                                <div className="flex gap-1.5 mt-3 flex-wrap">
-                                  {entry.effects.map((effect, index) => (
-                                    <Badge key={index} variant="outline" className="text-xs bg-background shadow-sm">
-                                      {effect}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              )}
-                              {entry.notes && (
-                                <div className="mt-3 p-3 bg-muted/30 rounded-md">
-                                  <p className="text-sm text-muted-foreground">{entry.notes}</p>
-                                </div>
                               )}
                             </div>
+                          )}
+                          
+                          <div className="text-sm text-foreground/90">
+                            <p className="line-clamp-3 whitespace-normal">{entry.review}</p>
+                            {entry.review.length > 180 && (
+                              <p className="text-xs text-primary mt-1 font-medium">Read more</p>
+                            )}
                           </div>
+                          
+                          {entry.effects.length > 0 && (
+                            <div className="flex gap-1.5 mt-2 flex-wrap">
+                              {entry.effects.map((effect, index) => (
+                                <Badge key={index} variant="outline" className="text-xs bg-background shadow-sm">
+                                  {effect}
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                          
+                          {entry.notes && (
+                            <div className="mt-2 p-2 bg-muted/30 rounded-md">
+                              <p className="text-xs text-muted-foreground">{entry.notes}</p>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    );
-                  })
+                    </div>
+                  );
+                })
               )}
             </div>
           </TabsContent>
@@ -361,6 +432,17 @@ export function Journal() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Edit Dialog */}
+      {selectedEntry && (
+        <EditDiaryEntryDialog
+          entry={selectedEntry}
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          onEntryUpdated={loadData}
+          onEntryDeleted={loadData}
+        />
+      )}
     </div>
   );
 } 
