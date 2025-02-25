@@ -4,6 +4,22 @@ import { useContext } from 'react';
 import { AuthContext } from '../lib/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
+/**
+ * A functional component that renders a mobile navigation bar.
+ * The navigation bar displays different links based on the authentication status of the user.
+ * If a user is logged in, it shows links to the Dashboard, Journal, Calendar, and Profile.
+ * If no user is logged in, it shows links to Home and Sign In.
+ *
+ * @returns {JSX.Element} The rendered mobile navigation component.
+ *
+ * @example
+ * // Usage in a React component
+ * return (
+ *   <MobileNav />
+ * );
+ *
+ * @throws {Error} Throws an error if the context for authentication is not provided.
+ */
 export function MobileNav() {
   const location = useLocation();
   const { currentUser } = useContext(AuthContext);
