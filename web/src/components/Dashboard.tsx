@@ -18,6 +18,21 @@ export interface ProductStats {
   repurchase: number;
 }
 
+/**
+ * Renders the Dashboard component, which displays user-specific information
+ * including greetings, product statistics, recent products, and routine progress.
+ *
+ * The component utilizes hooks to manage state and side effects, such as loading
+ * user data and calculating statistics based on the user's products and routines.
+ *
+ * @returns {JSX.Element} The rendered Dashboard component.
+ *
+ * @example
+ * // Usage in a parent component
+ * <Dashboard />
+ *
+ * @throws {Error} Throws an error if data loading fails.
+ */
 export function Dashboard() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
@@ -52,6 +67,31 @@ export function Dashboard() {
   useEffect(() => {
     if (!currentUser?.uid) return;
 
+    /**
+     * Asynchronously loads user data, including product statistics, routine completions,
+     * current streak, total completed routines, and the five most recent products.
+     *
+     * This function performs the following tasks:
+     * - Sets the loading state to true.
+     * - Fetches user products and calculates product statistics such as total, active,
+     *   finished, and repurchase counts.
+     * - Loads routine completions for calculating streaks and progress.
+     * - Calculates the current streak of consecutive days with at least one completed routine.
+     * - Counts the total number of completed routines where all steps are completed.
+     * - Retrieves the five most recent products based on their creation date.
+     *
+     * @async
+     * @function loadData
+     * @throws {Error} Throws an error if data loading fails.
+     *
+     * @example
+     * // Call the loadData function to initiate data loading
+     * loadData().then(() => {
+     *   console.log('Data loaded successfully');
+     * }).catch(error => {
+     *   console.error('Failed to load data:', error);
+     * });
+     */
     const loadData = async () => {
       setLoading(true);
       try {
