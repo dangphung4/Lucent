@@ -5,6 +5,22 @@ interface FooterProps {
   className?: string;
 }
 
+/**
+ * Renders the footer component of the application.
+ * The footer includes branding, quick links to legal documents,
+ * contact information, and copyright notice.
+ *
+ * @param {FooterProps} props - The properties for the Footer component.
+ * @param {string} props.className - Additional class names to apply to the footer.
+ *
+ * @returns {JSX.Element} The rendered footer component.
+ *
+ * @example
+ * // Example usage of the Footer component
+ * <Footer className="custom-class" />
+ *
+ * @throws {Error} Throws an error if there is an issue rendering the component.
+ */
 export function Footer({ className }: FooterProps) {
   const currentYear = new Date().getFullYear();
   
