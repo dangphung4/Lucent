@@ -3,6 +3,27 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { useAuth } from '../lib/AuthContext';
 
+/**
+ * Renders the landing page of the skincare tracking application.
+ * This component displays a hero section, features, testimonials, and a call-to-action.
+ * It also handles user authentication and navigation based on the user's login status.
+ *
+ * @returns {JSX.Element} The rendered landing page component.
+ *
+ * @example
+ * // Usage in a React application
+ * import { LandingPage } from './LandingPage';
+ *
+ * function App() {
+ *   return (
+ *     <div>
+ *       <LandingPage />
+ *     </div>
+ *   );
+ * }
+ *
+ * @throws {Error} Throws an error if the user authentication fails.
+ */
 export function LandingPage() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
