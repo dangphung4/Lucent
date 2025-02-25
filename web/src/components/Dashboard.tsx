@@ -18,6 +18,21 @@ export interface ProductStats {
   repurchase: number;
 }
 
+/**
+ * Renders the Dashboard component that displays user-specific information,
+ * including greetings, product statistics, and recent products.
+ *
+ * This component utilizes hooks to manage state and side effects, such as
+ * fetching user products and updating the greeting based on the time of day.
+ *
+ * @returns {JSX.Element} The rendered Dashboard component.
+ *
+ * @example
+ * // Usage in a parent component
+ * <Dashboard />
+ *
+ * @throws {Error} Throws an error if there is an issue loading products.
+ */
 export function Dashboard() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
