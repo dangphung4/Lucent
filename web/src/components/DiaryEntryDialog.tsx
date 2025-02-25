@@ -27,6 +27,28 @@ interface DiaryEntryDialogProps {
   children?: React.ReactNode;
 }
 
+/**
+ * A dialog component for adding a diary entry related to a skincare product.
+ *
+ * @param {Object} props - The properties for the DiaryEntryDialog component.
+ * @param {string} props.productId - The ID of the product associated with the diary entry.
+ * @param {string} props.productName - The name of the product for display purposes.
+ * @param {function} props.onEntryAdded - Callback function to be called when a new entry is added.
+ * @param {React.ReactNode} [props.children] - Optional children to render as the dialog trigger.
+ *
+ * @returns {JSX.Element} The rendered dialog component.
+ *
+ * @example
+ * <DiaryEntryDialog
+ *   productId="123"
+ *   productName="Moisturizer"
+ *   onEntryAdded={() => console.log('Entry added!')}
+ * >
+ *   <Button>Open Diary</Button>
+ * </DiaryEntryDialog>
+ *
+ * @throws {Error} Throws an error if there is an issue adding the diary entry.
+ */
 export function DiaryEntryDialog({ 
   productId,
   productName,
@@ -40,6 +62,26 @@ export function DiaryEntryDialog({
   const [entry, setEntry] = useState('');
   const [saving, setSaving] = useState(false);
 
+  /**
+   * Handles the submission of a journal entry form.
+   *
+   * This function is triggered when the user submits the form. It prevents the default form submission behavior,
+   * checks for the current user's ID, and validates the journal entry input. If the input is valid, it attempts
+   * to add a new journal entry using the provided details. It also manages loading states and displays appropriate
+   * success or error messages to the user.
+   *
+   * @param {React.FormEvent} e - The event object representing the form submission.
+   *
+   * @throws {Error} Throws an error if adding the journal entry fails.
+   *
+   * @returns {Promise<void>} A promise that resolves when the journal entry has been successfully added.
+   *
+   * @example
+   * // Example usage within a React component
+   * const onSubmit = (event) => {
+   *   handleSubmit(event);
+   * };
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser?.uid) return;
