@@ -51,32 +51,36 @@ export function LandingPage() {
             
             {/* App Preview Image */}
             <div className="relative w-full max-w-4xl mt-8 md:mt-16">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/5 rounded-3xl blur-3xl -z-10 transform scale-110"></div>
-              <div className="relative bg-card border rounded-2xl shadow-xl overflow-hidden dark:border-gray-800">
-                <div className="aspect-[16/9] md:aspect-[21/9] w-full bg-gradient-to-br from-primary/5 to-background p-4 md:p-8 dark:from-primary/10 dark:to-background">
-                  <div className="h-full w-full rounded-lg bg-card border shadow-sm flex flex-col dark:bg-gray-900 dark:border-gray-800">
-                    <div className="border-b p-4 dark:border-gray-800">
-                      <div className="flex items-center gap-2">
-                        <div className="h-3 w-3 rounded-full bg-red-500"></div>
-                        <div className="h-3 w-3 rounded-full bg-yellow-500"></div>
-                        <div className="h-3 w-3 rounded-full bg-green-500"></div>
-                        <div className="ml-4 h-6 w-64 rounded-md bg-muted dark:bg-gray-800"></div>
-                      </div>
+              {/* Animated background glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl blur-3xl -z-10 transform scale-110 animate-pulse"></div>
+              
+              {/* Animated border container */}
+              <div className="relative group">
+                {/* Animated gradient border */}
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary/50 to-primary rounded-2xl blur-sm group-hover:blur opacity-75 transition duration-1000 group-hover:opacity-100 animate-gradient-xy"></div>
+                
+                {/* Main container */}
+                <div className="relative bg-card border rounded-2xl shadow-2xl overflow-hidden dark:border-gray-800/50 backdrop-blur-sm">
+                  {/* Browser-like top bar */}
+                  <div className="bg-muted/30 backdrop-blur-sm border-b border-primary/10 p-3 flex items-center gap-2">
+                    <div className="flex gap-2">
+                      <div className="h-3 w-3 rounded-full bg-red-500/80"></div>
+                      <div className="h-3 w-3 rounded-full bg-yellow-500/80"></div>
+                      <div className="h-3 w-3 rounded-full bg-green-500/80"></div>
                     </div>
-                    <div className="flex-1 p-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="col-span-2 flex flex-col gap-4">
-                        <div className="h-8 w-48 rounded-md bg-muted dark:bg-gray-800"></div>
-                        <div className="h-24 w-full rounded-md bg-muted dark:bg-gray-800"></div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="h-32 rounded-md bg-muted dark:bg-gray-800"></div>
-                          <div className="h-32 rounded-md bg-muted dark:bg-gray-800"></div>
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-4">
-                        <div className="h-8 w-full rounded-md bg-muted dark:bg-gray-800"></div>
-                        <div className="h-64 w-full rounded-md bg-muted dark:bg-gray-800"></div>
-                      </div>
+                    <div className="flex-1 text-center">
+                      <div className="px-3 py-1 rounded-full bg-muted/30 text-xs text-muted-foreground inline-block">skincaregod.vercel.app</div>
                     </div>
+                  </div>
+                  
+                  {/* Image */}
+                  <div className="p-1">
+                    <img 
+                      src="/dashboard-preview.png" 
+                      alt="Lucent Dashboard Preview" 
+                      className="w-full h-auto rounded-xl shadow-lg transition-transform duration-700 group-hover:scale-[1.02]"
+                      loading="lazy"
+                    />
                   </div>
                 </div>
               </div>
