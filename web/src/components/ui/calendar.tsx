@@ -42,6 +42,7 @@ type CalendarContextProps = {
   locale: Intl.LocalesArgument;
   startDay: number;
   onSelectDate?: (date: Date) => void;
+  selectedDate?: Date;
 };
 
 const CalendarContext = createContext<CalendarContextProps>({
@@ -469,7 +470,7 @@ export const CalendarProvider = ({
   onSelectDate,
   selectedDate,
 }: CalendarProviderProps) => (
-  <CalendarContext.Provider value={{ locale, startDay, onSelectDate }}>
+  <CalendarContext.Provider value={{ locale, startDay, onSelectDate, selectedDate }}>
     <div className={cn('relative flex flex-col', className)}>{children}</div>
   </CalendarContext.Provider>
 );
