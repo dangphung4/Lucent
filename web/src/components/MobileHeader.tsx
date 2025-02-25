@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ThemeToggle } from './ui/theme-toggle';
 
 export function MobileHeader() {
   const [scrolled, setScrolled] = useState(false);

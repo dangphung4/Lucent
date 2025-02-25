@@ -15,7 +15,7 @@ import {
   CalendarMonthPicker,
   CalendarYearPicker,
   CalendarDatePagination,
-  CalendarItem,
+  // CalendarItem,
   Feature,
   Status
 } from './ui/calendar';
