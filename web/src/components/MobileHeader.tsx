@@ -3,6 +3,23 @@ import { Link } from 'react-router-dom';
 import LucentLogo from '../assets/lucent-logo.svg';
 import { ThemeToggle } from './ui/theme-toggle';
 
+/**
+ * A functional component that renders a mobile header for the application.
+ * The header includes a logo and a theme toggle button. It also applies a
+ * scroll effect to change the background of the header based on the scroll
+ * position of the window.
+ *
+ * @returns {JSX.Element} The rendered mobile header component.
+ *
+ * @example
+ * // Usage in a React component
+ * import MobileHeader from './MobileHeader';
+ *
+ * function App() {
+ *   return (
+ *     <div>
+ *       <MobileHeader />
+ *       {/* Other components */
 export function MobileHeader() {
   const [scrolled, setScrolled] = useState(false);
 
