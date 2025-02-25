@@ -1,4 +1,4 @@
-# Skincare Tracker PWA - Project Goals
+# Skincare Tracker PWA - Project Goals - Lucent
 
 ## Project Overview
 Building a progressive web application that allows users to track skincare products, usage patterns, and effectiveness. This app is being developed for personal use to help monitor which products work best over time.
@@ -6,7 +6,12 @@ Building a progressive web application that allows users to track skincare produ
 ## Core Goals
 
 
-1. a log of what I tried 2. a log of what I wanna try 3. review on products on how they made me feel/look 4. how long ive used it 5. a journal for skin care steps to know which order 6. progress section to keep track of progress  
+1. a log of what I tried 
+2. a log of what I wanna try
+ 3. review on products on how they made me feel/look 
+ 4. how long ive used it 
+ 5. a journal for skin care steps to know which order 
+ 6. progress section to keep track of progress  
 
 1. **Product Tracking**
    - Log skincare brands and products used
