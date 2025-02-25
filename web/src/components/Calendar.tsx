@@ -89,25 +89,47 @@ export function Calendar() {
         setCompletions(fetchedCompletions);
         
         // Generate features for the calendar
-        const newFeatures: Feature[] = fetchedCompletions.map(completion => {
-          const routine = routines.find(r => r.id === completion.routineId);
-          const completedSteps = completion.completedSteps.filter(step => step.completed).length;
-          const totalSteps = completion.completedSteps.length;
+        const newFeatures: Feature[] = [];
+        
+        // Group completions by date
+        const completionsByDate = fetchedCompletions.reduce((acc, completion) => {
+          const dateStr = completion.date.toDateString();
+          if (!acc[dateStr]) {
+            acc[dateStr] = [];
+          }
+          acc[dateStr].push(completion);
+          return acc;
+        }, {} as Record<string, RoutineCompletion[]>);
+        
+        // Create features for each date
+        Object.entries(completionsByDate).forEach(([dateStr, dateCompletions]) => {
+          const date = new Date(dateStr);
+          const morningCompletions = dateCompletions.filter(c => c.type === 'morning');
+          const eveningCompletions = dateCompletions.filter(c => c.type === 'evening');
+          
+          // Calculate total completion status
+          const totalSteps = dateCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
+          const completedSteps = dateCompletions.reduce((sum, c) => 
+            sum + c.completedSteps.filter(step => step.completed).length, 0
+          );
           
           let status = STATUSES[2]; // Default to incomplete
-          if (completedSteps === totalSteps) {
-            status = STATUSES[0]; // Completed
-          } else if (completedSteps > 0) {
-            status = STATUSES[1]; // Partial
+          if (totalSteps > 0) {
+            if (completedSteps === totalSteps) {
+              status = STATUSES[0]; // Completed
+            } else if (completedSteps > 0) {
+              status = STATUSES[1]; // Partial
+            }
           }
           
-          return {
-            id: completion.id,
-            name: routine?.name || 'Routine',
-            startAt: completion.date,
-            endAt: completion.date,
+          // Create feature for this date
+          newFeatures.push({
+            id: `routine-${dateStr}`,
+            name: `${morningCompletions.length > 0 ? '🌅 ' : ''}${eveningCompletions.length > 0 ? '🌙 ' : ''}Routines`,
+            startAt: date,
+            endAt: date,
             status
-          };
+          });
         });
         
         setFeatures(newFeatures);
@@ -120,7 +142,7 @@ export function Calendar() {
     };
     
     loadCompletions();
-  }, [currentUser, selectedDate, routines]);
+  }, [currentUser, selectedDate]);
 
   // Get routines for the selected date and tab
   const getRoutinesForDate = () => {
@@ -131,41 +153,49 @@ export function Calendar() {
   };
 
   // Get completion status for a routine
-  const getRoutineCompletion = (routineId: string) => {
+  const getRoutineCompletion = (routineId: string, type: 'morning' | 'evening' | 'weekly' | 'custom') => {
     return completions.find(completion => 
       completion.routineId === routineId && 
-      completion.date.toDateString() === selectedDate.toDateString()
+      completion.date.toDateString() === selectedDate.toDateString() &&
+      completion.type === type
     );
   };
 
   // Handle step completion toggle
-  const handleStepToggle = async (routineId: string, productId: string, completed: boolean) => {
+  const handleStepToggle = async (routineId: string, productId: string, routineType: 'morning' | 'evening' | 'weekly' | 'custom', completed: boolean) => {
     if (!currentUser?.uid) return;
     setSaving(true);
     
     try {
-      const completion = getRoutineCompletion(routineId);
+      const completion = getRoutineCompletion(routineId, routineType);
+      let updatedCompletions = [...completions];
       
       if (!completion) {
         // Create new completion record
         const routine = routines.find(r => r.id === routineId);
         if (!routine) throw new Error('Routine not found');
         
-        await addRoutineCompletion({
+        const newCompletion: Omit<RoutineCompletion, 'id' | 'createdAt' | 'updatedAt'> = {
           userId: currentUser.uid,
           routineId,
+          type: routineType,
           date: selectedDate,
           completedSteps: routine.steps.map(step => ({
             productId: step.productId,
             completed: step.productId === productId ? completed : false
           }))
-        });
+        };
         
-        // Reload completions
-        const startOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-        const endOfMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth() + 1, 0);
-        const updatedCompletions = await getRoutineCompletions(currentUser.uid, startOfMonth, endOfMonth);
-        setCompletions(updatedCompletions);
+        const completionId = await addRoutineCompletion(newCompletion);
+        
+        // Update local state immediately
+        updatedCompletions = [...completions, {
+          ...newCompletion,
+          id: completionId,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        } as RoutineCompletion];
+        
       } else {
         // Update existing completion
         const updatedSteps = completion.completedSteps.map(step => 
@@ -176,13 +206,58 @@ export function Calendar() {
           completedSteps: updatedSteps
         });
         
-        // Update local state
-        setCompletions(prev => prev.map(c => 
-          c.id === completion?.id 
+        // Update local state immediately
+        updatedCompletions = completions.map(c => 
+          c.id === completion.id 
             ? { ...c, completedSteps: updatedSteps }
             : c
-        ));
+        );
       }
+      
+      // Update completions state
+      setCompletions(updatedCompletions);
+      
+      // Update features immediately
+      const completionsByDate = updatedCompletions.reduce((acc, completion) => {
+        const dateStr = completion.date.toDateString();
+        if (!acc[dateStr]) {
+          acc[dateStr] = [];
+        }
+        acc[dateStr].push(completion);
+        return acc;
+      }, {} as Record<string, RoutineCompletion[]>);
+      
+      const newFeatures: Feature[] = [];
+      
+      Object.entries(completionsByDate).forEach(([dateStr, dateCompletions]) => {
+        const date = new Date(dateStr);
+        const morningCompletions = dateCompletions.filter(c => c.type === 'morning');
+        const eveningCompletions = dateCompletions.filter(c => c.type === 'evening');
+        
+        const totalSteps = dateCompletions.reduce((sum, c) => sum + c.completedSteps.length, 0);
+        const completedSteps = dateCompletions.reduce((sum, c) => 
+          sum + c.completedSteps.filter(step => step.completed).length, 0
+        );
+        
+        let status = STATUSES[2]; // Default to incomplete
+        if (totalSteps > 0) {
+          if (completedSteps === totalSteps) {
+            status = STATUSES[0]; // Completed
+          } else if (completedSteps > 0) {
+            status = STATUSES[1]; // Partial
+          }
+        }
+        
+        newFeatures.push({
+          id: `routine-${dateStr}`,
+          name: `${morningCompletions.length > 0 ? '🌅 ' : ''}${eveningCompletions.length > 0 ? '🌙 ' : ''}Routines`,
+          startAt: date,
+          endAt: date,
+          status
+        });
+      });
+      
+      setFeatures(newFeatures);
       
       toast.success('Progress updated');
     } catch (error) {
@@ -306,7 +381,7 @@ export function Calendar() {
                 {selectedRoutines.length > 0 ? (
                   <div className="space-y-6">
                     {selectedRoutines.map(routine => {
-                      const completion = getRoutineCompletion(routine.id);
+                      const completion = getRoutineCompletion(routine.id, 'morning');
                       return (
                         <div key={routine.id} className="space-y-3">
                           <h3 className="font-medium text-lg">{routine.name}</h3>
@@ -332,7 +407,7 @@ export function Calendar() {
                                     "h-8 w-8 rounded-full",
                                     isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90"
                                   )}
-                                  onClick={() => handleStepToggle(routine.id, step.productId, !isCompleted)}
+                                  onClick={() => handleStepToggle(routine.id, step.productId, 'morning', !isCompleted)}
                                   disabled={saving}
                                 >
                                   <Check className={cn(
@@ -373,7 +448,7 @@ export function Calendar() {
                 {selectedRoutines.length > 0 ? (
                   <div className="space-y-6">
                     {selectedRoutines.map(routine => {
-                      const completion = getRoutineCompletion(routine.id);
+                      const completion = getRoutineCompletion(routine.id, 'evening');
                       return (
                         <div key={routine.id} className="space-y-3">
                           <h3 className="font-medium text-lg">{routine.name}</h3>
@@ -399,7 +474,7 @@ export function Calendar() {
                                     "h-8 w-8 rounded-full",
                                     isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90"
                                   )}
-                                  onClick={() => handleStepToggle(routine.id, step.productId, !isCompleted)}
+                                  onClick={() => handleStepToggle(routine.id, step.productId, 'evening', !isCompleted)}
                                   disabled={saving}
                                 >
                                   <Check className={cn(

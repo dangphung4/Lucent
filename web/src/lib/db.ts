@@ -60,6 +60,7 @@ export interface RoutineCompletion {
   id: string;
   userId: string;
   routineId: string;
+  type: 'morning' | 'evening' | 'weekly' | 'custom';
   date: Date;
   completedSteps: Array<{
     productId: string;
