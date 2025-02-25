@@ -39,6 +39,7 @@ If you're helping with this project, please focus on:
 - [ ] Create calendar view for tracking usage
 - [ ] Add PWA capabilities
 - [ ] Set up local storage/IndexedDB
+- Use upload thing for image uploads https://docs.uploadthing.com/
 
 ## Notes
 This is a personal project being developed for my girlfriend to track her skincare routine. The focus is on simplicity and usability over complex features.
