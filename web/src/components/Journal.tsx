@@ -35,6 +35,14 @@ const formatDuration = (days: number) => {
   return months === 1 ? '1 month' : `${months} months`;
 };
 
+/**
+ * The Journal component serves as a user interface for tracking skincare products and journal entries.
+ * It allows users to search for products, view their journal entries, and manage product usage.
+ *
+ * @component
+ * @example
+ * <Journal />
+ */
 export function Journal() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('tracking');
@@ -76,6 +84,33 @@ export function Journal() {
   );
 
   // Product Card component to reuse across tabs
+  /**
+   * Renders a product card component displaying product details, usage duration,
+   * and the latest journal entry associated with the product.
+   *
+   * @param {Object} props - The properties for the ProductCard component.
+   * @param {Product} props.product - The product object containing details such as id, name, brand, category, and usage duration.
+   * @param {Function} props.onUpdate - Callback function to be called when the product usage is updated or a journal entry is added.
+   *
+   * @returns {JSX.Element} The rendered product card component.
+   *
+   * @example
+   * const product = {
+   *   id: '123',
+   *   name: 'Sample Product',
+   *   brand: 'Sample Brand',
+   *   category: 'Sample Category',
+   *   usageDuration: 120
+   * };
+   *
+   * const handleUpdate = () => {
+   *   console.log('Product updated');
+   * };
+   *
+   * <ProductCard product={product} onUpdate={handleUpdate} />
+   *
+   * @throws {Error} Throws an error if the product object is not provided or is invalid.
+   */
   const ProductCard = ({ product, onUpdate }: { product: Product, onUpdate: () => void }) => {
     const latestEntry = journalEntries
       .filter(entry => entry.productId === product.id)
