@@ -51,18 +51,18 @@ export function LandingPage() {
             
             {/* App Preview Image */}
             <div className="relative w-full max-w-4xl mt-8 md:mt-16">
-              {/* Animated background glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl blur-3xl -z-10 transform scale-110 animate-pulse"></div>
+              {/* Simplified background glow - no animation */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl blur-3xl -z-10 transform scale-110"></div>
               
-              {/* Animated border container */}
-              <div className="relative group">
-                {/* Animated gradient border */}
-                <div className="absolute -inset-1 bg-gradient-to-r from-primary via-primary/50 to-primary rounded-2xl blur-sm group-hover:blur opacity-75 transition duration-1000 group-hover:opacity-100 animate-gradient-xy"></div>
+              {/* Simplified container with lighter effects */}
+              <div className="relative">
+                {/* Static border glow instead of animated */}
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/40 to-primary/60 rounded-2xl blur-sm opacity-70"></div>
                 
                 {/* Main container */}
-                <div className="relative bg-card border rounded-2xl shadow-2xl overflow-hidden dark:border-gray-800/50 backdrop-blur-sm">
-                  {/* Browser-like top bar */}
-                  <div className="bg-muted/30 backdrop-blur-sm border-b border-primary/10 p-3 flex items-center gap-2">
+                <div className="relative bg-card border rounded-2xl shadow-xl overflow-hidden dark:border-gray-800/50">
+                  {/* Browser-like top bar - simplified */}
+                  <div className="bg-muted/30 border-b border-primary/10 p-3 flex items-center gap-2">
                     <div className="flex gap-2">
                       <div className="h-3 w-3 rounded-full bg-red-500/80"></div>
                       <div className="h-3 w-3 rounded-full bg-yellow-500/80"></div>
@@ -73,12 +73,12 @@ export function LandingPage() {
                     </div>
                   </div>
                   
-                  {/* Image */}
+                  {/* Image - removed transition effects */}
                   <div className="p-1">
                     <img 
                       src="/dashboard-preview.png" 
                       alt="Lucent Dashboard Preview" 
-                      className="w-full h-auto rounded-xl shadow-lg transition-transform duration-700 group-hover:scale-[1.02]"
+                      className="w-full h-auto rounded-xl shadow-md"
                       loading="lazy"
                     />
                   </div>
