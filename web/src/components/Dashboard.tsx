@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Avatar, AvatarImage } from './ui/avatar';
 import { useNavigate } from 'react-router-dom';
 import { AddProductDialog } from './AddProductDialog';
-import { getUserProducts, Product } from '@/lib/db';
+import { getUserProducts, getRoutineCompletions, Product } from '@/lib/db';
 import { Loader2 } from 'lucide-react';
 import { ProductList } from './ProductList';
 import { RoutineList } from './RoutineList';
@@ -29,8 +29,10 @@ export function Dashboard() {
     finished: 0,
     repurchase: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [streak, setStreak] = useState(0);
+  const [completedRoutines, setCompletedRoutines] = useState(0);
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const productListRef = useRef<{ loadProducts: () => Promise<void> }>(null);
   const navigate = useNavigate();
   
@@ -46,45 +48,93 @@ export function Dashboard() {
     else setGreeting('Good evening');
   }, []);
 
-  // Load products data
+  // Load products and calculate stats
   useEffect(() => {
-    const loadProducts = async () => {
-      if (!currentUser?.uid) return;
-      
-      setIsLoading(true);
+    if (!currentUser?.uid) return;
+
+    const loadData = async () => {
+      setLoading(true);
       try {
-        const products = await getUserProducts(currentUser.uid);
+        const fetchedProducts = await getUserProducts(currentUser.uid);
         
-        // Calculate stats
-        const stats = products.reduce((acc, product) => ({
-          total: acc.total + 1,
-          active: acc.active + (product.status === 'active' ? 1 : 0),
-          finished: acc.finished + (product.status === 'finished' ? 1 : 0),
-          repurchase: acc.repurchase + (product.wouldRepurchase ? 1 : 0),
-        }), {
-          total: 0,
-          active: 0,
-          finished: 0,
-          repurchase: 0,
+        // Calculate product stats
+        const stats: ProductStats = {
+          total: fetchedProducts.length,
+          active: fetchedProducts.filter(p => p.status === 'active').length,
+          finished: fetchedProducts.filter(p => p.status === 'finished').length,
+          repurchase: fetchedProducts.filter(p => p.status === 'finished' && p.wouldRepurchase).length,
+        };
+        setProductStats(stats);
+
+        // Load routine completions for streak and progress calculation
+        const today = new Date();
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(today.getMonth() - 1);
+        
+        const completions = await getRoutineCompletions(currentUser.uid, oneMonthAgo, today);
+        
+        // Calculate streak (consecutive days with at least one completed routine)
+        let currentStreak = 0;
+        const dateMap = new Map<string, boolean>();
+        
+        // Group completions by date
+        completions.forEach(completion => {
+          const dateStr = completion.date.toDateString();
+          const hasCompletedSteps = completion.completedSteps.some(step => step.completed);
+          
+          if (hasCompletedSteps) {
+            dateMap.set(dateStr, true);
+          }
         });
         
-        setProductStats(stats);
+        // Calculate streak
+        const today_str = today.toDateString();
+        const checkDate = new Date(today);
         
+        // Check if today has completions
+        if (dateMap.has(today_str)) {
+          currentStreak = 1;
+          
+          // Check previous days
+          while (true) {
+            checkDate.setDate(checkDate.getDate() - 1);
+            const checkDateStr = checkDate.toDateString();
+            
+            if (dateMap.has(checkDateStr)) {
+              currentStreak++;
+            } else {
+              break;
+            }
+          }
+        }
+        
+        setStreak(currentStreak);
+        
+        // Calculate total completed routines (routines with all steps completed)
+        const completedRoutinesCount = completions.filter(completion => {
+          const totalSteps = completion.completedSteps.length;
+          const completedSteps = completion.completedSteps.filter(step => step.completed).length;
+          return totalSteps > 0 && completedSteps === totalSteps;
+        }).length;
+        
+        setCompletedRoutines(completedRoutinesCount);
+
         // Get 5 most recent products
-        const sorted = [...products].sort((a, b) => {
+        const sorted = [...fetchedProducts].sort((a, b) => {
           const dateA = a.createdAt instanceof Date ? a.createdAt : new Date(a.createdAt);
           const dateB = b.createdAt instanceof Date ? b.createdAt : new Date(b.createdAt);
           return dateB.getTime() - dateA.getTime();
         });
+        
         setRecentProducts(sorted.slice(0, 5));
       } catch (error) {
-        console.error('Error loading products:', error);
+        console.error('Error loading data:', error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    loadProducts();
+    loadData();
   }, [currentUser]);
 
   // Handle tab change
@@ -209,7 +259,7 @@ export function Dashboard() {
                   <CardContent className="p-6">
                     <div className="flex flex-col">
                       <span className="text-green-600 dark:text-green-400 text-sm font-medium">Streak</span>
-                      <span className="text-3xl font-bold mt-1">0</span>
+                      <span className="text-3xl font-bold mt-1">{streak}</span>
                       <span className="text-muted-foreground text-xs mt-1">Days in a row</span>
                     </div>
                   </CardContent>
@@ -219,7 +269,7 @@ export function Dashboard() {
                   <CardContent className="p-6">
                     <div className="flex flex-col">
                       <span className="text-amber-600 dark:text-amber-400 text-sm font-medium">Progress</span>
-                      <span className="text-3xl font-bold mt-1">0</span>
+                      <span className="text-3xl font-bold mt-1">{completedRoutines}</span>
                       <span className="text-muted-foreground text-xs mt-1">Routines completed</span>
                     </div>
                   </CardContent>
@@ -242,7 +292,7 @@ export function Dashboard() {
                 
                 <Card>
                   <CardContent className="p-6">
-                    {isLoading ? (
+                    {loading ? (
                       <div className="flex items-center justify-center py-8">
                         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                       </div>
