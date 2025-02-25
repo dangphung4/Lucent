@@ -1,6 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+/**
+ * A functional component that renders a sticky header for the mobile version of the application.
+ * The header changes its appearance based on the scroll position of the window.
+ *
+ * @returns {JSX.Element} The rendered header component.
+ *
+ * @example
+ * // Usage in a React component
+ * import MobileHeader from './MobileHeader';
+ *
+ * function App() {
+ *   return (
+ *     <div>
+ *       <MobileHeader />
+ *       {/* Other components */
 export function MobileHeader() {
   const [scrolled, setScrolled] = useState(false);
 
