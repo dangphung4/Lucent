@@ -1,15 +1,56 @@
 import { useAuth } from '../lib/AuthContext';
 import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './ui/card';
-import { useState, useEffect } from 'react';
+import { Card, CardContent } from './ui/card';
+import { useState, useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Avatar, AvatarImage } from './ui/avatar';
 import { useNavigate } from 'react-router-dom';
+import { AddProductDialog } from './AddProductDialog';
+import { getUserProducts, getRoutineCompletions, Product } from '@/lib/db';
+import { Loader2 } from 'lucide-react';
+import { ProductList } from './ProductList';
+import { RoutineList } from './RoutineList';
+import { cn } from '@/lib/utils';
+import { Star, Droplets, FlaskConical, CircleDot, Sun, Layers, Sparkles, Eye, Zap, Package } from 'lucide-react';
 
+export interface ProductStats {
+  total: number;
+  active: number;
+  finished: number;
+  repurchase: number;
+}
+
+/**
+ * Renders the Dashboard component, which displays user-specific information
+ * including greetings, product statistics, recent products, and routine progress.
+ *
+ * The component utilizes hooks to manage state and side effects, such as loading
+ * user data and calculating statistics based on the user's products and routines.
+ *
+ * @returns {JSX.Element} The rendered Dashboard component.
+ *
+ * @example
+ * // Usage in a parent component
+ * <Dashboard />
+ *
+ * @throws {Error} Throws an error if data loading fails.
+ */
 export function Dashboard() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [greeting, setGreeting] = useState('Hello');
+  const [productFilter, setProductFilter] = useState<'all' | 'active' | 'finished' | 'repurchase'>('all');
+  const [productStats, setProductStats] = useState<ProductStats>({
+    total: 0,
+    active: 0,
+    finished: 0,
+    repurchase: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [streak, setStreak] = useState(0);
+  const [completedRoutines, setCompletedRoutines] = useState(0);
+  const [recentProducts, setRecentProducts] = useState<Product[]>([]);
+  const productListRef = useRef<{ loadProducts: () => Promise<void> }>(null);
   const navigate = useNavigate();
   
   // Get first name from email or use "there" as fallback
@@ -24,6 +65,120 @@ export function Dashboard() {
     else setGreeting('Good evening');
   }, []);
 
+  // Load products and calculate stats
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+
+    /**
+     * Asynchronously loads user data, including product statistics, routine completions,
+     * current streak, total completed routines, and the five most recent products.
+     *
+     * This function performs the following tasks:
+     * - Sets the loading state to true.
+     * - Fetches user products and calculates product statistics such as total, active,
+     *   finished, and repurchase counts.
+     * - Loads routine completions for calculating streaks and progress.
+     * - Calculates the current streak of consecutive days with at least one completed routine.
+     * - Counts the total number of completed routines where all steps are completed.
+     * - Retrieves the five most recent products based on their creation date.
+     *
+     * @async
+     * @function loadData
+     * @throws {Error} Throws an error if data loading fails.
+     *
+     * @example
+     * // Call the loadData function to initiate data loading
+     * loadData().then(() => {
+     *   console.log('Data loaded successfully');
+     * }).catch(error => {
+     *   console.error('Failed to load data:', error);
+     * });
+     */
+    const loadData = async () => {
+      setLoading(true);
+      try {
+        const fetchedProducts = await getUserProducts(currentUser.uid);
+        
+        // Calculate product stats
+        const stats: ProductStats = {
+          total: fetchedProducts.length,
+          active: fetchedProducts.filter(p => p.status === 'active').length,
+          finished: fetchedProducts.filter(p => p.status === 'finished').length,
+          repurchase: fetchedProducts.filter(p => p.status === 'finished' && p.wouldRepurchase).length,
+        };
+        setProductStats(stats);
+
+        // Load routine completions for streak and progress calculation
+        const today = new Date();
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(today.getMonth() - 1);
+        
+        const completions = await getRoutineCompletions(currentUser.uid, oneMonthAgo, today);
+        
+        // Calculate streak (consecutive days with at least one completed routine)
+        let currentStreak = 0;
+        const dateMap = new Map<string, boolean>();
+        
+        // Group completions by date
+        completions.forEach(completion => {
+          const dateStr = completion.date.toDateString();
+          const hasCompletedSteps = completion.completedSteps.some(step => step.completed);
+          
+          if (hasCompletedSteps) {
+            dateMap.set(dateStr, true);
+          }
+        });
+        
+        // Calculate streak
+        const today_str = today.toDateString();
+        const checkDate = new Date(today);
+        
+        // Check if today has completions
+        if (dateMap.has(today_str)) {
+          currentStreak = 1;
+          
+          // Check previous days
+          while (true) {
+            checkDate.setDate(checkDate.getDate() - 1);
+            const checkDateStr = checkDate.toDateString();
+            
+            if (dateMap.has(checkDateStr)) {
+              currentStreak++;
+            } else {
+              break;
+            }
+          }
+        }
+        
+        setStreak(currentStreak);
+        
+        // Calculate total completed routines (routines with all steps completed)
+        const completedRoutinesCount = completions.filter(completion => {
+          const totalSteps = completion.completedSteps.length;
+          const completedSteps = completion.completedSteps.filter(step => step.completed).length;
+          return totalSteps > 0 && completedSteps === totalSteps;
+        }).length;
+        
+        setCompletedRoutines(completedRoutinesCount);
+
+        // Get 5 most recent products
+        const sorted = [...fetchedProducts].sort((a, b) => {
+          const dateA = a.createdAt instanceof Date ? a.createdAt : new Date(a.createdAt);
+          const dateB = b.createdAt instanceof Date ? b.createdAt : new Date(b.createdAt);
+          return dateB.getTime() - dateA.getTime();
+        });
+        
+        setRecentProducts(sorted.slice(0, 5));
+      } catch (error) {
+        console.error('Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [currentUser]);
+
   // Handle tab change
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -33,7 +188,40 @@ export function Dashboard() {
   const handleEditProfile = () => {
     navigate('/settings?tab=account');
   };
-  
+
+  const handleProductsChange = (stats: ProductStats) => {
+    setProductStats(stats);
+  };
+
+  const handleFilterChange = (filter: typeof productFilter) => {
+    setProductFilter(filter);
+  };
+
+  const getCategoryIcon = (category: string | null | undefined) => {
+    switch (category?.toLowerCase()) {
+      case 'cleanser':
+        return <Droplets className="h-5 w-5" />;
+      case 'toner':
+        return <FlaskConical className="h-5 w-5" />;
+      case 'serum':
+        return <FlaskConical className="h-5 w-5" />;
+      case 'moisturizer':
+        return <CircleDot className="h-5 w-5" />;
+      case 'sunscreen':
+        return <Sun className="h-5 w-5" />;
+      case 'mask':
+        return <Layers className="h-5 w-5" />;
+      case 'exfoliant':
+        return <Sparkles className="h-5 w-5" />;
+      case 'eye cream':
+        return <Eye className="h-5 w-5" />;
+      case 'treatment':
+        return <Zap className="h-5 w-5" />;
+      default:
+        return <Package className="h-5 w-5" />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-8">
       {/* Welcome Section with Gradient */}
@@ -114,8 +302,10 @@ export function Dashboard() {
                   <CardContent className="p-6">
                     <div className="flex flex-col">
                       <span className="text-blue-600 dark:text-blue-400 text-sm font-medium">Products</span>
-                      <span className="text-3xl font-bold mt-1">0</span>
-                      <span className="text-muted-foreground text-xs mt-1">No products added yet</span>
+                      <span className="text-3xl font-bold mt-1">{productStats.total}</span>
+                      <span className="text-muted-foreground text-xs mt-1">
+                        {productStats.active} active
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -123,9 +313,11 @@ export function Dashboard() {
                 <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 border-purple-200 dark:border-purple-800">
                   <CardContent className="p-6">
                     <div className="flex flex-col">
-                      <span className="text-purple-600 dark:text-purple-400 text-sm font-medium">Routines</span>
-                      <span className="text-3xl font-bold mt-1">0</span>
-                      <span className="text-muted-foreground text-xs mt-1">No routines logged yet</span>
+                      <span className="text-purple-600 dark:text-purple-400 text-sm font-medium">Finished</span>
+                      <span className="text-3xl font-bold mt-1">{productStats.finished}</span>
+                      <span className="text-muted-foreground text-xs mt-1">
+                        {productStats.repurchase} would repurchase
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -134,7 +326,7 @@ export function Dashboard() {
                   <CardContent className="p-6">
                     <div className="flex flex-col">
                       <span className="text-green-600 dark:text-green-400 text-sm font-medium">Streak</span>
-                      <span className="text-3xl font-bold mt-1">0</span>
+                      <span className="text-3xl font-bold mt-1">{streak}</span>
                       <span className="text-muted-foreground text-xs mt-1">Days in a row</span>
                     </div>
                   </CardContent>
@@ -144,165 +336,105 @@ export function Dashboard() {
                   <CardContent className="p-6">
                     <div className="flex flex-col">
                       <span className="text-amber-600 dark:text-amber-400 text-sm font-medium">Progress</span>
-                      <span className="text-3xl font-bold mt-1">0</span>
-                      <span className="text-muted-foreground text-xs mt-1">Photos tracked</span>
+                      <span className="text-3xl font-bold mt-1">{completedRoutines}</span>
+                      <span className="text-muted-foreground text-xs mt-1">Routines completed</span>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Quick Actions */}
-              <div>
-                <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-                <div className="grid gap-6 md:grid-cols-3">
-                  <Card className="overflow-hidden group hover:shadow-md transition-all duration-300 border-blue-200 dark:border-blue-800/40">
-                    <CardHeader className="bg-gradient-to-r from-blue-500/10 to-blue-600/5 pb-4">
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-xl">Track Products</CardTitle>
-                        <div className="h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
-                            <rect x="9" y="3" width="6" height="4" rx="2"></rect>
-                            <path d="M9 14h.01"></path>
-                            <path d="M13 14h.01"></path>
-                            <path d="M9 18h.01"></path>
-                            <path d="M13 18h.01"></path>
-                          </svg>
-                        </div>
-                      </div>
-                      <CardDescription>
-                        Log your skincare products and track when you use them
-                      </CardDescription>
-                    </CardHeader>
-                    <CardFooter className="pt-4">
-                      <Button className="w-full rounded-full bg-blue-600 hover:bg-blue-700 text-white">
-                        Add Product
-                      </Button>
-                    </CardFooter>
-                  </Card>
-
-                  <Card className="overflow-hidden group hover:shadow-md transition-all duration-300 border-purple-200 dark:border-purple-800/40">
-                    <CardHeader className="bg-gradient-to-r from-purple-500/10 to-purple-600/5 pb-4">
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-xl">Daily Routine</CardTitle>
-                        <div className="h-10 w-10 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                          </svg>
-                        </div>
-                      </div>
-                      <CardDescription>
-                        Record your morning and evening skincare routines
-                      </CardDescription>
-                    </CardHeader>
-                    <CardFooter className="pt-4">
-                      <Button className="w-full rounded-full bg-purple-600 hover:bg-purple-700 text-white">
-                        Log Today's Routine
-                      </Button>
-                    </CardFooter>
-                  </Card>
-
-                  <Card className="overflow-hidden group hover:shadow-md transition-all duration-300 border-green-200 dark:border-green-800/40">
-                    <CardHeader className="bg-gradient-to-r from-green-500/10 to-green-600/5 pb-4">
-                      <div className="flex justify-between items-start">
-                        <CardTitle className="text-xl">Track Progress</CardTitle>
-                        <div className="h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400 group-hover:scale-110 transition-transform">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                          </svg>
-                        </div>
-                      </div>
-                      <CardDescription>
-                        Monitor your skin's progress and see what works
-                      </CardDescription>
-                    </CardHeader>
-                    <CardFooter className="pt-4">
-                      <Button className="w-full rounded-full bg-green-600 hover:bg-green-700 text-white">
-                        View Progress
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                </div>
-              </div>
-
-              {/* Recent Activity */}
+              {/* Recent Products */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold">Recent Activity</h2>
-                  <Button variant="ghost" size="sm" className="text-primary">
+                  <h2 className="text-xl font-semibold">Recent Products</h2>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-primary"
+                    onClick={() => setActiveTab('products')}
+                  >
                     View All
                   </Button>
                 </div>
                 
                 <Card>
-                  <CardContent className="p-6 space-y-6">
-                    <div className="flex items-center justify-between border-b pb-4">
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="16" y1="2" x2="16" y2="6"></line>
-                            <line x1="8" y1="2" x2="8" y2="6"></line>
-                            <line x1="3" y1="10" x2="21" y2="10"></line>
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 className="text-base font-medium">Morning Routine</h4>
-                          <p className="text-sm text-muted-foreground">
-                            You haven't logged your morning routine today
-                          </p>
-                        </div>
+                  <CardContent className="p-6">
+                    {loading ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                       </div>
-                      <Button variant="outline" size="sm" className="rounded-full hover:bg-primary hover:text-primary-foreground transition-colors">
-                        Log Now
-                      </Button>
-                    </div>
-                    
-                    <div className="flex items-center justify-between border-b pb-4">
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
-                            <rect x="9" y="3" width="6" height="4" rx="2"></rect>
-                            <path d="M9 14h.01"></path>
-                            <path d="M13 14h.01"></path>
-                            <path d="M9 18h.01"></path>
-                            <path d="M13 18h.01"></path>
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 className="text-base font-medium">Product Inventory</h4>
-                          <p className="text-sm text-muted-foreground">
-                            You haven't added any products yet
-                          </p>
-                        </div>
+                    ) : recentProducts.length === 0 ? (
+                      <div className="text-center py-8">
+                        <h3 className="text-lg font-semibold mb-2">No products yet</h3>
+                        <p className="text-muted-foreground mb-4">
+                          Start by adding your first skincare product
+                        </p>
+                        <AddProductDialog 
+                          onProductAdded={() => {
+                            setActiveTab('products');
+                            productListRef.current?.loadProducts();
+                          }}
+                        />
                       </div>
-                      <Button variant="outline" size="sm" className="rounded-full hover:bg-primary hover:text-primary-foreground transition-colors">
-                        Add Products
-                      </Button>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-start gap-4">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 className="text-base font-medium">Progress Tracking</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Start tracking your progress to see results
-                          </p>
-                        </div>
+                    ) : (
+                      <div className="space-y-6">
+                        {recentProducts.map((product) => (
+                          <div 
+                            key={product.id} 
+                            className={cn(
+                              "flex items-center justify-between group relative",
+                              "pb-6 last:pb-0 border-b last:border-0",
+                              product.status === 'finished' && !product.wouldRepurchase && "border-purple-200/50 dark:border-purple-800/30",
+                              product.wouldRepurchase && "border-green-200/50 dark:border-green-800/30"
+                            )}
+                          >
+                            <div className="flex items-start gap-4 flex-1 min-w-0">
+                              <div className={cn(
+                                "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
+                                product.status !== 'finished' && !product.wouldRepurchase && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+                                product.status === 'finished' && !product.wouldRepurchase && "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+                                product.wouldRepurchase && "bg-green-500/10 text-green-600 dark:text-green-400"
+                              )}>
+                                {product.imageUrl ? (
+                                  <img src={product.imageUrl} alt={product.name} className="h-full w-full rounded-full object-cover" />
+                                ) : (
+                                  getCategoryIcon(product.category)
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-base font-medium truncate">{product.name}</h4>
+                                  {product.wouldRepurchase && (
+                                    <Star className="h-4 w-4 text-green-500 shrink-0" />
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <p className="text-sm text-muted-foreground truncate">
+                                    {product.brand}
+                                  </p>
+                                  {product.category && (
+                                    <>
+                                      <span className="text-muted-foreground/40">•</span>
+                                      <span className="text-sm text-muted-foreground">{product.category}</span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            {product.status === 'finished' && (
+                              <div className={cn(
+                                "ml-4 px-3 py-1 rounded-full text-xs font-medium shrink-0",
+                                product.wouldRepurchase 
+                                  ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                                  : "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                              )}>
+                                {product.wouldRepurchase ? 'Would Repurchase' : 'Finished'}
+                              </div>
+                            )}
+                          </div>
+                        ))}
                       </div>
-                      <Button variant="outline" size="sm" className="rounded-full hover:bg-primary hover:text-primary-foreground transition-colors">
-                        Track Progress
-                      </Button>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               </div>
@@ -321,13 +453,26 @@ export function Dashboard() {
                         </svg>
                       </div>
                       <div>
-                        <h3 className="text-lg font-medium mb-1">Consistency is Key</h3>
+                        <h3 className="text-lg font-medium mb-1">Track Your Progress</h3>
                         <p className="text-muted-foreground">
-                          For best results, stick to your skincare routine consistently. Track your daily routines to build healthy habits and see better results over time.
+                          {productStats.total === 0 ? (
+                            "Start by adding your skincare products to track their effectiveness and build your perfect routine."
+                          ) : (
+                            `You have ${productStats.active} active products. Keep track of how they work for your skin and mark them as finished when done.`
+                          )}
                         </p>
-                        <Button variant="link" className="p-0 h-auto mt-2 text-primary font-medium">
-                          Learn more about building routines
-                        </Button>
+                        {productStats.total === 0 && (
+                          <AddProductDialog 
+                            onProductAdded={() => {
+                              setActiveTab('products');
+                              productListRef.current?.loadProducts();
+                            }}
+                          >
+                            <Button variant="link" className="p-0 h-auto mt-2 text-primary font-medium">
+                              Add your first product
+                            </Button>
+                          </AddProductDialog>
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -337,44 +482,123 @@ export function Dashboard() {
           </TabsContent>
           
           <TabsContent value="products" className="mt-0">
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                  <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
-                  <rect x="9" y="3" width="6" height="4" rx="2"></rect>
-                  <path d="M9 14h.01"></path>
-                  <path d="M13 14h.01"></path>
-                  <path d="M9 18h.01"></path>
-                  <path d="M13 18h.01"></path>
-                </svg>
+            <div className="space-y-4">
+              {/* Header Section */}
+              <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b pb-4">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold tracking-tight">Products</h2>
+                    <p className="text-muted-foreground text-sm">
+                      Manage your skincare products and track their usage.
+                    </p>
+                  </div>
+                  <AddProductDialog 
+                    onProductAdded={() => {
+                      setActiveTab('products');
+                      productListRef.current?.loadProducts();
+                    }} 
+                  />
+                </div>
+
+                {/* Quick Stats */}
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <Card className="bg-primary/5">
+                    <CardContent className="p-3">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">Total Products</span>
+                        <span className="text-2xl font-bold">{productStats.total}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-primary/5">
+                    <CardContent className="p-3">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">Active</span>
+                        <span className="text-2xl font-bold">{productStats.active}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-primary/5">
+                    <CardContent className="p-3">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">Finished</span>
+                        <span className="text-2xl font-bold">{productStats.finished}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-primary/5">
+                    <CardContent className="p-3">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">Would Repurchase</span>
+                        <span className="text-2xl font-bold">{productStats.repurchase}</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Filter/Sort Options */}
+                <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-none">
+                  <Button 
+                    variant={productFilter === 'all' ? 'default' : 'outline'} 
+                    size="sm" 
+                    className="whitespace-nowrap"
+                    onClick={() => handleFilterChange('all')}
+                  >
+                    All Products
+                  </Button>
+                  <Button 
+                    variant={productFilter === 'active' ? 'default' : 'outline'} 
+                    size="sm" 
+                    className="whitespace-nowrap"
+                    onClick={() => handleFilterChange('active')}
+                  >
+                    Active
+                  </Button>
+                  <Button 
+                    variant={productFilter === 'finished' ? 'default' : 'outline'} 
+                    size="sm" 
+                    className="whitespace-nowrap"
+                    onClick={() => handleFilterChange('finished')}
+                  >
+                    Finished
+                  </Button>
+                  <Button 
+                    variant={productFilter === 'repurchase' ? 'default' : 'outline'} 
+                    size="sm" 
+                    className="whitespace-nowrap"
+                    onClick={() => handleFilterChange('repurchase')}
+                  >
+                    Would Repurchase
+                  </Button>
+                </div>
               </div>
-              <h2 className="text-2xl font-bold mb-2">No Products Yet</h2>
-              <p className="text-muted-foreground max-w-md mb-6">
-                Start building your skincare collection by adding the products you use regularly.
-              </p>
-              <Button size="lg" className="rounded-full">
-                Add Your First Product
-              </Button>
+
+              {/* Product List */}
+              <div className="mt-2">
+                <ProductList 
+                  ref={productListRef}
+                  filter={productFilter}
+                  onProductsChange={() => setActiveTab('products')}
+                  onStatsChange={handleProductsChange}
+                />
+              </div>
             </div>
           </TabsContent>
           
           <TabsContent value="routines" className="mt-0">
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
+            <div className="space-y-4">
+              {/* Header Section */}
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight">Routines</h2>
+                  <p className="text-muted-foreground text-sm">
+                    Create and manage your skincare routines.
+                  </p>
+                </div>
               </div>
-              <h2 className="text-2xl font-bold mb-2">No Routines Yet</h2>
-              <p className="text-muted-foreground max-w-md mb-6">
-                Create your morning and evening skincare routines to track your daily habits.
-              </p>
-              <Button size="lg" className="rounded-full">
-                Create Your First Routine
-              </Button>
+
+              {/* Routines List */}
+              <RoutineList onRoutinesChange={() => setActiveTab('routines')} />
             </div>
           </TabsContent>
           
