@@ -94,6 +94,7 @@ export function Journal() {
   const [selectedProductId] = useState<string | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({});
 
   // Load products and journal entries
   const loadData = async () => {
@@ -462,6 +463,14 @@ export function Journal() {
     setEditDialogOpen(true);
   };
 
+  // Toggle entry expansion
+  const toggleEntryExpansion = (entryId: string) => {
+    setExpandedEntries(prev => ({
+      ...prev,
+      [entryId]: !prev[entryId]
+    }));
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
@@ -536,163 +545,178 @@ export function Journal() {
           </TabsContent>
 
           {/* Journal Notes Tab */}
-          <TabsContent value="notes" className="space-y-4 mt-6">
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-                <h3 className="text-lg font-medium">Your Journal Entries</h3>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-3 w-full">
-                <DiaryEntryDialog
-                  productId={selectedProductId || undefined}
-                  productName={
-                    selectedProductId
-                      ? products.find((p) => p.id === selectedProductId)?.name
-                      : undefined
-                  }
-                  onEntryAdded={loadData}
-                >
-                  <Button className="w-full sm:w-auto">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    New Diary Entry
+          <TabsContent value="notes" className="space-y-8">
+            {/* Hero Section */}
+            <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-blue-500 to-violet-600 dark:from-blue-600 dark:to-violet-700">
+              <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
+              <div className="relative p-8 sm:p-10 md:p-12 text-white">
+                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Your Skincare Story</h2>
+                <p className="text-white/80 text-lg max-w-xl mb-8">Document your journey, track your progress, and discover what works best for your skin.</p>
+                <DiaryEntryDialog onEntryAdded={loadData}>
+                  <Button size="lg" className="bg-white text-blue-600 hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <BookOpen className="h-5 w-5 mr-2" />
+                    Write New Entry
                   </Button>
                 </DiaryEntryDialog>
               </div>
+              <div className="absolute -bottom-6 right-10 opacity-10">
+                <BookOpen className="h-48 w-48 rotate-12" />
+              </div>
             </div>
 
-            <div className="grid gap-4 mt-6">
+            {/* Entries Section */}
+            <div className="space-y-12">
               {filteredJournalEntries.length === 0 ? (
-                <div className="text-center py-12 px-4 rounded-lg border bg-muted/30 shadow-sm">
-                  <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                  <p className="font-medium text-foreground">
-                    No journal entries yet
-                  </p>
-                  <p className="text-sm text-muted-foreground/80 mt-1">
-                    Start by adding a diary entry or product review
-                  </p>
+                <div className="relative overflow-hidden rounded-3xl border bg-gradient-to-b from-muted/50 to-muted p-12">
+                  <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-black/10" />
+                  <div className="relative text-center space-y-4">
+                    <BookOpen className="h-16 w-16 mx-auto text-muted-foreground/50" />
+                    <h3 className="font-semibold text-xl">Begin Your Skincare Journey</h3>
+                    <p className="text-muted-foreground max-w-sm mx-auto">
+                      Start documenting your skincare experiences and track your progress over time
+                    </p>
+                  </div>
                 </div>
               ) : (
-                filteredJournalEntries.map((entry) => {
-                  const product = products.find(
-                    (p) => p.id === entry.productId
-                  );
-                  const isSimpleDiaryEntry = isDiaryEntry(entry);
+                <div className="grid grid-cols-1 gap-8">
+                  {filteredJournalEntries.map((entry) => {
+                    const product = products.find((p) => p.id === entry.productId);
+                    const isSimpleDiaryEntry = isDiaryEntry(entry);
 
-                  return (
-                    <div key={entry.id}>
+                    return (
                       <div
-                        className={`relative rounded-lg border shadow-sm hover:shadow-md transition-all cursor-pointer group ${
+                        key={entry.id}
+                        className={cn(
+                          "group relative rounded-2xl border transition-all duration-300",
+                          "hover:shadow-xl hover:-translate-y-0.5",
+                          "active:translate-y-0 overflow-hidden cursor-pointer",
                           isSimpleDiaryEntry
-                            ? "bg-blue-50/30 dark:bg-blue-950/10"
-                            : "bg-card"
-                        }`}
+                            ? "bg-gradient-to-br from-blue-50/90 to-transparent dark:from-blue-950/30 dark:to-transparent"
+                            : "bg-gradient-to-br from-violet-50/90 to-transparent dark:from-violet-950/30 dark:to-transparent"
+                        )}
                         onClick={() => handleEntryClick(entry)}
                       >
-                        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Pencil className="h-4 w-4 text-muted-foreground" />
-                        </div>
-
-                        {/* Header section with icon, title and date */}
-                        <div className="flex items-center gap-3 p-3 border-b">
-                          <Avatar
-                            className={`h-10 w-10 shadow-sm ${
+                        <div className="p-6 sm:p-8 space-y-6">
+                          {/* Header */}
+                          <div className="flex items-start gap-4">
+                            <Avatar className={cn(
+                              "h-14 w-14 rounded-2xl shadow-lg",
                               isSimpleDiaryEntry
-                                ? "bg-blue-100 dark:bg-blue-900"
-                                : "bg-background"
-                            }`}
-                          >
-                            <div className="flex h-full w-full items-center justify-center rounded-full font-medium">
-                              {isSimpleDiaryEntry ? (
-                                <div className="bg-primary/10 text-primary">
-                                  <BookOpen className="h-4 w-4" />
-                                </div>
-                              ) : product?.category &&
-                                categoryIcons[product.category] ? (
-                                categoryIcons[product.category]
-                              ) : (
-                                <div className="bg-primary/10 text-primary">
-                                  <Beaker className="h-4 w-4" />
-                                </div>
+                                ? "bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800"
+                                : "bg-gradient-to-br from-violet-100 to-violet-200 dark:from-violet-900 dark:to-violet-800"
+                            )}>
+                              <div className="flex h-full w-full items-center justify-center">
+                                {isSimpleDiaryEntry ? (
+                                  <BookOpen className="h-7 w-7 text-blue-600 dark:text-blue-400" />
+                                ) : product?.category && categoryIcons[product.category] ? (
+                                  categoryIcons[product.category]
+                                ) : (
+                                  <Beaker className="h-7 w-7 text-primary/70" />
+                                )}
+                              </div>
+                            </Avatar>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-4">
+                                <h3 className="text-xl font-semibold tracking-tight">
+                                  {isSimpleDiaryEntry ? (entry.title || "Journal Entry") : product?.name}
+                                </h3>
+                                <time className="text-sm text-muted-foreground whitespace-nowrap">
+                                  {format(entry.date, "MMMM d, yyyy")}
+                                </time>
+                              </div>
+                              {!isSimpleDiaryEntry && product?.brand && (
+                                <p className="text-sm text-muted-foreground mt-1">{product.brand}</p>
                               )}
                             </div>
-                          </Avatar>
-
-                          <div className="flex-1 min-w-0">
-                            {isSimpleDiaryEntry ? (
-                              <h3 className="font-medium text-foreground">
-                                {entry.title || "Diary Entry"}
-                              </h3>
-                            ) : (
-                              <h3 className="font-medium text-foreground">
-                                {product?.name || "Unknown Product"}
-                              </h3>
-                            )}
                           </div>
 
-                          <Badge
-                            variant="secondary"
-                            className="shrink-0 bg-accent/50 text-accent-foreground shadow-sm text-xs"
-                          >
-                            {format(entry.date, "MMM d, yyyy")}
-                          </Badge>
-                        </div>
-
-                        {/* Content section */}
-                        <div className="p-3">
-                          {!isSimpleDiaryEntry && (
-                            <div className="flex items-center gap-2 mb-2">
-                              <p className="text-xs text-muted-foreground">
-                                {product?.brand}
-                              </p>
-                              {entry.rating > 0 && (
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs bg-background shadow-sm"
-                                >
-                                  <Star className="h-3 w-3 mr-1" />
-                                  {entry.rating}/5
-                                </Badge>
-                              )}
-                            </div>
-                          )}
-
-                          <div className="text-sm text-foreground/90">
-                            <p className="line-clamp-3 whitespace-normal">
-                              {entry.review}
-                            </p>
-                            {entry.review.length > 180 && (
-                              <p className="text-xs text-primary mt-1 font-medium">
-                                Read more
-                              </p>
-                            )}
-                          </div>
-
-                          {entry.effects && entry.effects.length > 0 && (
-                            <div className="flex gap-1.5 mt-2 flex-wrap">
-                              {entry.effects.map((effect, index) => (
-                                <Badge
-                                  key={index}
-                                  variant="outline"
-                                  className="text-xs bg-background shadow-sm"
-                                >
-                                  {effect}
-                                </Badge>
+                          {/* Rating Stars */}
+                          {!isSimpleDiaryEntry && entry.rating > 0 && (
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={cn(
+                                    "h-5 w-5",
+                                    i < entry.rating
+                                      ? "text-amber-500 dark:text-amber-400 fill-current"
+                                      : "text-muted stroke-[1.5]"
+                                  )}
+                                />
                               ))}
                             </div>
                           )}
 
-                          {entry.notes && (
-                            <div className="mt-2 p-2 bg-muted/30 rounded-md">
-                              <p className="text-xs text-muted-foreground">
-                                {entry.notes}
-                              </p>
+                          {/* Review Text */}
+                          <div className="prose prose-sm dark:prose-invert max-w-none">
+                            <p className={cn(
+                              "text-base leading-relaxed",
+                              !expandedEntries[entry.id] && "line-clamp-3"
+                            )}>
+                              {entry.review}
+                            </p>
+                            {entry.review.split('\n').length > 3 && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="mt-2 h-auto p-0 text-muted-foreground hover:text-foreground"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  toggleEntryExpansion(entry.id);
+                                }}
+                              >
+                                {expandedEntries[entry.id] ? "Show less" : "Read more"}
+                              </Button>
+                            )}
+                          </div>
+
+                          {/* Effects Tags */}
+                          {entry.effects && entry.effects.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {entry.effects.map((effect, index) => {
+                                const getEffectStyle = () => {
+                                  if (effect.toLowerCase().includes('irritation') || effect.toLowerCase().includes('breakout')) {
+                                    return "bg-red-100/80 text-red-700 ring-red-200 dark:bg-red-500/20 dark:text-red-300 dark:ring-red-500/30";
+                                  }
+                                  if (effect.toLowerCase().includes('hydrating') || effect.toLowerCase().includes('moisturizing')) {
+                                    return "bg-blue-100/80 text-blue-700 ring-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:ring-blue-500/30";
+                                  }
+                                  if (effect.toLowerCase().includes('brightening') || effect.toLowerCase().includes('glowing')) {
+                                    return "bg-amber-100/80 text-amber-700 ring-amber-200 dark:bg-amber-500/20 dark:text-amber-300 dark:ring-amber-500/30";
+                                  }
+                                  if (effect.toLowerCase().includes('calming') || effect.toLowerCase().includes('soothing')) {
+                                    return "bg-green-100/80 text-green-700 ring-green-200 dark:bg-green-500/20 dark:text-green-300 dark:ring-green-500/30";
+                                  }
+                                  return "bg-gray-100/80 text-gray-700 ring-gray-200 dark:bg-gray-500/20 dark:text-gray-300 dark:ring-gray-500/30";
+                                };
+
+                                return (
+                                  <span
+                                    key={index}
+                                    className={cn(
+                                      "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ring-1 ring-inset",
+                                      getEffectStyle()
+                                    )}
+                                  >
+                                    {effect}
+                                  </span>
+                                );
+                              })}
                             </div>
                           )}
+
+                          {/* Edit indicator */}
+                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="p-2 rounded-full bg-background/80 backdrop-blur-sm shadow-sm">
+                              <Pencil className="h-4 w-4 text-muted-foreground" />
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
             </div>
           </TabsContent>
