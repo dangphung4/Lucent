@@ -6,6 +6,27 @@ import { useTheme } from '../lib/ThemeProvider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Chrome, Smartphone, Apple, Monitor, Share, Menu, Plus, ExternalLink } from 'lucide-react';
 
+/**
+ * Renders the landing page of the skincare tracking application.
+ * This component displays a hero section, features, testimonials, and a call-to-action.
+ * It conditionally renders buttons based on the authentication status of the user.
+ *
+ * @returns {JSX.Element} The rendered landing page component.
+ *
+ * @example
+ * // Usage in a React application
+ * import { LandingPage } from './LandingPage';
+ *
+ * function App() {
+ *   return (
+ *     <div>
+ *       <LandingPage />
+ *     </div>
+ *   );
+ * }
+ *
+ * @throws {Error} Throws an error if the user authentication state cannot be determined.
+ */
 export function LandingPage() {
   const { currentUser } = useAuth();
   const { theme } = useTheme();
