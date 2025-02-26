@@ -1,10 +1,25 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Button } from './ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { useAuth } from '../lib/AuthContext';
-import { useTheme } from '../lib/ThemeProvider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Chrome, Smartphone, Apple, Monitor, Share, Menu, Plus, ExternalLink } from 'lucide-react';
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { useAuth } from "../lib/AuthContext";
+import { useTheme } from "../lib/ThemeProvider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import {
+  Chrome,
+  Smartphone,
+  Apple,
+  Monitor,
+  Share,
+  Menu,
+  Plus,
+  ExternalLink,
+} from "lucide-react";
 
 /**
  * Renders the landing page of the skincare tracking application.
@@ -46,53 +61,74 @@ export function LandingPage() {
                 Your Skincare Journey, Tracked
               </h1>
               <p className="mx-auto max-w-[700px] text-muted-foreground text-lg md:text-xl leading-relaxed px-4">
-                Discover what works best for your skin by tracking products, routines, and results in one beautiful app. Join thousands of skincare enthusiasts today.
+                Discover what works best for your skin by tracking products,
+                routines, and results in one beautiful app. Join others on their
+                skincare journey today.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4">
               {currentUser ? (
-                <Button onClick={() => navigate('/dashboard')} size="lg" className="w-full sm:w-auto px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary">
+                <Button
+                  onClick={() => navigate("/dashboard")}
+                  size="lg"
+                  className="w-full sm:w-auto px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                >
                   Dashboard
                 </Button>
               ) : (
-              <Link to="/login" className="w-full sm:w-auto">
-                <Button size="lg" className="w-full px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary">
-                  Get Started Free
-                </Button>
-              </Link>
+                <Link to="/login" className="w-full sm:w-auto">
+                  <Button
+                    size="lg"
+                    className="w-full px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                  >
+                    Get Started Free
+                  </Button>
+                </Link>
               )}
               {currentUser ? (
                 <Link to="/calendar" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full px-8 rounded-full border-2">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full px-8 rounded-full border-2"
+                  >
                     Calendar
-                </Button>
+                  </Button>
                 </Link>
               ) : (
-              <>
-                <Link to="/login" className="w-full sm:w-auto">
-                  <Button size="lg" variant="outline" className="w-full px-8 rounded-full border-2">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/about" className="w-full sm:w-auto">
-                  <Button size="lg" variant="secondary" className="w-full px-8 rounded-full">
-                    About Us
-                  </Button>
-                </Link>
-              </>
+                <>
+                  <Link to="/login" className="w-full sm:w-auto">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="w-full px-8 rounded-full border-2"
+                    >
+                      Sign In
+                    </Button>
+                  </Link>
+                </>
               )}
+              <Link to="/about" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="w-full px-8 rounded-full"
+                >
+                  About Us
+                </Button>
+              </Link>
             </div>
-            
+
             {/* App Preview Image */}
             <div className="relative w-full max-w-4xl mt-12 md:mt-20 px-4">
               {/* Enhanced background glow */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl blur-3xl -z-10 transform scale-110"></div>
-              
+
               {/* Simplified container with enhanced effects */}
               <div className="relative">
                 {/* Enhanced border glow */}
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/40 to-primary/60 rounded-2xl blur-sm opacity-75"></div>
-                
+
                 {/* Main container with enhanced shadows */}
                 <div className="relative bg-card border rounded-2xl shadow-2xl overflow-hidden dark:border-gray-800/50 backdrop-blur-sm">
                   {/* Enhanced browser-like top bar */}
@@ -103,15 +139,21 @@ export function LandingPage() {
                       <div className="h-3 w-3 rounded-full bg-green-500/90"></div>
                     </div>
                     <div className="flex-1 text-center">
-                      <div className="px-4 py-1.5 rounded-full bg-background/50 text-xs font-medium text-muted-foreground inline-block backdrop-blur-sm">skincaregod.vercel.app</div>
+                      <div className="px-4 py-1.5 rounded-full bg-background/50 text-xs font-medium text-muted-foreground inline-block backdrop-blur-sm">
+                        skincaregod.vercel.app
+                      </div>
                     </div>
                   </div>
-                  
+
                   {/* Enhanced image container */}
                   <div className="p-1 bg-gradient-to-b from-transparent to-background/5">
-                    <img 
-                      src={theme === 'light' ? '/dashboard-preview-light.png' : '/dashboard-preview.png'}
-                      alt="Lucent Dashboard Preview" 
+                    <img
+                      src={
+                        theme === "light"
+                          ? "/dashboard-preview-light.png"
+                          : "/dashboard-preview.png"
+                      }
+                      alt="Lucent Dashboard Preview"
                       className="w-full h-auto rounded-xl shadow-xl"
                       loading="lazy"
                     />
@@ -121,7 +163,7 @@ export function LandingPage() {
             </div>
           </div>
         </div>
-        
+
         {/* Enhanced decorative elements */}
         <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none select-none">
           <div className="absolute left-[10%] top-[20%] h-[300px] w-[300px] rounded-full bg-gradient-to-r from-primary/10 to-primary/5 blur-3xl opacity-80"></div>
@@ -142,17 +184,29 @@ export function LandingPage() {
               Everything You Need
             </h2>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg leading-relaxed px-4">
-              Track your skincare routine and see what works best for your skin with our comprehensive feature set
+              Track your skincare routine and see what works best for your skin
+              with our comprehensive feature set
             </p>
           </div>
-          
+
           <div className="mx-auto grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl px-4">
             <Card className="group overflow-hidden transition-all hover:shadow-xl border-gray-200/50 dark:border-gray-800/50 relative bg-gradient-to-b from-background to-primary/5">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div className="h-1.5 bg-gradient-to-r from-primary to-primary/60"></div>
               <CardHeader className="pb-2 relative">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-2 group-hover:scale-110 transition-transform">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-primary"
+                  >
                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
                     <rect x="9" y="3" width="6" height="4" rx="2"></rect>
                     <path d="M9 14h.01"></path>
@@ -161,7 +215,9 @@ export function LandingPage() {
                     <path d="M13 18h.01"></path>
                   </svg>
                 </div>
-                <CardTitle className="text-xl font-bold">Product Tracking</CardTitle>
+                <CardTitle className="text-xl font-bold">
+                  Product Tracking
+                </CardTitle>
                 <CardDescription className="text-muted-foreground/90">
                   Log all your skincare products and track when you use them
                 </CardDescription>
@@ -169,19 +225,52 @@ export function LandingPage() {
               <CardContent>
                 <ul className="space-y-2.5 text-sm text-muted-foreground">
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5 text-primary shrink-0">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-5 w-5 text-primary shrink-0"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     <span className="font-medium">Track product details</span>
                   </li>
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5 text-primary shrink-0">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-5 w-5 text-primary shrink-0"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     <span className="font-medium">Log usage frequency</span>
                   </li>
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5 text-primary shrink-0">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-5 w-5 text-primary shrink-0"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     <span className="font-medium">Rate effectiveness</span>
@@ -189,12 +278,23 @@ export function LandingPage() {
                 </ul>
               </CardContent>
             </Card>
-            
+
             <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
               <div className="h-2 bg-primary"></div>
               <CardHeader className="pb-2">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-primary"
+                  >
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -208,19 +308,52 @@ export function LandingPage() {
               <CardContent>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     AM/PM routines
                   </li>
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     Daily reminders
                   </li>
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     Track consistency
@@ -228,13 +361,31 @@ export function LandingPage() {
                 </ul>
               </CardContent>
             </Card>
-            
-                 <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
+
+            <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
               <div className="h-2 bg-primary"></div>
               <CardHeader className="pb-2">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-primary"
+                  >
+                    <rect
+                      x="3"
+                      y="4"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      ry="2"
+                    ></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
                     <line x1="8" y1="2" x2="8" y2="6"></line>
                     <line x1="3" y1="10" x2="21" y2="10"></line>
@@ -248,19 +399,52 @@ export function LandingPage() {
               <CardContent>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     Log skincare steps
                   </li>
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     Add detailed instructions
                   </li>
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     Share routines with others
@@ -268,12 +452,23 @@ export function LandingPage() {
                 </ul>
               </CardContent>
             </Card>
-            
+
             <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
               <div className="h-2 bg-primary"></div>
               <CardHeader className="pb-2">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-primary"
+                  >
                     <path d="M2 12h20"></path>
                     <path d="M16 6l6 6-6 6"></path>
                     <path d="M8 18l-6-6 6-6"></path>
@@ -287,19 +482,52 @@ export function LandingPage() {
               <CardContent>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     Visual progress photos
                   </li>
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     Effectiveness insights
                   </li>
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
                     Trend analysis
@@ -307,9 +535,6 @@ export function LandingPage() {
                 </ul>
               </CardContent>
             </Card>
-            
-            
-
           </div>
         </div>
       </section>
@@ -320,7 +545,7 @@ export function LandingPage() {
           <div className="absolute right-0 top-0 h-[300px] w-[300px] rounded-full bg-gradient-to-b from-primary/5 to-transparent blur-3xl"></div>
           <div className="absolute left-0 bottom-0 h-[300px] w-[300px] rounded-full bg-gradient-to-t from-primary/5 to-transparent blur-3xl"></div>
         </div>
-        
+
         <div className="container mx-auto px-4 md:px-6 max-w-screen-xl relative">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
             <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur-sm">
@@ -333,7 +558,7 @@ export function LandingPage() {
               Start tracking your skincare journey in three simple steps
             </p>
           </div>
-          
+
           <div className="mx-auto max-w-6xl px-4">
             <div className="grid grid-cols-1 gap-8 md:gap-12 md:grid-cols-3">
               <div className="relative flex flex-col items-center text-center">
@@ -344,10 +569,11 @@ export function LandingPage() {
                 <div className="hidden md:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-4rem)] h-0.5 bg-gradient-to-r from-primary/30 to-primary/10"></div>
                 <h3 className="text-xl font-bold mb-3">Add Products</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Enter the skincare products you use regularly in your collection
+                  Enter the skincare products you use regularly in your
+                  collection
                 </p>
               </div>
-              
+
               <div className="relative flex flex-col items-center text-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-2xl font-bold mb-6 shadow-lg relative">
                   <div className="absolute inset-0 bg-gradient-to-tr from-primary to-primary/80 rounded-2xl"></div>
@@ -356,10 +582,11 @@ export function LandingPage() {
                 <div className="hidden md:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-4rem)] h-0.5 bg-gradient-to-r from-primary/30 to-primary/10"></div>
                 <h3 className="text-xl font-bold mb-3">Log Routines</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  Record which products you use each day in your morning and evening routines
+                  Record which products you use each day in your morning and
+                  evening routines
                 </p>
               </div>
-              
+
               <div className="flex flex-col items-center text-center">
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-2xl font-bold mb-6 shadow-lg relative">
                   <div className="absolute inset-0 bg-gradient-to-tr from-primary to-primary/80 rounded-2xl"></div>
@@ -367,7 +594,8 @@ export function LandingPage() {
                 </div>
                 <h3 className="text-xl font-bold mb-3">Track Results</h3>
                 <p className="text-muted-foreground leading-relaxed">
-                  See which products and routines work best for your skin over time
+                  See which products and routines work best for your skin over
+                  time
                 </p>
               </div>
             </div>
@@ -387,18 +615,25 @@ export function LandingPage() {
               Use Skincare God Anywhere
             </h2>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg leading-relaxed px-4">
-              Install our app on your device for the best experience. Access your skincare routine even when offline!
+              Install our app on your device for the best experience. Access
+              your skincare routine even when offline!
             </p>
           </div>
 
           <div className="mx-auto max-w-3xl">
             <Tabs defaultValue="desktop" className="w-full">
               <TabsList className="grid w-full grid-cols-3 p-1">
-                <TabsTrigger value="desktop" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="desktop"
+                  className="flex items-center gap-2"
+                >
                   <Monitor className="h-4 w-4" />
                   <span>Desktop</span>
                 </TabsTrigger>
-                <TabsTrigger value="android" className="flex items-center gap-2">
+                <TabsTrigger
+                  value="android"
+                  className="flex items-center gap-2"
+                >
                   <Smartphone className="h-4 w-4" />
                   <span>Android</span>
                 </TabsTrigger>
@@ -407,7 +642,7 @@ export function LandingPage() {
                   <span>iOS</span>
                 </TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="desktop" className="mt-6">
                 <Card className="border-2 border-primary/10 backdrop-blur-sm">
                   <CardHeader className="space-y-1">
@@ -417,43 +652,58 @@ export function LandingPage() {
                       </div>
                       <div>
                         <CardTitle>Install on Desktop</CardTitle>
-                        <CardDescription>Chrome, Edge, or other Chromium browsers</CardDescription>
+                        <CardDescription>
+                          Chrome, Edge, or other Chromium browsers
+                        </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <ol className="list-none space-y-6">
                       <li className="flex items-start gap-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">1</div>
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          1
+                        </div>
                         <div className="flex-1">
                           <p className="font-medium">Visit</p>
                           <div className="mt-1 flex items-center gap-2 text-muted-foreground">
-                            <span className="font-mono text-primary">skincaregod.vercel.app</span>
+                            <span className="font-mono text-primary">
+                              skincaregod.vercel.app
+                            </span>
                             <ExternalLink className="h-4 w-4" />
                           </div>
                         </div>
                       </li>
                       <li className="flex items-start gap-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">2</div>
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          2
+                        </div>
                         <div className="flex-1">
                           <p className="font-medium">Click the install icon</p>
                           <div className="mt-1 flex items-center gap-2 text-muted-foreground">
-                            <Plus className="h-4 w-4" /> in your browser's address bar
+                            <Plus className="h-4 w-4" /> in your browser's
+                            address bar
                           </div>
                         </div>
                       </li>
                       <li className="flex items-start gap-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">3</div>
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          3
+                        </div>
                         <div className="flex-1">
-                          <p className="font-medium">Click "Install" in the prompt</p>
-                          <p className="mt-1 text-muted-foreground">The app will install and create a desktop shortcut</p>
+                          <p className="font-medium">
+                            Click "Install" in the prompt
+                          </p>
+                          <p className="mt-1 text-muted-foreground">
+                            The app will install and create a desktop shortcut
+                          </p>
                         </div>
                       </li>
                     </ol>
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="android" className="mt-6">
                 <Card className="border-2 border-primary/10 backdrop-blur-sm">
                   <CardHeader className="space-y-1">
@@ -470,17 +720,23 @@ export function LandingPage() {
                   <CardContent className="space-y-4">
                     <ol className="list-none space-y-6">
                       <li className="flex items-start gap-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">1</div>
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          1
+                        </div>
                         <div className="flex-1">
                           <p className="font-medium">Visit in Chrome</p>
                           <div className="mt-1 flex items-center gap-2 text-muted-foreground">
-                            <span className="font-mono text-primary">skincaregod.vercel.app</span>
+                            <span className="font-mono text-primary">
+                              skincaregod.vercel.app
+                            </span>
                             <ExternalLink className="h-4 w-4" />
                           </div>
                         </div>
                       </li>
                       <li className="flex items-start gap-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">2</div>
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          2
+                        </div>
                         <div className="flex-1">
                           <p className="font-medium">Tap the menu icon</p>
                           <div className="mt-1 flex items-center gap-2 text-muted-foreground">
@@ -489,17 +745,23 @@ export function LandingPage() {
                         </div>
                       </li>
                       <li className="flex items-start gap-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">3</div>
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          3
+                        </div>
                         <div className="flex-1">
-                          <p className="font-medium">Tap "Add to Home screen"</p>
-                          <p className="mt-1 text-muted-foreground">Choose a name and tap "Add"</p>
+                          <p className="font-medium">
+                            Tap "Add to Home screen"
+                          </p>
+                          <p className="mt-1 text-muted-foreground">
+                            Choose a name and tap "Add"
+                          </p>
                         </div>
                       </li>
                     </ol>
                   </CardContent>
                 </Card>
               </TabsContent>
-              
+
               <TabsContent value="ios" className="mt-6">
                 <Card className="border-2 border-primary/10 backdrop-blur-sm">
                   <CardHeader className="space-y-1">
@@ -509,24 +771,32 @@ export function LandingPage() {
                       </div>
                       <div>
                         <CardTitle>Install on iOS</CardTitle>
-                        <CardDescription>Safari on iPhone or iPad</CardDescription>
+                        <CardDescription>
+                          Safari on iPhone or iPad
+                        </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <ol className="list-none space-y-6">
                       <li className="flex items-start gap-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">1</div>
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          1
+                        </div>
                         <div className="flex-1">
                           <p className="font-medium">Visit in Safari</p>
                           <div className="mt-1 flex items-center gap-2 text-muted-foreground">
-                            <span className="font-mono text-primary">skincaregod.vercel.app</span>
+                            <span className="font-mono text-primary">
+                              skincaregod.vercel.app
+                            </span>
                             <ExternalLink className="h-4 w-4" />
                           </div>
                         </div>
                       </li>
                       <li className="flex items-start gap-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">2</div>
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          2
+                        </div>
                         <div className="flex-1">
                           <p className="font-medium">Tap the Share button</p>
                           <div className="mt-1 flex items-center gap-2 text-muted-foreground">
@@ -535,10 +805,16 @@ export function LandingPage() {
                         </div>
                       </li>
                       <li className="flex items-start gap-4">
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">3</div>
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          3
+                        </div>
                         <div className="flex-1">
-                          <p className="font-medium">Tap "Add to Home Screen"</p>
-                          <p className="mt-1 text-muted-foreground">Choose a name and tap "Add"</p>
+                          <p className="font-medium">
+                            Tap "Add to Home Screen"
+                          </p>
+                          <p className="mt-1 text-muted-foreground">
+                            Choose a name and tap "Add"
+                          </p>
                         </div>
                       </li>
                     </ol>
@@ -565,7 +841,7 @@ export function LandingPage() {
               Join other skincare enthusiasts who've improved their routines
             </p>
           </div>
-          
+
           <div className="mx-auto grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl px-4">
             <Card className="group overflow-hidden transition-all hover:shadow-xl border-gray-200/50 dark:border-gray-800/50 relative bg-gradient-to-b from-background to-primary/5">
               <CardHeader>
@@ -575,18 +851,23 @@ export function LandingPage() {
                     <span className="relative">S</span>
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-bold">Sarah K.</CardTitle>
-                    <CardDescription className="text-muted-foreground/90">Skincare Enthusiast</CardDescription>
+                    <CardTitle className="text-lg font-bold">
+                      Sarah K.
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground/90">
+                      Skincare Enthusiast
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  "This app has completely transformed my skincare routine. I can finally track what works and what doesn't!"
+                  "This app has completely transformed my skincare routine. I
+                  can finally track what works and what doesn't!"
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card className="group overflow-hidden transition-all hover:shadow-xl border-gray-200/50 dark:border-gray-800/50 relative bg-gradient-to-b from-background to-primary/5">
               <CardHeader>
                 <div className="flex items-center gap-4 mb-2">
@@ -595,18 +876,23 @@ export function LandingPage() {
                     <span className="relative">J</span>
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-bold">James T.</CardTitle>
-                    <CardDescription className="text-muted-foreground/90">Skincare Newbie</CardDescription>
+                    <CardTitle className="text-lg font-bold">
+                      James T.
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground/90">
+                      Skincare Newbie
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  "As someone new to skincare, this app has been invaluable in helping me establish a consistent routine."
+                  "As someone new to skincare, this app has been invaluable in
+                  helping me establish a consistent routine."
                 </p>
               </CardContent>
             </Card>
-            
+
             <Card className="group overflow-hidden transition-all hover:shadow-xl border-gray-200/50 dark:border-gray-800/50 relative bg-gradient-to-b from-background to-primary/5 md:col-span-2 lg:col-span-1">
               <CardHeader>
                 <div className="flex items-center gap-4 mb-2">
@@ -615,14 +901,19 @@ export function LandingPage() {
                     <span className="relative">M</span>
                   </div>
                   <div>
-                    <CardTitle className="text-lg font-bold">Michelle L.</CardTitle>
-                    <CardDescription className="text-muted-foreground/90">Dermatologist</CardDescription>
+                    <CardTitle className="text-lg font-bold">
+                      Michelle L.
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground/90">
+                      Dermatologist
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  "I recommend this app to all my patients. It helps them stay consistent and track their progress over time."
+                  "I recommend this app to all my patients. It helps them stay
+                  consistent and track their progress over time."
                 </p>
               </CardContent>
             </Card>
@@ -643,17 +934,25 @@ export function LandingPage() {
                 Ready to transform your skincare routine?
               </h2>
               <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg leading-relaxed px-4">
-                Join thousands of skincare enthusiasts who've improved their routines with our app
+                Join thousands of skincare enthusiasts who've improved their
+                routines with our app
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-8 px-4">
               {currentUser ? (
-                <Button onClick={() => navigate('/dashboard')} size="lg" className="w-full sm:w-auto px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary">
+                <Button
+                  onClick={() => navigate("/dashboard")}
+                  size="lg"
+                  className="w-full sm:w-auto px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                >
                   Go to Dashboard
                 </Button>
               ) : (
                 <Link to="/login" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary">
+                  <Button
+                    size="lg"
+                    className="w-full px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                  >
                     Get Started Free
                   </Button>
                 </Link>
@@ -664,4 +963,4 @@ export function LandingPage() {
       </section>
     </div>
   );
-} 
+}
