@@ -4,7 +4,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Badge } from './ui/badge';
 import { Avatar } from './ui/avatar';
-import { Check, Loader2, Sun, Moon, AlertCircle, Calendar as CalendarIcon, Settings } from 'lucide-react';
+import { 
+  Check, 
+  Loader2, 
+  Sun, 
+  Moon, 
+  AlertCircle, 
+  Calendar as CalendarIcon, 
+  Settings,
+  Droplets,
+  Beaker,
+  Pipette,
+  CircleDot,
+  Layers,
+  Sparkles,
+  Eye,
+  Zap,
+  Package
+} from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 import {
@@ -46,6 +63,20 @@ const STATUSES: Status[] = [
   { id: 'partial', name: 'Partially Complete', color: '#f59e0b' },
   { id: 'incomplete', name: 'Not Started', color: '#6b7280' },
 ];
+
+// Add this after the STATUSES constant
+const CATEGORY_ICONS: Record<string, React.ElementType> = {
+  cleanser: Droplets,
+  toner: Beaker,
+  serum: Pipette,
+  moisturizer: CircleDot,
+  sunscreen: Sun,
+  mask: Layers,
+  exfoliant: Sparkles,
+  'eye cream': Eye,
+  treatment: Zap,
+  other: Package,
+};
 
 export function Calendar() {
   const { currentUser } = useAuth();
@@ -785,8 +816,11 @@ export function Calendar() {
                                   )} />
                                 </Button>
                                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
-                                  <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary font-medium">
-                                    {product.category?.charAt(0) || '?'}
+                                  <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
+                                    {(() => {
+                                      const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
+                                      return <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />;
+                                    })()}
                                   </div>
                                 </Avatar>
                                 <div className="flex-1 min-w-0">
@@ -852,8 +886,11 @@ export function Calendar() {
                                   )} />
                                 </Button>
                                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
-                                  <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary font-medium">
-                                    {product.category?.charAt(0) || '?'}
+                                  <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
+                                    {(() => {
+                                      const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
+                                      return <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />;
+                                    })()}
                                   </div>
                                 </Avatar>
                                 <div className="flex-1 min-w-0">
@@ -919,8 +956,11 @@ export function Calendar() {
                                   )} />
                                 </Button>
                                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
-                                  <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary font-medium">
-                                    {product.category?.charAt(0) || '?'}
+                                  <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
+                                    {(() => {
+                                      const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
+                                      return <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />;
+                                    })()}
                                   </div>
                                 </Avatar>
                                 <div className="flex-1 min-w-0">
@@ -986,8 +1026,11 @@ export function Calendar() {
                                   )} />
                                 </Button>
                                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
-                                  <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary font-medium">
-                                    {product.category?.charAt(0) || '?'}
+                                  <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
+                                    {(() => {
+                                      const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
+                                      return <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />;
+                                    })()}
                                   </div>
                                 </Avatar>
                                 <div className="flex-1 min-w-0">
