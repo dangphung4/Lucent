@@ -37,6 +37,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Button } from "./ui/button";
 import { DiaryEntryDialog } from "./DiaryEntryDialog";
 import { EditDiaryEntryDialog } from "./EditDiaryEntryDialog";
+import { cn } from "@/lib/utils";
 
 // Check if an entry is a diary entry (without specific product details)
 const isDiaryEntry = (entry: JournalEntry) => {
@@ -145,39 +146,140 @@ export function Journal() {
       .filter((entry) => entry.productId === product.id)
       .sort((a, b) => b.date.getTime() - a.date.getTime())[0];
 
-    // Determine card color based on product category
-    const getCategoryColor = () => {
-      if (!product.category) return "bg-card dark:bg-card";
+    // Enhanced category color system with gradients matching ProductList.tsx
+    const getCategoryStyle = () => {
+      if (!product.category) return {
+        card: [
+          "bg-gradient-to-br from-blue-50 via-blue-50/50 to-transparent",
+          "dark:from-blue-950/20 dark:via-transparent dark:to-transparent",
+          "hover:from-blue-100/80 hover:via-blue-50/40 hover:to-transparent",
+          "dark:hover:from-blue-950/30 dark:hover:via-transparent dark:hover:to-transparent",
+          "border-blue-200/50 dark:border-blue-800/30"
+        ].join(" "),
+        icon: "text-blue-600 dark:text-blue-400"
+      };
 
       switch (product.category.toLowerCase()) {
         case "moisturizer":
-          return "bg-blue-50/50 dark:bg-blue-950/30";
+          return {
+            card: [
+              "bg-gradient-to-br from-blue-50 via-blue-50/50 to-transparent",
+              "dark:from-blue-950/20 dark:via-transparent dark:to-transparent",
+              "hover:from-blue-100/80 hover:via-blue-50/40 hover:to-transparent",
+              "dark:hover:from-blue-950/30 dark:hover:via-transparent dark:hover:to-transparent",
+              "border-blue-200/50 dark:border-blue-800/30"
+            ].join(" "),
+            icon: "text-blue-600 dark:text-blue-400"
+          };
         case "cleanser":
-          return "bg-green-50/50 dark:bg-green-950/30";
+          return {
+            card: [
+              "bg-gradient-to-br from-green-50 via-green-50/50 to-transparent",
+              "dark:from-green-950/20 dark:via-transparent dark:to-transparent",
+              "hover:from-green-100/80 hover:via-green-50/40 hover:to-transparent",
+              "dark:hover:from-green-950/30 dark:hover:via-transparent dark:hover:to-transparent",
+              "border-green-200/50 dark:border-green-800/30"
+            ].join(" "),
+            icon: "text-green-600 dark:text-green-400"
+          };
         case "serum":
-          return "bg-purple-50/50 dark:bg-purple-950/30";
+          return {
+            card: [
+              "bg-gradient-to-br from-purple-50 via-purple-50/50 to-transparent",
+              "dark:from-purple-950/20 dark:via-transparent dark:to-transparent",
+              "hover:from-purple-100/80 hover:via-purple-50/40 hover:to-transparent",
+              "dark:hover:from-purple-950/30 dark:hover:via-transparent dark:hover:to-transparent",
+              "border-purple-200/50 dark:border-purple-800/30"
+            ].join(" "),
+            icon: "text-purple-600 dark:text-purple-400"
+          };
         case "sunscreen":
-          return "bg-amber-50/50 dark:bg-amber-950/30";
+          return {
+            card: [
+              "bg-gradient-to-br from-amber-50 via-amber-50/50 to-transparent",
+              "dark:from-amber-950/20 dark:via-transparent dark:to-transparent",
+              "hover:from-amber-100/80 hover:via-amber-50/40 hover:to-transparent",
+              "dark:hover:from-amber-950/30 dark:hover:via-transparent dark:hover:to-transparent",
+              "border-amber-200/50 dark:border-amber-800/30"
+            ].join(" "),
+            icon: "text-amber-600 dark:text-amber-400"
+          };
         case "toner":
-          return "bg-pink-50/50 dark:bg-pink-950/30";
+          return {
+            card: [
+              "bg-gradient-to-br from-pink-50 via-pink-50/50 to-transparent",
+              "dark:from-pink-950/20 dark:via-transparent dark:to-transparent",
+              "hover:from-pink-100/80 hover:via-pink-50/40 hover:to-transparent",
+              "dark:hover:from-pink-950/30 dark:hover:via-transparent dark:hover:to-transparent",
+              "border-pink-200/50 dark:border-pink-800/30"
+            ].join(" "),
+            icon: "text-pink-600 dark:text-pink-400"
+          };
         case "treatment":
-          return "bg-red-50/50 dark:bg-red-950/30";
+          return {
+            card: [
+              "bg-gradient-to-br from-red-50 via-red-50/50 to-transparent",
+              "dark:from-red-950/20 dark:via-transparent dark:to-transparent",
+              "hover:from-red-100/80 hover:via-red-50/40 hover:to-transparent",
+              "dark:hover:from-red-950/30 dark:hover:via-transparent dark:hover:to-transparent",
+              "border-red-200/50 dark:border-red-800/30"
+            ].join(" "),
+            icon: "text-red-600 dark:text-red-400"
+          };
         case "mask":
-          return "bg-indigo-50/50 dark:bg-indigo-950/30";
+          return {
+            card: [
+              "bg-gradient-to-br from-indigo-50 via-indigo-50/50 to-transparent",
+              "dark:from-indigo-950/20 dark:via-transparent dark:to-transparent",
+              "hover:from-indigo-100/80 hover:via-indigo-50/40 hover:to-transparent",
+              "dark:hover:from-indigo-950/30 dark:hover:via-transparent dark:hover:to-transparent",
+              "border-indigo-200/50 dark:border-indigo-800/30"
+            ].join(" "),
+            icon: "text-indigo-600 dark:text-indigo-400"
+          };
         case "eye cream":
-          return "bg-cyan-50/50 dark:bg-cyan-950/30";
+          return {
+            card: [
+              "bg-gradient-to-br from-cyan-50 via-cyan-50/50 to-transparent",
+              "dark:from-cyan-950/20 dark:via-transparent dark:to-transparent",
+              "hover:from-cyan-100/80 hover:via-cyan-50/40 hover:to-transparent",
+              "dark:hover:from-cyan-950/30 dark:hover:via-transparent dark:hover:to-transparent",
+              "border-cyan-200/50 dark:border-cyan-800/30"
+            ].join(" "),
+            icon: "text-cyan-600 dark:text-cyan-400"
+          };
         default:
-          return "bg-card dark:bg-card";
+          return {
+            card: [
+              "bg-gradient-to-br from-blue-50 via-blue-50/50 to-transparent",
+              "dark:from-blue-950/20 dark:via-transparent dark:to-transparent",
+              "hover:from-blue-100/80 hover:via-blue-50/40 hover:to-transparent",
+              "dark:hover:from-blue-950/30 dark:hover:via-transparent dark:hover:to-transparent",
+              "border-blue-200/50 dark:border-blue-800/30"
+            ].join(" "),
+            icon: "text-blue-600 dark:text-blue-400"
+          };
       }
     };
 
+    const categoryStyle = getCategoryStyle();
+
     return (
       <div
-        className={`relative rounded-lg border shadow-sm hover:shadow-md transition-all ${getCategoryColor()}`}
+        className={cn(
+          "relative rounded-xl border",
+          "transition-all duration-300",
+          "hover:scale-[1.02] hover:-translate-y-0.5 active:scale-[0.98] active:translate-y-0",
+          "shadow-lg hover:shadow-xl",
+          categoryStyle.card
+        )}
       >
-        {/* Header section with icon, title and actions */}
-        <div className="flex items-center gap-3 p-3 border-b">
-          <Avatar className="h-10 w-10 shadow-sm bg-background">
+        {/* Header section */}
+        <div className="flex items-start gap-3 p-4">
+          <Avatar className={cn(
+            "h-12 w-12 rounded-xl shadow-md transition-transform group-hover:scale-105",
+            "bg-white dark:bg-gray-800"
+          )}>
             {(() => {
               const category = product.category || 'Other';
               const IconComponent = {
@@ -192,138 +294,163 @@ export function Journal() {
                 other: Package
               }[category.toLowerCase()] || Package;
 
-              const getIconColor = () => {
-                switch (category.toLowerCase()) {
-                  case 'cleanser': return "bg-green-500/10 text-green-500";
-                  case 'toner': return "bg-pink-500/10 text-pink-500";
-                  case 'serum': return "bg-purple-500/10 text-purple-500";
-                  case 'moisturizer': return "bg-blue-500/10 text-blue-500";
-                  case 'sunscreen': return "bg-amber-500/10 text-amber-500";
-                  case 'mask': return "bg-indigo-500/10 text-indigo-500";
-                  case 'eye cream': return "bg-cyan-500/10 text-cyan-500";
-                  case 'treatment': return "bg-red-500/10 text-red-500";
-                  default: return "bg-gray-500/10 text-gray-500";
-                }
-              };
-
               return (
-                <div className={`flex h-full w-full items-center justify-center rounded-full ${getIconColor()}`}>
-                  <IconComponent className="h-5 w-5" />
+                <div className={cn(
+                  "flex h-full w-full items-center justify-center",
+                  categoryStyle.icon
+                )}>
+                  <IconComponent className="h-6 w-6 transition-transform group-hover:scale-110" />
                 </div>
               );
             })()}
           </Avatar>
 
-          <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-foreground">{product.name}</h3>
-            <p className="text-xs text-muted-foreground">{product.brand}</p>
+          <div className="flex-1 min-w-0 space-y-1">
+            <h3 className="font-semibold text-base sm:text-lg tracking-tight truncate">
+              {product.name}
+            </h3>
+            <p className="text-sm text-muted-foreground truncate">
+              {product.brand}
+            </p>
           </div>
         </div>
 
-        {/* Content section */}
-        <div className="p-3">
-          <div className="flex flex-wrap gap-2 mb-3">
-            {product.usageDuration > 0 && (
-              <Badge
-                variant="outline"
-                className="text-xs bg-background shadow-sm"
-              >
-                <Clock className="h-3 w-3 mr-1" />
-                Using for {formatDuration(product.usageDuration)}
-              </Badge>
-            )}
-            {latestEntry && (
-              <>
-                <Badge
-                  variant="outline"
-                  className="text-xs bg-background shadow-sm"
-                >
-                  <Star className="h-3 w-3 mr-1" />
-                  {latestEntry.rating}/5
-                </Badge>
-                <Badge
-                  variant="outline"
-                  className="text-xs bg-background shadow-sm"
-                >
-                  <CalendarIcon className="h-3 w-3 mr-1" />
-                  Last reviewed{" "}
-                  {formatDuration(
-                    Math.floor(
-                      (new Date().getTime() - latestEntry.date.getTime()) /
-                        (1000 * 60 * 60 * 24)
-                    )
-                  )}{" "}
-                  ago
-                </Badge>
-              </>
-            )}
-          </div>
-
+        {/* Stats section with distinct badge styles */}
+        <div className="px-4 py-3 flex flex-wrap gap-2">
+          {product.usageDuration > 0 && (
+            <Badge variant="secondary" className={cn(
+              "bg-violet-100 dark:bg-violet-900",
+              "text-violet-700 dark:text-violet-200",
+              "border-violet-200 dark:border-violet-800"
+            )}>
+              <Clock className="h-3.5 w-3.5 mr-1" />
+              {formatDuration(product.usageDuration)}
+            </Badge>
+          )}
           {latestEntry && (
-            <div
-              className="mb-3 cursor-pointer hover:bg-background/50 p-2 rounded-md transition-colors group relative"
-              onClick={() => {
-                setSelectedEntry(latestEntry);
-                setEditDialogOpen(true);
-              }}
-            >
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-              </div>
-              <p className="text-sm text-foreground/90 line-clamp-2">
-                {latestEntry.review}
-              </p>
-              {latestEntry.effects && latestEntry.effects.length > 0 && (
-                <div className="flex gap-1.5 mt-2 flex-wrap">
-                  {latestEntry.effects.map((effect: string, index: number) => (
+            <>
+              <Badge variant="secondary" className={cn(
+                "bg-amber-100 dark:bg-amber-900",
+                "text-amber-700 dark:text-amber-200",
+                "border-amber-200 dark:border-amber-800"
+              )}>
+                <Star className="h-3.5 w-3.5 mr-1 fill-current" />
+                {latestEntry.rating}/5
+              </Badge>
+              <Badge variant="secondary" className={cn(
+                "bg-blue-100 dark:bg-blue-900",
+                "text-blue-700 dark:text-blue-200",
+                "border-blue-200 dark:border-blue-800"
+              )}>
+                <CalendarIcon className="h-3.5 w-3.5 mr-1" />
+                Last reviewed {formatDuration(
+                  Math.floor(
+                    (new Date().getTime() - latestEntry.date.getTime()) /
+                    (1000 * 60 * 60 * 24)
+                  )
+                )} ago
+              </Badge>
+            </>
+          )}
+        </div>
+
+        {/* Review preview with solid background */}
+        {latestEntry && (
+          <div 
+            className={cn(
+              "mx-4 mb-3 cursor-pointer rounded-lg",
+              "bg-white dark:bg-gray-800",
+              "p-3 transition-colors",
+              "hover:bg-gray-50 dark:hover:bg-gray-700",
+              "group"
+            )}
+            onClick={() => {
+              setSelectedEntry(latestEntry);
+              setEditDialogOpen(true);
+            }}
+          >
+            <p className="text-sm line-clamp-2 text-foreground">
+              {latestEntry.review}
+            </p>
+            {latestEntry.effects && latestEntry.effects.length > 0 && (
+              <div className="flex gap-1.5 mt-2 flex-wrap">
+                {latestEntry.effects.map((effect, index) => {
+                  const getEffectStyle = () => {
+                    if (effect.toLowerCase().includes('irritation') || effect.toLowerCase().includes('breakout')) {
+                      return "bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 border-red-200 dark:border-red-800";
+                    }
+                    if (effect.toLowerCase().includes('hydrating') || effect.toLowerCase().includes('moisturizing')) {
+                      return "bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 border-blue-200 dark:border-blue-800";
+                    }
+                    if (effect.toLowerCase().includes('brightening') || effect.toLowerCase().includes('glowing')) {
+                      return "bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-200 border-amber-200 dark:border-amber-800";
+                    }
+                    if (effect.toLowerCase().includes('calming') || effect.toLowerCase().includes('soothing')) {
+                      return "bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-200 border-green-200 dark:border-green-800";
+                    }
+                    return "bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-800";
+                  };
+
+                  return (
                     <Badge
                       key={index}
                       variant="outline"
-                      className="text-xs bg-background shadow-sm"
+                      className={cn(
+                        "text-xs",
+                        getEffectStyle()
+                      )}
                     >
                       {effect}
                     </Badge>
-                  ))}
-                </div>
-              )}
-              {latestEntry.notes && (
-                <div className="mt-2 p-2 bg-muted/30 rounded-md">
-                  <p className="text-xs text-muted-foreground">
-                    {latestEntry.notes}
-                  </p>
-                </div>
-              )}
-              <p className="text-xs text-primary mt-1 font-medium group-hover:underline">
-                Edit review
-              </p>
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex flex-wrap items-center gap-2 mt-2 pt-2 border-t">
-            <UpdateUsageDialog
-              productId={product.id}
-              productName={product.name}
-              onUsageUpdated={onUpdate}
-            >
-              <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
-                <Clock className="h-3.5 w-3.5 mr-1" />
-                Update Usage
-              </Button>
-            </UpdateUsageDialog>
-            {!latestEntry && (
-              <AddJournalEntryDialog
-                productId={product.id}
-                productName={product.name}
-                onEntryAdded={onUpdate}
-              >
-                <Button variant="ghost" size="sm" className="h-8 px-2 text-xs">
-                  <FileText className="h-3.5 w-3.5 mr-1" />
-                  Add Review
-                </Button>
-              </AddJournalEntryDialog>
+                  );
+                })}
+              </div>
             )}
           </div>
+        )}
+
+        {/* Actions with distinct button styles */}
+        <div className="px-4 pb-4 flex flex-wrap items-center gap-2">
+          <UpdateUsageDialog
+            productId={product.id}
+            productName={product.name}
+            onUsageUpdated={onUpdate}
+          >
+            <Button 
+              variant="secondary" 
+              size="sm" 
+              className={cn(
+                "h-8",
+                "bg-violet-100 dark:bg-violet-900/90",
+                "hover:bg-violet-200 dark:hover:bg-violet-800",
+                "text-violet-700 dark:text-violet-200"
+              )}
+            >
+              <Clock className="h-3.5 w-3.5 mr-1.5" />
+              Update Usage
+            </Button>
+          </UpdateUsageDialog>
+          {!latestEntry && (
+            <AddJournalEntryDialog
+              productId={product.id}
+              productName={product.name}
+              onEntryAdded={onUpdate}
+            >
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                className={cn(
+                  "h-8",
+                  "bg-emerald-100 dark:bg-emerald-900/90",
+                  "hover:bg-emerald-200 dark:hover:bg-emerald-800",
+                  "text-emerald-700 dark:text-emerald-200"
+                )}
+              >
+                <FileText className="h-3.5 w-3.5 mr-1.5" />
+                Add Review
+              </Button>
+            </AddJournalEntryDialog>
+          )}
         </div>
       </div>
     );
@@ -376,7 +503,7 @@ export function Journal() {
           </div>
 
           {/* Product Tracking Tab */}
-          <TabsContent value="tracking" className="space-y-4 mt-6">
+          <TabsContent value="tracking" className="space-y-6">
             {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -384,30 +511,25 @@ export function Journal() {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 bg-background shadow-sm focus-visible:ring-primary/30"
+                className="pl-9 bg-white/50 dark:bg-black/20 backdrop-blur-sm border-0 
+                          shadow-lg focus-visible:ring-primary/30"
               />
             </div>
 
-            {/* Your products section */}
-            <div className="grid gap-4">
-              <h3 className="text-lg font-medium">Your Products</h3>
-            </div>
-            <div className="grid gap-4">
+            {/* Products Grid */}
+            <div className="grid gap-6">
               {filteredProducts.length === 0 ? (
-                <div className="text-center py-12 px-4 rounded-lg border bg-muted/30 shadow-sm">
+                <div className="text-center py-12 px-4 rounded-xl border bg-white/50 dark:bg-black/20 
+                              backdrop-blur-sm shadow-lg">
                   <Beaker className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-                  <p className="font-medium text-foreground">
-                    No products found
-                  </p>
+                  <p className="font-medium text-foreground">No products found</p>
                   <p className="text-sm text-muted-foreground/80 mt-1">
                     Try adjusting your search or add some products
                   </p>
                 </div>
               ) : (
                 filteredProducts.map((product) => (
-                  <div key={product.id}>
-                    <ProductCard product={product} onUpdate={loadData} />
-                  </div>
+                  <ProductCard key={product.id} product={product} onUpdate={loadData} />
                 ))
               )}
             </div>
