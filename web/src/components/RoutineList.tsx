@@ -342,11 +342,18 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                           {index + 1}
                         </Badge>
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium block truncate">
-                            {product?.name || 'Unknown Product'}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium truncate">
+                              {product?.name || 'Unknown Product'}
+                            </span>
+                            {product?.category && (
+                              <Badge variant="secondary" className="text-xs">
+                                {product.category}
+                              </Badge>
+                            )}
+                          </div>
                           {step.notes && (
-                            <span className="text-xs text-muted-foreground block truncate">
+                            <span className="text-xs text-muted-foreground block truncate mt-0.5">
                               {step.notes}
                             </span>
                           )}
@@ -523,7 +530,14 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                                       >
                                         {index + 1}
                                       </Badge>
-                                      <span className="flex-1 font-medium">{product?.name}</span>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-medium">{product?.name}</span>
+                                        {product?.category && (
+                                          <Badge variant="secondary" className="text-xs">
+                                            {product.category}
+                                          </Badge>
+                                        )}
+                                      </div>
                                     </div>
                                     <div className="flex items-center gap-2 w-full sm:w-auto">
                                       <Input
