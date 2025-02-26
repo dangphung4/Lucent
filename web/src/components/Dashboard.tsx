@@ -10,6 +10,8 @@ import { getUserProducts, getRoutineCompletions, Product } from '@/lib/db';
 import { Loader2 } from 'lucide-react';
 import { ProductList } from './ProductList';
 import { RoutineList } from './RoutineList';
+import { cn } from '@/lib/utils';
+import { Star, Droplets, FlaskConical, CircleDot, Sun, Layers, Sparkles, Eye, Zap, Package } from 'lucide-react';
 
 export interface ProductStats {
   total: number;
@@ -195,6 +197,31 @@ export function Dashboard() {
     setProductFilter(filter);
   };
 
+  const getCategoryIcon = (category: string | null | undefined) => {
+    switch (category?.toLowerCase()) {
+      case 'cleanser':
+        return <Droplets className="h-5 w-5" />;
+      case 'toner':
+        return <FlaskConical className="h-5 w-5" />;
+      case 'serum':
+        return <FlaskConical className="h-5 w-5" />;
+      case 'moisturizer':
+        return <CircleDot className="h-5 w-5" />;
+      case 'sunscreen':
+        return <Sun className="h-5 w-5" />;
+      case 'mask':
+        return <Layers className="h-5 w-5" />;
+      case 'exfoliant':
+        return <Sparkles className="h-5 w-5" />;
+      case 'eye cream':
+        return <Eye className="h-5 w-5" />;
+      case 'treatment':
+        return <Zap className="h-5 w-5" />;
+      default:
+        return <Package className="h-5 w-5" />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-8">
       {/* Welcome Section with Gradient */}
@@ -350,40 +377,60 @@ export function Dashboard() {
                         />
                       </div>
                     ) : (
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         {recentProducts.map((product) => (
-                          <div key={product.id} className="flex items-center justify-between border-b last:border-0 pb-4 last:pb-0">
-                            <div className="flex items-start gap-4">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <div 
+                            key={product.id} 
+                            className={cn(
+                              "flex items-center justify-between group relative",
+                              "pb-6 last:pb-0 border-b last:border-0",
+                              product.status === 'finished' && !product.wouldRepurchase && "border-purple-200/50 dark:border-purple-800/30",
+                              product.wouldRepurchase && "border-green-200/50 dark:border-green-800/30"
+                            )}
+                          >
+                            <div className="flex items-start gap-4 flex-1 min-w-0">
+                              <div className={cn(
+                                "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
+                                product.status !== 'finished' && !product.wouldRepurchase && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+                                product.status === 'finished' && !product.wouldRepurchase && "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+                                product.wouldRepurchase && "bg-green-500/10 text-green-600 dark:text-green-400"
+                              )}>
                                 {product.imageUrl ? (
                                   <img src={product.imageUrl} alt={product.name} className="h-full w-full rounded-full object-cover" />
                                 ) : (
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
-                                    <rect x="9" y="3" width="6" height="4" rx="2"></rect>
-                                  </svg>
+                                  getCategoryIcon(product.category)
                                 )}
                               </div>
-                              <div>
-                                <h4 className="text-base font-medium">{product.name}</h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {product.brand}
-                                  {product.category && ` • ${product.category}`}
-                                </p>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-base font-medium truncate">{product.name}</h4>
+                                  {product.wouldRepurchase && (
+                                    <Star className="h-4 w-4 text-green-500 shrink-0" />
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <p className="text-sm text-muted-foreground truncate">
+                                    {product.brand}
+                                  </p>
+                                  {product.category && (
+                                    <>
+                                      <span className="text-muted-foreground/40">•</span>
+                                      <span className="text-sm text-muted-foreground">{product.category}</span>
+                                    </>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              {product.status === 'finished' && (
-                                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                                  Finished
-                                </span>
-                              )}
-                              {product.wouldRepurchase && (
-                                <span className="text-xs bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-1 rounded-full">
-                                  Would Repurchase
-                                </span>
-                              )}
-                            </div>
+                            {product.status === 'finished' && (
+                              <div className={cn(
+                                "ml-4 px-3 py-1 rounded-full text-xs font-medium shrink-0",
+                                product.wouldRepurchase 
+                                  ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                                  : "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                              )}>
+                                {product.wouldRepurchase ? 'Would Repurchase' : 'Finished'}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
