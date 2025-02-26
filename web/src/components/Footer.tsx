@@ -40,10 +40,10 @@ export function Footer({ className }: FooterProps) {
           <div className="flex flex-col gap-4">
             <h3 className="text-sm font-semibold">Get in Touch</h3>
             <a 
-              href="mailto:contact@skincaretrack.app" 
+              href="mailto:dangphung4@gmail.com" 
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              contact@skincaretrack.app
+              dangphung4@gmail.com
             </a>
             <div className="flex items-center gap-4 mt-2">
               <a 

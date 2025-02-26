@@ -11,6 +11,8 @@ import { ThemeProvider } from './lib/ThemeProvider';
 import { Toaster } from './components/ui/sonner';
 import PWABadge from './PWABadge';
 import { Journal } from './components/Journal';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { TermsOfService } from './components/TermsOfService';
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -70,6 +72,8 @@ function App() {
             <Route element={<RootLayout />}>
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsOfService />} />
               <Route 
                 path="/calendar" 
                 element={

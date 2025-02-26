@@ -1,10 +1,9 @@
-# Skincare Tracker PWA - Project Goals - Lucent
+# Lucent Skincare PWA
 
 <img src="/web/public/lucent-logo.svg" alt="Lucent" width="200" height="200">
 
 ## Project Overview
-Building a progressive web application that allows users to track skincare products, usage patterns, and effectiveness. This app is being developed for personal use to help monitor which products work best over time.
-
+Building a progressive web application that allows users to track skincare products, usage patterns, and effectiveness. This app is being developed for my gf
 ## Core Goals
 
 
@@ -29,7 +28,7 @@ Building a progressive web application that allows users to track skincare produ
 ## Getting Started
 
 1. Clone this repository
-2. Install dependencies with `npm install`
+2. Install dependencies with `npm install --legacy-peer-deps`
 3. Run development server with `npm run dev`
 
 ## Contribution Guidelines
@@ -40,6 +39,7 @@ If you're helping with this project, please focus on:
 - Simple, intuitive user interface
 - Local storage implementation for product data
 - Calendar component for tracking usage dates
+- Adding dexie for offline use
 
 ## Next Steps
 
