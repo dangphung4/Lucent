@@ -84,6 +84,24 @@ const formatDuration = (days: number) => {
   return months === 1 ? "1 month" : `${months} months`;
 };
 
+/**
+ * The Journal component serves as the main interface for users to track their skincare products,
+ * document their skincare journey, and view their journal entries.
+ *
+ * It manages the state of various UI elements, including the active tab, loading status,
+ * search query, selected product and journal entry, and expanded entries.
+ *
+ * The component fetches user-specific data such as products and journal entries upon mounting,
+ * and provides filtering capabilities for both products and journal entries based on user input.
+ *
+ * @returns {JSX.Element} The rendered Journal component.
+ *
+ * @throws {Error} Throws an error if data loading fails.
+ *
+ * @example
+ * // Usage of the Journal component
+ * <Journal />
+ */
 export function Journal() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState("tracking");
@@ -464,6 +482,22 @@ export function Journal() {
   };
 
   // Toggle entry expansion
+  /**
+   * Toggles the expansion state of a specific entry identified by its ID.
+   * This function updates the state of expanded entries by inverting the
+   * current expansion state for the given entry ID.
+   *
+   * @param {string} entryId - The unique identifier of the entry whose
+   * expansion state is to be toggled.
+   *
+   * @returns {void} This function does not return a value.
+   *
+   * @example
+   * // Assuming 'entry1' is an ID of an entry
+   * toggleEntryExpansion('entry1');
+   *
+   * @throws {Error} Throws an error if the entryId is not a valid string.
+   */
   const toggleEntryExpansion = (entryId: string) => {
     setExpandedEntries(prev => ({
       ...prev,
@@ -675,6 +709,27 @@ export function Journal() {
                           {entry.effects && entry.effects.length > 0 && (
                             <div className="flex flex-wrap gap-2">
                               {entry.effects.map((effect, index) => {
+                                /**
+                                 * Determines the appropriate style class based on the specified effect.
+                                 *
+                                 * This function evaluates the provided effect string and returns a corresponding
+                                 * style class that can be used for UI elements. The styles are categorized based
+                                 * on common skincare effects such as irritation, hydration, brightening, and calming.
+                                 *
+                                 * @returns {string} A string representing the style class for the given effect.
+                                 *
+                                 * @example
+                                 * const style = getEffectStyle('hydrating');
+                                 * // style will be "bg-blue-100/80 text-blue-700 ring-blue-200 dark:bg-blue-500/20 dark:text-blue-300 dark:ring-blue-500/30"
+                                 *
+                                 * @example
+                                 * const style = getEffectStyle('irritation');
+                                 * // style will be "bg-red-100/80 text-red-700 ring-red-200 dark:bg-red-500/20 dark:text-red-300 dark:ring-red-500/30"
+                                 *
+                                 * @example
+                                 * const style = getEffectStyle('unknown effect');
+                                 * // style will be "bg-gray-100/80 text-gray-700 ring-gray-200 dark:bg-gray-500/20 dark:text-gray-300 dark:ring-gray-500/30"
+                                 */
                                 const getEffectStyle = () => {
                                   if (effect.toLowerCase().includes('irritation') || effect.toLowerCase().includes('breakout')) {
                                     return "bg-red-100/80 text-red-700 ring-red-200 dark:bg-red-500/20 dark:text-red-300 dark:ring-red-500/30";
