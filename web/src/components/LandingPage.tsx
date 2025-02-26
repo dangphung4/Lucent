@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { useAuth } from '../lib/AuthContext';
 import { useTheme } from '../lib/ThemeProvider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Chrome, Smartphone, Apple, Monitor, Share, Menu, Plus, ExternalLink } from 'lucide-react';
 
 export function LandingPage() {
   const { currentUser } = useAuth();
@@ -351,10 +352,10 @@ export function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background pointer-events-none"></div>
         <div className="container mx-auto px-4 md:px-6 max-w-screen-xl relative">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
-            <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur-sm">
+            <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4 backdrop-blur-sm">
               Install the App
             </div>
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70 px-4">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/70 px-4">
               Use Skincare God Anywhere
             </h2>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg leading-relaxed px-4">
@@ -364,60 +365,154 @@ export function LandingPage() {
 
           <div className="mx-auto max-w-3xl">
             <Tabs defaultValue="desktop" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="desktop">Desktop</TabsTrigger>
-                <TabsTrigger value="android">Android</TabsTrigger>
-                <TabsTrigger value="ios">iOS</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3 p-1">
+                <TabsTrigger value="desktop" className="flex items-center gap-2">
+                  <Monitor className="h-4 w-4" />
+                  <span>Desktop</span>
+                </TabsTrigger>
+                <TabsTrigger value="android" className="flex items-center gap-2">
+                  <Smartphone className="h-4 w-4" />
+                  <span>Android</span>
+                </TabsTrigger>
+                <TabsTrigger value="ios" className="flex items-center gap-2">
+                  <Apple className="h-4 w-4" />
+                  <span>iOS</span>
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="desktop" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Install on Desktop</CardTitle>
-                    <CardDescription>Chrome, Edge, or other Chromium browsers</CardDescription>
+                <Card className="border-2 border-primary/10 backdrop-blur-sm">
+                  <CardHeader className="space-y-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="p-2 rounded-full bg-primary/10">
+                        <Chrome className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle>Install on Desktop</CardTitle>
+                        <CardDescription>Chrome, Edge, or other Chromium browsers</CardDescription>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
-                      <li>Visit <span className="font-mono text-primary">skincaregod.vercel.app</span></li>
-                      <li>Click the install icon (⊕) in your browser's address bar</li>
-                      <li>Click "Install" in the prompt that appears</li>
-                      <li>The app will install and create a desktop shortcut</li>
+                    <ol className="list-none space-y-6">
+                      <li className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">1</div>
+                        <div className="flex-1">
+                          <p className="font-medium">Visit</p>
+                          <div className="mt-1 flex items-center gap-2 text-muted-foreground">
+                            <span className="font-mono text-primary">skincaregod.vercel.app</span>
+                            <ExternalLink className="h-4 w-4" />
+                          </div>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">2</div>
+                        <div className="flex-1">
+                          <p className="font-medium">Click the install icon</p>
+                          <div className="mt-1 flex items-center gap-2 text-muted-foreground">
+                            <Plus className="h-4 w-4" /> in your browser's address bar
+                          </div>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">3</div>
+                        <div className="flex-1">
+                          <p className="font-medium">Click "Install" in the prompt</p>
+                          <p className="mt-1 text-muted-foreground">The app will install and create a desktop shortcut</p>
+                        </div>
+                      </li>
                     </ol>
                   </CardContent>
                 </Card>
               </TabsContent>
               
               <TabsContent value="android" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Install on Android</CardTitle>
-                    <CardDescription>Chrome for Android</CardDescription>
+                <Card className="border-2 border-primary/10 backdrop-blur-sm">
+                  <CardHeader className="space-y-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="p-2 rounded-full bg-primary/10">
+                        <Smartphone className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle>Install on Android</CardTitle>
+                        <CardDescription>Chrome for Android</CardDescription>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
-                      <li>Visit <span className="font-mono text-primary">skincaregod.vercel.app</span> in Chrome</li>
-                      <li>Tap the menu icon (⋮) in the top right</li>
-                      <li>Tap "Add to Home screen"</li>
-                      <li>Choose a name and tap "Add"</li>
-                      <li>The app will appear on your home screen</li>
+                    <ol className="list-none space-y-6">
+                      <li className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">1</div>
+                        <div className="flex-1">
+                          <p className="font-medium">Visit in Chrome</p>
+                          <div className="mt-1 flex items-center gap-2 text-muted-foreground">
+                            <span className="font-mono text-primary">skincaregod.vercel.app</span>
+                            <ExternalLink className="h-4 w-4" />
+                          </div>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">2</div>
+                        <div className="flex-1">
+                          <p className="font-medium">Tap the menu icon</p>
+                          <div className="mt-1 flex items-center gap-2 text-muted-foreground">
+                            <Menu className="h-4 w-4" /> in the top right
+                          </div>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">3</div>
+                        <div className="flex-1">
+                          <p className="font-medium">Tap "Add to Home screen"</p>
+                          <p className="mt-1 text-muted-foreground">Choose a name and tap "Add"</p>
+                        </div>
+                      </li>
                     </ol>
                   </CardContent>
                 </Card>
               </TabsContent>
               
               <TabsContent value="ios" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Install on iOS</CardTitle>
-                    <CardDescription>Safari on iPhone or iPad</CardDescription>
+                <Card className="border-2 border-primary/10 backdrop-blur-sm">
+                  <CardHeader className="space-y-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="p-2 rounded-full bg-primary/10">
+                        <Apple className="h-6 w-6 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle>Install on iOS</CardTitle>
+                        <CardDescription>Safari on iPhone or iPad</CardDescription>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
-                      <li>Visit <span className="font-mono text-primary">skincaregod.vercel.app</span> in Safari</li>
-                      <li>Tap the Share button (rectangle with arrow)</li>
-                      <li>Scroll down and tap "Add to Home Screen"</li>
-                      <li>Choose a name and tap "Add"</li>
-                      <li>The app will appear on your home screen</li>
+                    <ol className="list-none space-y-6">
+                      <li className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">1</div>
+                        <div className="flex-1">
+                          <p className="font-medium">Visit in Safari</p>
+                          <div className="mt-1 flex items-center gap-2 text-muted-foreground">
+                            <span className="font-mono text-primary">skincaregod.vercel.app</span>
+                            <ExternalLink className="h-4 w-4" />
+                          </div>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">2</div>
+                        <div className="flex-1">
+                          <p className="font-medium">Tap the Share button</p>
+                          <div className="mt-1 flex items-center gap-2 text-muted-foreground">
+                            <Share className="h-4 w-4" /> rectangle with arrow
+                          </div>
+                        </div>
+                      </li>
+                      <li className="flex items-start gap-4">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">3</div>
+                        <div className="flex-1">
+                          <p className="font-medium">Tap "Add to Home Screen"</p>
+                          <p className="mt-1 text-muted-foreground">Choose a name and tap "Add"</p>
+                        </div>
+                      </li>
                     </ol>
                   </CardContent>
                 </Card>
