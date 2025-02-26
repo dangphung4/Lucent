@@ -2,9 +2,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { useAuth } from '../lib/AuthContext';
+import { useTheme } from '../lib/ThemeProvider';
 
 export function LandingPage() {
   const { currentUser } = useAuth();
+  const { theme } = useTheme();
   const navigate = useNavigate();
 
 
@@ -76,7 +78,7 @@ export function LandingPage() {
                   {/* Image - removed transition effects */}
                   <div className="p-1">
                     <img 
-                      src="/dashboard-preview.png" 
+                      src={theme === 'light' ? '/dashboard-preview-light.png' : '/dashboard-preview.png'}
                       alt="Lucent Dashboard Preview" 
                       className="w-full h-auto rounded-xl shadow-md"
                       loading="lazy"
