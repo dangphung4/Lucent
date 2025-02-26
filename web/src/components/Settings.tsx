@@ -162,7 +162,7 @@ export function Settings() {
   };
   
   return (
-    <div className="container max-w-5xl mx-auto px-4 md:py-12">
+    <div className="container max-w-5xl mx-auto px-4 md:py-12 pb-12">
       
       <Tabs defaultValue={activeTab} value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="mb-8 border rounded-lg p-1 bg-muted/30">
