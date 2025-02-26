@@ -192,6 +192,12 @@ export function Navbar() {
                 </DropdownMenu>
               ) : (
                 <div className="flex items-center gap-2">
+                  <Link 
+                    to="/about"
+                    className="text-sm font-medium transition-colors hover:text-primary"
+                  >
+                    About Us
+                  </Link>
                   <Link to="/login">
                     <Button 
                       variant="outline" 

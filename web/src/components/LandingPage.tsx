@@ -68,11 +68,18 @@ export function LandingPage() {
                 </Button>
                 </Link>
               ) : (
-              <Link to="/login" className="w-full sm:w-auto">
-                <Button size="lg" variant="outline" className="w-full px-8 rounded-full border-2">
-                  Sign In
-                </Button>
-              </Link>
+              <>
+                <Link to="/login" className="w-full sm:w-auto">
+                  <Button size="lg" variant="outline" className="w-full px-8 rounded-full border-2">
+                    Sign In
+                  </Button>
+                </Link>
+                <Link to="/about" className="w-full sm:w-auto">
+                  <Button size="lg" variant="secondary" className="w-full px-8 rounded-full">
+                    About Us
+                  </Button>
+                </Link>
+              </>
               )}
             </div>
             

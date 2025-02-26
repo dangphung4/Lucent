@@ -13,6 +13,7 @@ import PWABadge from './PWABadge';
 import { Journal } from './components/Journal';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { TermsOfService } from './components/TermsOfService';
+import { AboutUs } from './components/AboutUs';
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -74,6 +75,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/about" element={<AboutUs />} />
               <Route 
                 path="/calendar" 
                 element={
