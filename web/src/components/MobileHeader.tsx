@@ -3,6 +3,21 @@ import LucentLogo from '../assets/lucent-logo.svg';
 import { ThemeToggle } from './ui/theme-toggle';
 import { cn } from '../lib/utils';
 
+/**
+ * A functional component that renders a sticky header for the mobile version of the application.
+ * The header changes its appearance based on the scroll position of the window.
+ *
+ * @returns {JSX.Element} The rendered header component.
+ *
+ * @example
+ * // Usage in a React component
+ * import MobileHeader from './MobileHeader';
+ *
+ * function App() {
+ *   return (
+ *     <div>
+ *       <MobileHeader />
+ *       {/* Other components */
 export function MobileHeader() {
   return (
     <header 
