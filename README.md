@@ -1,5 +1,7 @@
 # Skincare Tracker PWA - Project Goals - Lucent
 
+<img src="/web/public/lucent-logo.svg" alt="Lucent" width="200" height="200">
+
 ## Project Overview
 Building a progressive web application that allows users to track skincare products, usage patterns, and effectiveness. This app is being developed for personal use to help monitor which products work best over time.
 

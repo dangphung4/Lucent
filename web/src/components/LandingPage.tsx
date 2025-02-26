@@ -16,35 +16,38 @@ export function LandingPage() {
       <section className="relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 pt-20 pb-24 md:pt-32 md:pb-32">
         <div className="container mx-auto px-4 md:px-6 max-w-screen-xl">
           <div className="flex flex-col items-center text-center space-y-8">
-            <div className="space-y-4 max-w-3xl mx-auto">
-              <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/60">
+            <div className="space-y-6 max-w-3xl mx-auto">
+              <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4">
+                Your Personal Skincare Companion
+              </div>
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/70">
                 Your Skincare Journey, Tracked
               </h1>
-              <p className="mx-auto max-w-[700px] text-muted-foreground text-lg md:text-xl">
-                Discover what works best for your skin by tracking products, routines, and results in one beautiful app.
+              <p className="mx-auto max-w-[700px] text-muted-foreground text-lg md:text-xl leading-relaxed">
+                Discover what works best for your skin by tracking products, routines, and results in one beautiful app. Join thousands of skincare enthusiasts today.
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 min-[400px]:flex-row">
               {currentUser ? (
-                <Button onClick={() => navigate('/dashboard')} size="lg" className="px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+                <Button onClick={() => navigate('/dashboard')} size="lg" className="px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary">
                   Dashboard
                 </Button>
               ) : (
               <Link to="/login">
-                <Button size="lg" className="px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all">
+                <Button size="lg" className="px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary">
                   Get Started Free
                 </Button>
               </Link>
               )}
               {currentUser ? (
                 <Link to="/calendar">
-                <Button size="lg" variant="outline" className="px-8 rounded-full">
+                <Button size="lg" variant="outline" className="px-8 rounded-full border-2">
                     Calendar
                 </Button>
                 </Link>
               ) : (
               <Link to="/login">
-                <Button size="lg" variant="outline" className="px-8 rounded-full">
+                <Button size="lg" variant="outline" className="px-8 rounded-full border-2">
                   Sign In
                 </Button>
               </Link>
@@ -52,35 +55,35 @@ export function LandingPage() {
             </div>
             
             {/* App Preview Image */}
-            <div className="relative w-full max-w-4xl mt-8 md:mt-16">
-              {/* Simplified background glow - no animation */}
+            <div className="relative w-full max-w-4xl mt-12 md:mt-20">
+              {/* Enhanced background glow */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl blur-3xl -z-10 transform scale-110"></div>
               
-              {/* Simplified container with lighter effects */}
+              {/* Simplified container with enhanced effects */}
               <div className="relative">
-                {/* Static border glow instead of animated */}
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/40 to-primary/60 rounded-2xl blur-sm opacity-70"></div>
+                {/* Enhanced border glow */}
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/40 to-primary/60 rounded-2xl blur-sm opacity-75"></div>
                 
-                {/* Main container */}
-                <div className="relative bg-card border rounded-2xl shadow-xl overflow-hidden dark:border-gray-800/50">
-                  {/* Browser-like top bar - simplified */}
-                  <div className="bg-muted/30 border-b border-primary/10 p-3 flex items-center gap-2">
+                {/* Main container with enhanced shadows */}
+                <div className="relative bg-card border rounded-2xl shadow-2xl overflow-hidden dark:border-gray-800/50 backdrop-blur-sm">
+                  {/* Enhanced browser-like top bar */}
+                  <div className="bg-muted/40 border-b border-primary/10 p-3 flex items-center gap-2 backdrop-blur-sm">
                     <div className="flex gap-2">
-                      <div className="h-3 w-3 rounded-full bg-red-500/80"></div>
-                      <div className="h-3 w-3 rounded-full bg-yellow-500/80"></div>
-                      <div className="h-3 w-3 rounded-full bg-green-500/80"></div>
+                      <div className="h-3 w-3 rounded-full bg-red-500/90"></div>
+                      <div className="h-3 w-3 rounded-full bg-yellow-500/90"></div>
+                      <div className="h-3 w-3 rounded-full bg-green-500/90"></div>
                     </div>
                     <div className="flex-1 text-center">
-                      <div className="px-3 py-1 rounded-full bg-muted/30 text-xs text-muted-foreground inline-block">skincaregod.vercel.app</div>
+                      <div className="px-4 py-1.5 rounded-full bg-background/50 text-xs font-medium text-muted-foreground inline-block backdrop-blur-sm">skincaregod.vercel.app</div>
                     </div>
                   </div>
                   
-                  {/* Image - removed transition effects */}
-                  <div className="p-1">
+                  {/* Enhanced image container */}
+                  <div className="p-1 bg-gradient-to-b from-transparent to-background/5">
                     <img 
                       src={theme === 'light' ? '/dashboard-preview-light.png' : '/dashboard-preview.png'}
                       alt="Lucent Dashboard Preview" 
-                      className="w-full h-auto rounded-xl shadow-md"
+                      className="w-full h-auto rounded-xl shadow-xl"
                       loading="lazy"
                     />
                   </div>
@@ -90,34 +93,36 @@ export function LandingPage() {
           </div>
         </div>
         
-        {/* Decorative elements */}
+        {/* Enhanced decorative elements */}
         <div className="absolute inset-0 -z-10 overflow-hidden">
-          <div className="absolute left-[10%] top-[20%] h-[300px] w-[300px] rounded-full bg-primary/5 blur-3xl"></div>
-          <div className="absolute right-[10%] bottom-[10%] h-[250px] w-[250px] rounded-full bg-primary/10 blur-3xl"></div>
-          <div className="absolute left-[50%] bottom-0 h-[200px] w-[200px] -translate-x-1/2 rounded-full bg-primary/5 blur-3xl"></div>
+          <div className="absolute left-[10%] top-[20%] h-[300px] w-[300px] rounded-full bg-gradient-to-r from-primary/10 to-primary/5 blur-3xl opacity-80"></div>
+          <div className="absolute right-[10%] bottom-[10%] h-[250px] w-[250px] rounded-full bg-gradient-to-l from-primary/10 to-primary/5 blur-3xl opacity-80"></div>
+          <div className="absolute left-[50%] bottom-0 h-[200px] w-[200px] -translate-x-1/2 rounded-full bg-gradient-to-t from-primary/10 to-primary/5 blur-3xl opacity-80"></div>
         </div>
       </section>
 
       {/* Features Section with Cards */}
-      <section className="py-16 md:py-24">
-        <div className="container mx-auto px-4 md:px-6 max-w-screen-xl">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-            <div className="inline-block rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+      <section className="py-16 md:py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background"></div>
+        <div className="container mx-auto px-4 md:px-6 max-w-screen-xl relative">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
+            <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
               Features
             </div>
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
               Everything You Need
             </h2>
-            <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg">
-              Track your skincare routine and see what works best for your skin
+            <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg leading-relaxed">
+              Track your skincare routine and see what works best for your skin with our comprehensive feature set
             </p>
           </div>
           
           <div className="mx-auto grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl">
-            <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
-              <div className="h-2 bg-primary"></div>
-              <CardHeader className="pb-2">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
+            <Card className="group overflow-hidden transition-all hover:shadow-xl border-gray-200/50 dark:border-gray-800/50 relative bg-gradient-to-b from-background to-primary/5">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="h-1.5 bg-gradient-to-r from-primary to-primary/60"></div>
+              <CardHeader className="pb-2 relative">
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 mb-2 group-hover:scale-110 transition-transform">
                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
                     <rect x="9" y="3" width="6" height="4" rx="2"></rect>
@@ -127,30 +132,30 @@ export function LandingPage() {
                     <path d="M13 18h.01"></path>
                   </svg>
                 </div>
-                <CardTitle className="text-xl">Product Tracking</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-xl font-bold">Product Tracking</CardTitle>
+                <CardDescription className="text-muted-foreground/90">
                   Log all your skincare products and track when you use them
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-sm text-muted-foreground">
+                <ul className="space-y-2.5 text-sm text-muted-foreground">
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5 text-primary">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Track product details
+                    <span className="font-medium">Track product details</span>
                   </li>
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5 text-primary">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Log usage frequency
+                    <span className="font-medium">Log usage frequency</span>
                   </li>
                   <li className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-4 w-4 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2 h-5 w-5 text-primary">
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Rate effectiveness
+                    <span className="font-medium">Rate effectiveness</span>
                   </li>
                 </ul>
               </CardContent>
