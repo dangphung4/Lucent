@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 import { getDay, getDaysInMonth, isSameDay } from 'date-fns';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { Check, ChevronsUpDown } from 'lucide-react';
-import { type ReactNode, createContext, useContext, useState } from 'react';
+import { type ReactNode, createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
@@ -38,11 +38,22 @@ export const useCalendar = create<CalendarState>()(
   }))
 );
 
-type CalendarContextProps = {
+export type CalendarContextProps = {
   locale: Intl.LocalesArgument;
   startDay: number;
-  onSelectDate?: (date: Date) => void;
+  onSelectDate?: (date: Date, event?: React.MouseEvent) => void;
   selectedDate?: Date;
+  onMonthChange?: (month: number, year: number) => void;
+  month?: number;
+  year?: number;
+  day?: number;
+  weekday?: number;
+  selected?: Date;
+  today?: Date;
+  setMonth?: (month: number) => void;
+  setYear?: (year: number) => void;
+  setDay?: (day: number) => void;
+  setSelected?: (day: Date, event?: React.MouseEvent) => void;
 };
 
 const CalendarContext = createContext<CalendarContextProps>({
@@ -121,6 +132,10 @@ const Combobox = ({
           variant="outline"
           aria-expanded={open}
           className={cn('w-40 justify-between capitalize', className)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         >
           {value
             ? data.find((item) => item.value === value)?.label
@@ -147,6 +162,10 @@ const Combobox = ({
                   onSelect={(currentValue) => {
                     setValue(currentValue === value ? '' : currentValue);
                     setOpen(false);
+                  }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
                   }}
                   className="capitalize"
                 >
@@ -183,7 +202,7 @@ export type CalendarBodyProps = {
     feature: Feature;
   }) => ReactNode;
   selectedDate?: Date;
-  onSelectDate?: (date: Date) => void;
+  onSelectDate?: (date: Date, event?: React.MouseEvent) => void;
 };
 
 export const CalendarBody = ({ 
@@ -245,7 +264,18 @@ export const CalendarBody = ({
           isSelected(day) ? "bg-primary/20 font-medium" : "",
           !isToday(day) && !isSelected(day) ? "hover:bg-muted" : ""
         )}
-        onClick={() => onSelectDate && onSelectDate(currentDate)}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (onSelectDate) {
+            onSelectDate(currentDate, e);
+          }
+          return false;
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          return false;
+        }}
       >
         <div className="flex justify-between items-start">
           <span className={cn(
@@ -323,16 +353,24 @@ export type CalendarMonthPickerProps = {
 export const CalendarMonthPicker = ({
   className,
 }: CalendarMonthPickerProps) => {
-  const { month, setMonth } = useCalendar();
-  const { locale } = useContext(CalendarContext);
+  const { month, setMonth, year } = useCalendar();
+  const { locale, onMonthChange } = useContext(CalendarContext);
+
+  const handleMonthChange = (value: string) => {
+    const newMonth = Number.parseInt(value) as CalendarState['month'];
+    setMonth(newMonth);
+    
+    // Call onMonthChange if provided
+    if (onMonthChange) {
+      onMonthChange(newMonth, year);
+    }
+  };
 
   return (
     <Combobox
       className={className}
       value={month.toString()}
-      setValue={(value) =>
-        setMonth(Number.parseInt(value) as CalendarState['month'])
-      }
+      setValue={handleMonthChange}
       data={monthsForLocale(locale).map((monthName, index) => ({
         value: index.toString(),
         label: monthName,
@@ -357,13 +395,24 @@ export const CalendarYearPicker = ({
   start,
   end,
 }: CalendarYearPickerProps) => {
-  const { year, setYear } = useCalendar();
+  const { year, setYear, month } = useCalendar();
+  const { onMonthChange } = useContext(CalendarContext);
+
+  const handleYearChange = (value: string) => {
+    const newYear = Number.parseInt(value);
+    setYear(newYear);
+    
+    // Call onMonthChange if provided
+    if (onMonthChange) {
+      onMonthChange(month, newYear);
+    }
+  };
 
   return (
     <Combobox
       className={className}
       value={year.toString()}
-      setValue={(value) => setYear(Number.parseInt(value))}
+      setValue={handleYearChange}
       data={Array.from({ length: end - start + 1 }, (_, i) => ({
         value: (start + i).toString(),
         label: (start + i).toString(),
@@ -385,31 +434,70 @@ export const CalendarDatePagination = ({
   className,
 }: CalendarDatePaginationProps) => {
   const { month, year, setMonth, setYear } = useCalendar();
+  const { onMonthChange } = useContext(CalendarContext);
 
   const handlePreviousMonth = () => {
+    let newMonth: CalendarState['month'], newYear: number;
+    
     if (month === 0) {
-      setMonth(11);
-      setYear(year - 1);
+      newMonth = 11;
+      newYear = year - 1;
+      setMonth(newMonth);
+      setYear(newYear);
     } else {
-      setMonth((month - 1) as CalendarState['month']);
+      newMonth = (month - 1) as CalendarState['month'];
+      newYear = year;
+      setMonth(newMonth);
+    }
+    
+    // Call onMonthChange if provided
+    if (onMonthChange) {
+      onMonthChange(newMonth, newYear);
     }
   };
 
   const handleNextMonth = () => {
+    let newMonth: CalendarState['month'], newYear: number;
+    
     if (month === 11) {
-      setMonth(0);
-      setYear(year + 1);
+      newMonth = 0;
+      newYear = year + 1;
+      setMonth(newMonth);
+      setYear(newYear);
     } else {
-      setMonth((month + 1) as CalendarState['month']);
+      newMonth = (month + 1) as CalendarState['month'];
+      newYear = year;
+      setMonth(newMonth);
+    }
+    
+    // Call onMonthChange if provided
+    if (onMonthChange) {
+      onMonthChange(newMonth, newYear);
     }
   };
 
   return (
     <div className={cn('flex items-center gap-2', className)}>
-      <Button onClick={() => handlePreviousMonth()} variant="ghost" size="icon">
+      <Button 
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handlePreviousMonth();
+        }} 
+        variant="ghost" 
+        size="icon"
+      >
         <ChevronLeftIcon size={16} />
       </Button>
-      <Button onClick={() => handleNextMonth()} variant="ghost" size="icon">
+      <Button 
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleNextMonth();
+        }} 
+        variant="ghost" 
+        size="icon"
+      >
         <ChevronRightIcon size={16} />
       </Button>
     </div>
@@ -458,19 +546,94 @@ export type CalendarProviderProps = {
   startDay?: number;
   children: ReactNode;
   className?: string;
-  onSelectDate?: (date: Date) => void;
+  onSelectDate?: (date: Date, event?: React.MouseEvent) => void;
   selectedDate?: Date;
+  onMonthChange?: (month: number, year: number) => void;
 };
 
-export const CalendarProvider = ({
-  locale = 'en-US',
-  startDay = 0,
+export function CalendarProvider({
   children,
   className,
   onSelectDate,
   selectedDate,
-}: CalendarProviderProps) => (
-  <CalendarContext.Provider value={{ locale, startDay, onSelectDate, selectedDate }}>
-    <div className={cn('relative flex flex-col', className)}>{children}</div>
-  </CalendarContext.Provider>
-);
+  onMonthChange,
+  locale = 'en-US',
+  startDay = 0,
+}: CalendarProviderProps) {
+  const today = new Date();
+  const [month, setMonth] = useState(today.getMonth());
+  const [year, setYear] = useState(today.getFullYear());
+  const [day, setDay] = useState(today.getDate());
+  const [weekday] = useState(today.getDay());
+  const [selectedDates, setSelectedDates] = useState<Date[] | undefined>(
+    selectedDate ? [selectedDate] : undefined
+  );
+
+  // Handle date selection
+  const setSelected = useCallback(
+    (day: Date, event?: React.MouseEvent) => {
+      // If onSelectDate is provided, call it
+      if (onSelectDate) {
+        onSelectDate(day, event);
+      }
+      
+      setSelectedDates([day]);
+    },
+    [onSelectDate]
+  );
+
+  const handleSetMonth = useCallback((newMonth: number) => {
+    setMonth(newMonth);
+    if (onMonthChange) {
+      onMonthChange(newMonth, year);
+    }
+  }, [year, onMonthChange]);
+
+  const handleSetYear = useCallback((newYear: number) => {
+    setYear(newYear);
+    if (onMonthChange) {
+      onMonthChange(month, newYear);
+    }
+  }, [month, onMonthChange]);
+
+  const contextValue = useMemo(() => {
+    return {
+      locale,
+      startDay,
+      month,
+      year,
+      day,
+      weekday,
+      selected: selectedDates?.[0],
+      selectedDate: selectedDates?.[0],
+      today,
+      setMonth: handleSetMonth,
+      setYear: handleSetYear,
+      setDay,
+      setSelected,
+      onMonthChange,
+      onSelectDate,
+    };
+  }, [
+    locale,
+    startDay,
+    month,
+    year,
+    day,
+    weekday,
+    selectedDates,
+    today,
+    handleSetMonth,
+    handleSetYear,
+    setDay,
+    setSelected,
+    onMonthChange,
+    onSelectDate,
+  ]);
+
+  return (
+    <CalendarContext.Provider value={contextValue}>
+      <div className={cn('relative flex flex-col', className)}>{children}</div>
+    </CalendarContext.Provider>
+  );
+}

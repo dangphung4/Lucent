@@ -6,10 +6,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Avatar, AvatarImage } from './ui/avatar';
 import { useNavigate } from 'react-router-dom';
 import { AddProductDialog } from './AddProductDialog';
-import { getUserProducts, Product } from '@/lib/db';
+import { getUserProducts, getRoutineCompletions, Product } from '@/lib/db';
 import { Loader2 } from 'lucide-react';
 import { ProductList } from './ProductList';
 import { RoutineList } from './RoutineList';
+import { cn } from '@/lib/utils';
+import { Star, Droplets, FlaskConical, CircleDot, Sun, Layers, Sparkles, Eye, Zap, Package } from 'lucide-react';
 
 export interface ProductStats {
   total: number;
@@ -18,6 +20,21 @@ export interface ProductStats {
   repurchase: number;
 }
 
+/**
+ * Renders the Dashboard component, which displays user-specific information
+ * including greetings, product statistics, recent products, and routine progress.
+ *
+ * The component utilizes hooks to manage state and side effects, such as loading
+ * user data and calculating statistics based on the user's products and routines.
+ *
+ * @returns {JSX.Element} The rendered Dashboard component.
+ *
+ * @example
+ * // Usage in a parent component
+ * <Dashboard />
+ *
+ * @throws {Error} Throws an error if data loading fails.
+ */
 export function Dashboard() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
@@ -29,8 +46,10 @@ export function Dashboard() {
     finished: 0,
     repurchase: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [streak, setStreak] = useState(0);
+  const [completedRoutines, setCompletedRoutines] = useState(0);
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const productListRef = useRef<{ loadProducts: () => Promise<void> }>(null);
   const navigate = useNavigate();
   
@@ -46,45 +65,118 @@ export function Dashboard() {
     else setGreeting('Good evening');
   }, []);
 
-  // Load products data
+  // Load products and calculate stats
   useEffect(() => {
-    const loadProducts = async () => {
-      if (!currentUser?.uid) return;
-      
-      setIsLoading(true);
+    if (!currentUser?.uid) return;
+
+    /**
+     * Asynchronously loads user data, including product statistics, routine completions,
+     * current streak, total completed routines, and the five most recent products.
+     *
+     * This function performs the following tasks:
+     * - Sets the loading state to true.
+     * - Fetches user products and calculates product statistics such as total, active,
+     *   finished, and repurchase counts.
+     * - Loads routine completions for calculating streaks and progress.
+     * - Calculates the current streak of consecutive days with at least one completed routine.
+     * - Counts the total number of completed routines where all steps are completed.
+     * - Retrieves the five most recent products based on their creation date.
+     *
+     * @async
+     * @function loadData
+     * @throws {Error} Throws an error if data loading fails.
+     *
+     * @example
+     * // Call the loadData function to initiate data loading
+     * loadData().then(() => {
+     *   console.log('Data loaded successfully');
+     * }).catch(error => {
+     *   console.error('Failed to load data:', error);
+     * });
+     */
+    const loadData = async () => {
+      setLoading(true);
       try {
-        const products = await getUserProducts(currentUser.uid);
+        const fetchedProducts = await getUserProducts(currentUser.uid);
         
-        // Calculate stats
-        const stats = products.reduce((acc, product) => ({
-          total: acc.total + 1,
-          active: acc.active + (product.status === 'active' ? 1 : 0),
-          finished: acc.finished + (product.status === 'finished' ? 1 : 0),
-          repurchase: acc.repurchase + (product.wouldRepurchase ? 1 : 0),
-        }), {
-          total: 0,
-          active: 0,
-          finished: 0,
-          repurchase: 0,
+        // Calculate product stats
+        const stats: ProductStats = {
+          total: fetchedProducts.length,
+          active: fetchedProducts.filter(p => p.status === 'active').length,
+          finished: fetchedProducts.filter(p => p.status === 'finished').length,
+          repurchase: fetchedProducts.filter(p => p.status === 'finished' && p.wouldRepurchase).length,
+        };
+        setProductStats(stats);
+
+        // Load routine completions for streak and progress calculation
+        const today = new Date();
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(today.getMonth() - 1);
+        
+        const completions = await getRoutineCompletions(currentUser.uid, oneMonthAgo, today);
+        
+        // Calculate streak (consecutive days with at least one completed routine)
+        let currentStreak = 0;
+        const dateMap = new Map<string, boolean>();
+        
+        // Group completions by date
+        completions.forEach(completion => {
+          const dateStr = completion.date.toDateString();
+          const hasCompletedSteps = completion.completedSteps.some(step => step.completed);
+          
+          if (hasCompletedSteps) {
+            dateMap.set(dateStr, true);
+          }
         });
         
-        setProductStats(stats);
+        // Calculate streak
+        const today_str = today.toDateString();
+        const checkDate = new Date(today);
         
+        // Check if today has completions
+        if (dateMap.has(today_str)) {
+          currentStreak = 1;
+          
+          // Check previous days
+          while (true) {
+            checkDate.setDate(checkDate.getDate() - 1);
+            const checkDateStr = checkDate.toDateString();
+            
+            if (dateMap.has(checkDateStr)) {
+              currentStreak++;
+            } else {
+              break;
+            }
+          }
+        }
+        
+        setStreak(currentStreak);
+        
+        // Calculate total completed routines (routines with all steps completed)
+        const completedRoutinesCount = completions.filter(completion => {
+          const totalSteps = completion.completedSteps.length;
+          const completedSteps = completion.completedSteps.filter(step => step.completed).length;
+          return totalSteps > 0 && completedSteps === totalSteps;
+        }).length;
+        
+        setCompletedRoutines(completedRoutinesCount);
+
         // Get 5 most recent products
-        const sorted = [...products].sort((a, b) => {
+        const sorted = [...fetchedProducts].sort((a, b) => {
           const dateA = a.createdAt instanceof Date ? a.createdAt : new Date(a.createdAt);
           const dateB = b.createdAt instanceof Date ? b.createdAt : new Date(b.createdAt);
           return dateB.getTime() - dateA.getTime();
         });
+        
         setRecentProducts(sorted.slice(0, 5));
       } catch (error) {
-        console.error('Error loading products:', error);
+        console.error('Error loading data:', error);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    loadProducts();
+    loadData();
   }, [currentUser]);
 
   // Handle tab change
@@ -103,6 +195,31 @@ export function Dashboard() {
 
   const handleFilterChange = (filter: typeof productFilter) => {
     setProductFilter(filter);
+  };
+
+  const getCategoryIcon = (category: string | null | undefined) => {
+    switch (category?.toLowerCase()) {
+      case 'cleanser':
+        return <Droplets className="h-5 w-5" />;
+      case 'toner':
+        return <FlaskConical className="h-5 w-5" />;
+      case 'serum':
+        return <FlaskConical className="h-5 w-5" />;
+      case 'moisturizer':
+        return <CircleDot className="h-5 w-5" />;
+      case 'sunscreen':
+        return <Sun className="h-5 w-5" />;
+      case 'mask':
+        return <Layers className="h-5 w-5" />;
+      case 'exfoliant':
+        return <Sparkles className="h-5 w-5" />;
+      case 'eye cream':
+        return <Eye className="h-5 w-5" />;
+      case 'treatment':
+        return <Zap className="h-5 w-5" />;
+      default:
+        return <Package className="h-5 w-5" />;
+    }
   };
 
   return (
@@ -209,7 +326,7 @@ export function Dashboard() {
                   <CardContent className="p-6">
                     <div className="flex flex-col">
                       <span className="text-green-600 dark:text-green-400 text-sm font-medium">Streak</span>
-                      <span className="text-3xl font-bold mt-1">0</span>
+                      <span className="text-3xl font-bold mt-1">{streak}</span>
                       <span className="text-muted-foreground text-xs mt-1">Days in a row</span>
                     </div>
                   </CardContent>
@@ -219,8 +336,8 @@ export function Dashboard() {
                   <CardContent className="p-6">
                     <div className="flex flex-col">
                       <span className="text-amber-600 dark:text-amber-400 text-sm font-medium">Progress</span>
-                      <span className="text-3xl font-bold mt-1">0</span>
-                      <span className="text-muted-foreground text-xs mt-1">Photos tracked</span>
+                      <span className="text-3xl font-bold mt-1">{completedRoutines}</span>
+                      <span className="text-muted-foreground text-xs mt-1">Routines completed</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -242,7 +359,7 @@ export function Dashboard() {
                 
                 <Card>
                   <CardContent className="p-6">
-                    {isLoading ? (
+                    {loading ? (
                       <div className="flex items-center justify-center py-8">
                         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                       </div>
@@ -260,40 +377,60 @@ export function Dashboard() {
                         />
                       </div>
                     ) : (
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         {recentProducts.map((product) => (
-                          <div key={product.id} className="flex items-center justify-between border-b last:border-0 pb-4 last:pb-0">
-                            <div className="flex items-start gap-4">
-                              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                          <div 
+                            key={product.id} 
+                            className={cn(
+                              "flex items-center justify-between group relative",
+                              "pb-6 last:pb-0 border-b last:border-0",
+                              product.status === 'finished' && !product.wouldRepurchase && "border-purple-200/50 dark:border-purple-800/30",
+                              product.wouldRepurchase && "border-green-200/50 dark:border-green-800/30"
+                            )}
+                          >
+                            <div className="flex items-start gap-4 flex-1 min-w-0">
+                              <div className={cn(
+                                "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
+                                product.status !== 'finished' && !product.wouldRepurchase && "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+                                product.status === 'finished' && !product.wouldRepurchase && "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+                                product.wouldRepurchase && "bg-green-500/10 text-green-600 dark:text-green-400"
+                              )}>
                                 {product.imageUrl ? (
                                   <img src={product.imageUrl} alt={product.name} className="h-full w-full rounded-full object-cover" />
                                 ) : (
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
-                                    <rect x="9" y="3" width="6" height="4" rx="2"></rect>
-                                  </svg>
+                                  getCategoryIcon(product.category)
                                 )}
                               </div>
-                              <div>
-                                <h4 className="text-base font-medium">{product.name}</h4>
-                                <p className="text-sm text-muted-foreground">
-                                  {product.brand}
-                                  {product.category && ` • ${product.category}`}
-                                </p>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-base font-medium truncate">{product.name}</h4>
+                                  {product.wouldRepurchase && (
+                                    <Star className="h-4 w-4 text-green-500 shrink-0" />
+                                  )}
+                                </div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <p className="text-sm text-muted-foreground truncate">
+                                    {product.brand}
+                                  </p>
+                                  {product.category && (
+                                    <>
+                                      <span className="text-muted-foreground/40">•</span>
+                                      <span className="text-sm text-muted-foreground">{product.category}</span>
+                                    </>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                              {product.status === 'finished' && (
-                                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                                  Finished
-                                </span>
-                              )}
-                              {product.wouldRepurchase && (
-                                <span className="text-xs bg-green-500/10 text-green-600 dark:text-green-400 px-2 py-1 rounded-full">
-                                  Would Repurchase
-                                </span>
-                              )}
-                            </div>
+                            {product.status === 'finished' && (
+                              <div className={cn(
+                                "ml-4 px-3 py-1 rounded-full text-xs font-medium shrink-0",
+                                product.wouldRepurchase 
+                                  ? "bg-green-500/10 text-green-600 dark:text-green-400"
+                                  : "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                              )}>
+                                {product.wouldRepurchase ? 'Would Repurchase' : 'Finished'}
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>

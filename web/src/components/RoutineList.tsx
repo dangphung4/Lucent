@@ -2,8 +2,7 @@ import { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { MoreHorizontal, Plus, Trash, Edit, Loader2, Sun, Moon, Calendar, GripVertical } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
+import { Plus, Trash, Loader2, Sun, Moon, Calendar, GripVertical } from 'lucide-react';
 import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { useAuth } from '@/lib/AuthContext';
@@ -239,7 +238,7 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
             <Card 
               key={routine.id} 
               className={cn(
-                "group relative overflow-hidden transition-all hover:shadow-md border",
+                "group relative overflow-hidden transition-all hover:shadow-md border cursor-pointer",
                 routine.type === 'morning' && [
                   "bg-gradient-to-br from-amber-100/50 via-amber-50/25 to-transparent",
                   "dark:from-amber-950/20 dark:via-transparent dark:to-transparent",
@@ -269,6 +268,7 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                   "border-purple-200/50 dark:border-purple-800/30"
                 ]
               )}
+              onClick={() => setEditingRoutine(routine)}
             >
               <CardHeader className="pb-4">
                 <div className="flex justify-between items-start">
@@ -302,29 +302,18 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                       {routine.name}
                     </CardTitle>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => setEditingRoutine(routine)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        className="text-destructive"
-                        onClick={() => {
-                          setRoutineToDelete(routine);
-                          setDeleteDialogOpen(true);
-                        }}
-                      >
-                        <Trash className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent card click
+                      setRoutineToDelete(routine);
+                      setDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash className="h-4 w-4" />
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent>
@@ -353,11 +342,18 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                           {index + 1}
                         </Badge>
                         <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium block truncate">
-                            {product?.name || 'Unknown Product'}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium truncate">
+                              {product?.name || 'Unknown Product'}
+                            </span>
+                            {product?.category && (
+                              <Badge variant="secondary" className="text-xs">
+                                {product.category}
+                              </Badge>
+                            )}
+                          </div>
                           {step.notes && (
-                            <span className="text-xs text-muted-foreground block truncate">
+                            <span className="text-xs text-muted-foreground block truncate mt-0.5">
                               {step.notes}
                             </span>
                           )}
@@ -416,8 +412,8 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
             }
           }}
         >
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col">
-            <DialogHeader>
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0 sm:p-6 sm:gap-4">
+            <DialogHeader className="p-4 sm:p-0 border-b sm:border-0">
               <DialogTitle>{editingRoutine ? 'Edit Routine' : 'Create Routine'}</DialogTitle>
               <DialogDescription>
                 {editingRoutine 
@@ -425,8 +421,8 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                   : 'Set up a new skincare routine with your products.'}
               </DialogDescription>
             </DialogHeader>
-            <ScrollArea className="flex-1">
-              <div className="grid gap-6 py-4 px-1">
+            <ScrollArea className="flex-1 p-4 sm:p-0">
+              <div className="grid gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="name">Name</Label>
                   <Input 
@@ -478,17 +474,17 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                   />
                 </div>
 
-                <Separator />
+                <Separator className="sm:hidden" />
 
                 {/* Product Steps */}
                 <div className="grid gap-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:justify-between">
                     <Label>Products</Label>
                     <Select
                       onValueChange={(value) => addStep(value)}
                       value=""
                     >
-                      <SelectTrigger className="w-[200px]">
+                      <SelectTrigger className="w-full sm:w-[200px]">
                         <SelectValue placeholder="Add a product" />
                       </SelectTrigger>
                       <SelectContent>
@@ -520,38 +516,49 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     className={cn(
-                                      "flex items-center gap-3 p-3 rounded-lg",
+                                      "flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 rounded-lg",
                                       "bg-secondary/50 hover:bg-secondary/70 transition-colors"
                                     )}
                                   >
-                                    <div {...provided.dragHandleProps} className="cursor-grab">
-                                      <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                    <div className="flex items-center gap-3 w-full sm:w-auto">
+                                      <div {...provided.dragHandleProps} className="cursor-grab">
+                                        <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                      </div>
+                                      <Badge 
+                                        variant="outline" 
+                                        className="w-6 h-6 rounded-full p-0 flex items-center justify-center border-2 font-semibold"
+                                      >
+                                        {index + 1}
+                                      </Badge>
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-medium">{product?.name}</span>
+                                        {product?.category && (
+                                          <Badge variant="secondary" className="text-xs">
+                                            {product.category}
+                                          </Badge>
+                                        )}
+                                      </div>
                                     </div>
-                                    <Badge 
-                                      variant="outline" 
-                                      className="w-6 h-6 rounded-full p-0 flex items-center justify-center border-2 font-semibold"
-                                    >
-                                      {index + 1}
-                                    </Badge>
-                                    <span className="flex-1 font-medium">{product?.name}</span>
-                                    <Input
-                                      placeholder="Notes (optional)"
-                                      value={step.notes || ''}
-                                      onChange={(e) => {
-                                        const newSteps = [...formState.steps];
-                                        newSteps[index].notes = e.target.value;
-                                        setFormState(prev => ({ ...prev, steps: newSteps }));
-                                      }}
-                                      className="w-48"
-                                    />
-                                    <Button
-                                      variant="ghost"
-                                      size="icon"
-                                      onClick={() => removeStep(index)}
-                                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                    >
-                                      <Trash className="h-4 w-4" />
-                                    </Button>
+                                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                                      <Input
+                                        placeholder="Notes (optional)"
+                                        value={step.notes || ''}
+                                        onChange={(e) => {
+                                          const newSteps = [...formState.steps];
+                                          newSteps[index].notes = e.target.value;
+                                          setFormState(prev => ({ ...prev, steps: newSteps }));
+                                        }}
+                                        className="flex-1 sm:w-48"
+                                      />
+                                      <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => removeStep(index)}
+                                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                      >
+                                        <Trash className="h-4 w-4" />
+                                      </Button>
+                                    </div>
                                   </div>
                                 )}
                               </Draggable>
@@ -571,24 +578,34 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                 </div>
               </div>
             </ScrollArea>
-            <DialogFooter className="pt-4">
-              <Button variant="outline" onClick={() => {
-                setCreateDialogOpen(false);
-                setEditingRoutine(null);
-                setFormState(initialFormState);
-              }}>
-                Cancel
-              </Button>
-              <Button onClick={handleSave} disabled={isSaving}>
-                {isSaving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  'Save Changes'
-                )}
-              </Button>
+            <DialogFooter className="p-4 sm:p-0 border-t sm:border-0">
+              <div className="flex flex-col-reverse sm:flex-row gap-2 w-full sm:w-auto">
+                <Button 
+                  variant="outline" 
+                  className="w-full sm:w-auto"
+                  onClick={() => {
+                    setCreateDialogOpen(false);
+                    setEditingRoutine(null);
+                    setFormState(initialFormState);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  className="w-full sm:w-auto"
+                  onClick={handleSave} 
+                  disabled={isSaving}
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save Changes'
+                  )}
+                </Button>
+              </div>
             </DialogFooter>
           </DialogContent>
         </Dialog>

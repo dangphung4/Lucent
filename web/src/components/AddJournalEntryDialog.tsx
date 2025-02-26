@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -16,10 +15,11 @@ import { Calendar } from './ui/calendarshadcn';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { CalendarIcon, Loader2 } from 'lucide-react';
+import { CalendarIcon, Loader2, Plus, X, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
 import { addJournalEntry } from '@/lib/db';
+import { Badge } from './ui/badge';
 
 interface AddJournalEntryDialogProps {
   productId: string;
@@ -39,9 +39,21 @@ export function AddJournalEntryDialog({
   const [date, setDate] = useState<Date>(new Date());
   const [rating, setRating] = useState<number>(0);
   const [review, setReview] = useState('');
-  const [effects, setEffects] = useState('');
+  const [effects, setEffects] = useState<string[]>([]);
+  const [newEffect, setNewEffect] = useState('');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
+
+  const handleAddEffect = () => {
+    if (newEffect.trim() && !effects.includes(newEffect.trim())) {
+      setEffects([...effects, newEffect.trim()]);
+      setNewEffect('');
+    }
+  };
+
+  const handleRemoveEffect = (effectToRemove: string) => {
+    setEffects(effects.filter(effect => effect !== effectToRemove));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,12 +67,13 @@ export function AddJournalEntryDialog({
         date,
         rating,
         review,
-        effects: effects.split(',').map(e => e.trim()).filter(Boolean),
+        effects: effects,
         usageDuration: Math.floor((new Date().getTime() - date.getTime()) / (1000 * 60 * 60 * 24)),
-        notes
+        notes,
+        type: 'product'
       });
       
-      toast.success('Journal entry added');
+      toast.success('Product review added');
       setOpen(false);
       onEntryAdded?.();
       
@@ -68,11 +81,12 @@ export function AddJournalEntryDialog({
       setDate(new Date());
       setRating(0);
       setReview('');
-      setEffects('');
+      setEffects([]);
+      setNewEffect('');
       setNotes('');
     } catch (error) {
-      console.error('Error adding journal entry:', error);
-      toast.error('Error adding journal entry');
+      console.error('Error adding product review:', error);
+      toast.error('Error adding product review');
     } finally {
       setSaving(false);
     }
@@ -83,23 +97,24 @@ export function AddJournalEntryDialog({
       <DialogTrigger asChild>
         {children || <Button variant="ghost" size="sm">Add Review</Button>}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[600px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Add Journal Entry</DialogTitle>
+            <DialogTitle className="text-xl">Add Product Review</DialogTitle>
             <DialogDescription>
               Record your experience with {productName}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <div className="grid gap-2">
-              <Label htmlFor="date">Date</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="date" className="text-sm font-medium">Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
+                    size="sm"
                     className={cn(
-                      "w-full justify-start text-left font-normal",
+                      "justify-start text-left font-normal",
                       !date && "text-muted-foreground"
                     )}
                   >
@@ -107,7 +122,7 @@ export function AddJournalEntryDialog({
                     {date ? format(date, "PPP") : <span>Pick a date</span>}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0" align="end">
                   <Calendar
                     mode="single"
                     selected={date}
@@ -119,57 +134,119 @@ export function AddJournalEntryDialog({
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="rating">Rating (0-5)</Label>
-              <Input
-                id="rating"
-                type="number"
-                min="0"
-                max="5"
-                step="0.5"
-                value={rating}
-                onChange={(e) => setRating(parseFloat(e.target.value))}
-              />
+              <Label className="text-sm font-medium">Rating</Label>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Button
+                    key={star}
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "p-0 h-8 w-8",
+                      star <= rating ? "text-amber-500" : "text-muted-foreground/30"
+                    )}
+                    onClick={() => setRating(star)}
+                  >
+                    <Star className="h-5 w-5" fill={star <= rating ? "currentColor" : "none"} />
+                  </Button>
+                ))}
+                <span className="ml-2 text-sm text-muted-foreground">
+                  {rating}/5
+                </span>
+              </div>
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="review">Review</Label>
+              <Label htmlFor="review" className="text-sm font-medium">Review</Label>
               <Textarea
                 id="review"
                 placeholder="How did this product work for you?"
                 value={review}
                 onChange={(e) => setReview(e.target.value)}
+                className="min-h-[120px] resize-none border-muted-foreground/20 focus-visible:ring-primary/30"
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Share your thoughts on this product's effectiveness, texture, scent, and how it works for your skin.
+              </p>
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="effects">Effects (comma-separated)</Label>
-              <Input
-                id="effects"
-                placeholder="e.g., hydrating, soothing, brightening"
-                value={effects}
-                onChange={(e) => setEffects(e.target.value)}
-              />
+              <Label className="text-sm font-medium">Effects</Label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {effects.map((effect, index) => (
+                  <Badge key={index} variant="secondary" className="px-2 py-1 gap-1">
+                    {effect}
+                    <button 
+                      type="button" 
+                      onClick={() => handleRemoveEffect(effect)}
+                      className="ml-1 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add effect (e.g., hydrating)"
+                  value={newEffect}
+                  onChange={(e) => setNewEffect(e.target.value)}
+                  className="flex-1"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddEffect();
+                    }
+                  }}
+                />
+                <Button 
+                  type="button" 
+                  size="sm" 
+                  onClick={handleAddEffect}
+                  variant="outline"
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Add effects you've noticed from using this product
+              </p>
             </div>
             
             <div className="grid gap-2">
-              <Label htmlFor="notes">Additional Notes</Label>
+              <Label htmlFor="notes" className="text-sm font-medium">Additional Notes</Label>
               <Textarea
                 id="notes"
                 placeholder="Any other observations or notes?"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
+                className="min-h-[80px] resize-none border-muted-foreground/20 focus-visible:ring-primary/30"
               />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Entry
-            </Button>
-          </DialogFooter>
+          
+          <div className="flex items-center justify-end pt-2">
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setOpen(false)} 
+                type="button"
+                size="sm"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={saving}
+                size="sm"
+                className="px-4"
+              >
+                {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save Review
+              </Button>
+            </div>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

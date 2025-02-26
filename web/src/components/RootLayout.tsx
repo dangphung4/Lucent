@@ -34,7 +34,7 @@ export function RootLayout({ children }: RootLayoutProps) {
     <div className="flex min-h-[100dvh] flex-col bg-background">
       <Navbar />
       <MobileHeader />
-      <main className="flex-1 pb-16 md:pb-0">
+      <main className="flex-1 pb-16 md:pt-0 md:pb-0">
         {children || <Outlet />}
       </main>
       <MobileNav />
