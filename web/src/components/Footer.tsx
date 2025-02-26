@@ -47,7 +47,7 @@ export function Footer({ className }: FooterProps) {
             </a>
             <div className="flex items-center gap-4 mt-2">
               <a 
-                href="https://github.com/dangphung4/SKINCAREGOD" 
+                href="https://github.com/dangphung4/Lucent" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="text-muted-foreground hover:text-foreground transition-colors"
