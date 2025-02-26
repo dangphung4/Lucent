@@ -669,7 +669,7 @@ export function Calendar() {
   const selectedRoutines = getRoutinesForDate();
 
   return (
-    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
+    <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 pb-12">
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {/* Calendar Section */}
         <Card className="overflow-hidden calendar-container">
