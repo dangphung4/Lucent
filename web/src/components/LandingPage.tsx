@@ -15,7 +15,6 @@ import {
   Smartphone,
   Apple,
   Monitor,
-  Share,
   Menu,
   Plus,
   ExternalLink,
@@ -62,7 +61,7 @@ export function LandingPage() {
               </h1>
               <p className="mx-auto max-w-[700px] text-muted-foreground text-lg md:text-xl leading-relaxed px-4">
                 Discover what works best for your skin by tracking products,
-                routines, and results in one beautiful app. Join others on their
+                routines, and results in one beautiful app. Start your
                 skincare journey today.
               </p>
             </div>
@@ -800,7 +799,10 @@ export function LandingPage() {
                         <div className="flex-1">
                           <p className="font-medium">Tap the Share button</p>
                           <div className="mt-1 flex items-center gap-2 text-muted-foreground">
-                            <Share className="h-4 w-4" /> rectangle with arrow
+                            <span className="font-mono text-primary">
+                              skincaregod.vercel.app
+                            </span>
+                            <ExternalLink className="h-4 w-4" />
                           </div>
                         </div>
                       </li>
@@ -838,7 +840,7 @@ export function LandingPage() {
               What Our Users Say
             </h2>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg leading-relaxed px-4">
-              Join other skincare enthusiasts who've improved their routines
+              Join others who've improved their routines with our app
             </p>
           </div>
 
