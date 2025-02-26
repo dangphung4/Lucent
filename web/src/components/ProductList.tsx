@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, forwardRef, useImperativeHandle } from 'r
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Star, Plus, Trash, Loader2 } from 'lucide-react';
+import { Star, Plus, Trash, Loader2, Droplets, FlaskConical, CircleDot, Sun, Layers, Sparkles, Eye, Zap, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { EditProductDialog } from './EditProductDialog';
@@ -24,6 +24,31 @@ export interface ProductListProps {
   onProductsChange?: () => void;
   onStatsChange?: (stats: ProductStats) => void;
 }
+
+const getCategoryIcon = (category: string | null | undefined) => {
+  switch (category?.toLowerCase()) {
+    case 'cleanser':
+      return <Droplets className="h-5 w-5" />;
+    case 'toner':
+      return <FlaskConical className="h-5 w-5" />;
+    case 'serum':
+      return <FlaskConical className="h-5 w-5" />;
+    case 'moisturizer':
+      return <CircleDot className="h-5 w-5" />;
+    case 'sunscreen':
+      return <Sun className="h-5 w-5" />;
+    case 'mask':
+      return <Layers className="h-5 w-5" />;
+    case 'exfoliant':
+      return <Sparkles className="h-5 w-5" />;
+    case 'eye cream':
+      return <Eye className="h-5 w-5" />;
+    case 'treatment':
+      return <Zap className="h-5 w-5" />;
+    default:
+      return <Package className="h-5 w-5" />;
+  }
+};
 
 export const ProductList = forwardRef<{ loadProducts: () => Promise<void> }, ProductListProps>(
   ({ filter = 'all', onProductsChange, onStatsChange }, ref) => {
@@ -183,10 +208,7 @@ export const ProductList = forwardRef<{ loadProducts: () => Promise<void> }, Pro
                       {product.imageUrl ? (
                         <img src={product.imageUrl} alt={product.name} className="h-full w-full rounded-full object-cover" />
                       ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
-                          <rect x="9" y="3" width="6" height="4" rx="2"></rect>
-                        </svg>
+                        getCategoryIcon(product.category)
                       )}
                     </div>
                     <div className="space-y-1 flex-1">
