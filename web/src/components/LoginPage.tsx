@@ -7,6 +7,19 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 
+/**
+ * Renders the login and signup page for the application.
+ * This component manages user authentication through email/password and Google sign-in.
+ * It handles user state, error messages, and loading states during authentication processes.
+ *
+ * @returns {JSX.Element} The rendered login/signup page component.
+ *
+ * @example
+ * // Usage in a parent component
+ * <LoginPage />
+ *
+ * @throws {Error} Throws an error if the authentication fails, which is caught and displayed to the user.
+ */
 export function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,6 +36,28 @@ export function LoginPage() {
     }
   }, [currentUser, navigate]);
 
+  /**
+   * Handles email authentication for user sign-up or sign-in.
+   *
+   * This asynchronous function manages the authentication process based on the
+   * provided `isSignUp` flag. It sets the loading state and handles any errors
+   * that may occur during the authentication process.
+   *
+   * @param {boolean} isSignUp - A flag indicating whether the operation is a sign-up
+   *                             (true) or a sign-in (false).
+   * @returns {Promise<void>} A promise that resolves when the authentication process
+   *                          is complete.
+   *
+   * @throws {Error} Throws an error if the authentication fails, which is caught
+   *                 and handled within the function.
+   *
+   * @example
+   * // To sign up a user
+   * await handleEmailAuth(true);
+   *
+   * // To sign in a user
+   * await handleEmailAuth(false);
+   */
   const handleEmailAuth = async (isSignUp: boolean) => {
     setError('');
     setIsLoading(true);
@@ -41,6 +76,31 @@ export function LoginPage() {
     }
   };
 
+  /**
+   * Handles the Google sign-in process.
+   *
+   * This asynchronous function initiates the sign-in process with Google. It manages loading states and error handling.
+   *
+   * It sets an error message to an empty string and indicates that the loading process has started. Upon successful sign-in,
+   * it relies on a useEffect hook to manage navigation, thus no manual navigation is required. If an error occurs during the
+   * sign-in process, it captures the error and sets an appropriate error message. Finally, it ensures that the loading state
+   * is reset regardless of the outcome.
+   *
+   * @async
+   * @function handleGoogleSignIn
+   * @returns {Promise<void>} A promise that resolves when the sign-in process is complete.
+   *
+   * @throws {Error} Throws an error if the sign-in process fails, which is caught and handled within the function.
+   *
+   * @example
+   * handleGoogleSignIn()
+   *   .then(() => {
+   *     console.log('Sign-in successful');
+   *   })
+   *   .catch((error) => {
+   *     console.error('Sign-in failed:', error);
+   *   });
+   */
   const handleGoogleSignIn = async () => {
     setError('');
     setIsLoading(true);
@@ -62,7 +122,7 @@ export function LoginPage() {
           <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/5 to-primary/20 z-0 opacity-50"></div>
           
           <CardHeader className="relative z-10 text-center space-y-1">
-            <CardTitle className="text-2xl font-bold">Welcome to Skincare Track</CardTitle>
+            <CardTitle className="text-2xl font-bold">Welcome to Lucent</CardTitle>
             <CardDescription>
               Sign in to track your skincare routine and see results
             </CardDescription>

@@ -14,7 +14,24 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Settings, LogOut, User } from 'lucide-react';
 import { toast } from 'sonner';
+import LucentLogo from '../assets/lucent-logo.svg';
 
+/**
+ * Navbar component that renders the navigation bar for the application.
+ * It includes links to different sections of the app, user authentication controls,
+ * and a responsive design that adjusts based on the user's scroll position.
+ *
+ * @returns {JSX.Element} The rendered Navbar component.
+ *
+ * @example
+ * // Usage in a React component
+ * import { Navbar } from './Navbar';
+ *
+ * function App() {
+ *   return (
+ *     <div>
+ *       <Navbar />
+ *       {/* Other components */
 export function Navbar() {
   const { currentUser, logOut } = useAuth();
   const [scrolled, setScrolled] = useState(false);
@@ -67,11 +84,9 @@ export function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary transition-all duration-300 group-hover:scale-110">
-              <span className="text-lg font-bold text-primary-foreground">ST</span>
-            </div>
+            <img src={LucentLogo} alt="Lucent Logo" className="w-8 h-8" />
             <span className="text-xl font-bold transition-colors duration-200 group-hover:text-primary">
-              Skincare Track
+              Lucent
             </span>
           </Link>
 
@@ -81,19 +96,20 @@ export function Navbar() {
               {currentUser && (
                 <>
                   <Link 
-                    to="/calendar" 
+                    to="/journal"
                     className={`text-sm font-medium transition-colors hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full ${
-                      location.pathname === '/calendar' ? 'text-primary after:w-full' : ''
+                      location.pathname === '/journal' ? 'text-primary after:w-full' : ''
                     }`}
                   >
                     <div className="flex items-center gap-1.5">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <line x1="10" y1="9" x2="8" y2="9"></line>
                       </svg>
-                      Calendar
+                      Journal
                     </div>
                   </Link>
                   <Link 
@@ -109,6 +125,22 @@ export function Navbar() {
                         <line x1="9" y1="21" x2="9" y2="9"></line>
                       </svg>
                       Dashboard
+                    </div>
+                  </Link>
+                  <Link 
+                    to="/calendar" 
+                    className={`text-sm font-medium transition-colors hover:text-primary relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-primary after:transition-all hover:after:w-full ${
+                      location.pathname === '/calendar' ? 'text-primary after:w-full' : ''
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                      Calendar
                     </div>
                   </Link>
                 </>

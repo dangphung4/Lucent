@@ -86,3 +86,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Keeping these commented in case we want to use them later with reduced intensity
+@keyframes gradient-xy {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-xy {
+  background-size: 200% 200%;
+  animation: gradient-xy 15s ease infinite;
+}
+*/
