@@ -9,9 +9,17 @@ import {
   FileText,
   TrendingUp,
   Search,
-  Beaker,
   BookOpen,
   Pencil,
+  Droplets,
+  Beaker,
+  Pipette,
+  CircleDot,
+  Sun,
+  Layers,
+  Eye,
+  Zap,
+  Package
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/AuthContext";
@@ -53,16 +61,17 @@ const filterJournalEntries = (
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 };
 
-// Add category icons mapping
+// Replace the categoryIcons mapping with Lucide icons
 const categoryIcons: Record<string, React.ReactNode> = {
-  Moisturizer: <div className="bg-blue-500/10 text-blue-500">M</div>,
-  Cleanser: <div className="bg-green-500/10 text-green-500">C</div>,
-  Serum: <div className="bg-purple-500/10 text-purple-500">S</div>,
-  Sunscreen: <div className="bg-amber-500/10 text-amber-500">SP</div>,
-  Toner: <div className="bg-pink-500/10 text-pink-500">T</div>,
-  Treatment: <div className="bg-red-500/10 text-red-500">Rx</div>,
-  Mask: <div className="bg-indigo-500/10 text-indigo-500">M</div>,
-  Oil: <div className="bg-orange-500/10 text-orange-500">O</div>,
+  Cleanser: <div className="bg-green-500/10 text-green-500"><Droplets className="h-4 w-4" /></div>,
+  Toner: <div className="bg-pink-500/10 text-pink-500"><Beaker className="h-4 w-4" /></div>,
+  Serum: <div className="bg-purple-500/10 text-purple-500"><Pipette className="h-4 w-4" /></div>,
+  Moisturizer: <div className="bg-blue-500/10 text-blue-500"><CircleDot className="h-4 w-4" /></div>,
+  Sunscreen: <div className="bg-amber-500/10 text-amber-500"><Sun className="h-4 w-4" /></div>,
+  Mask: <div className="bg-indigo-500/10 text-indigo-500"><Layers className="h-4 w-4" /></div>,
+  "Eye Cream": <div className="bg-cyan-500/10 text-cyan-500"><Eye className="h-4 w-4" /></div>,
+  Treatment: <div className="bg-red-500/10 text-red-500"><Zap className="h-4 w-4" /></div>,
+  Other: <div className="bg-gray-500/10 text-gray-500"><Package className="h-4 w-4" /></div>,
 };
 
 // Format duration helper
@@ -140,23 +149,23 @@ export function Journal() {
     const getCategoryColor = () => {
       if (!product.category) return "bg-card dark:bg-card";
 
-      switch (product.category) {
-        case "Moisturizer":
+      switch (product.category.toLowerCase()) {
+        case "moisturizer":
           return "bg-blue-50/50 dark:bg-blue-950/30";
-        case "Cleanser":
+        case "cleanser":
           return "bg-green-50/50 dark:bg-green-950/30";
-        case "Serum":
+        case "serum":
           return "bg-purple-50/50 dark:bg-purple-950/30";
-        case "Sunscreen":
+        case "sunscreen":
           return "bg-amber-50/50 dark:bg-amber-950/30";
-        case "Toner":
+        case "toner":
           return "bg-pink-50/50 dark:bg-pink-950/30";
-        case "Treatment":
+        case "treatment":
           return "bg-red-50/50 dark:bg-red-950/30";
-        case "Mask":
+        case "mask":
           return "bg-indigo-50/50 dark:bg-indigo-950/30";
-        case "Oil":
-          return "bg-orange-50/50 dark:bg-orange-950/30";
+        case "eye cream":
+          return "bg-cyan-50/50 dark:bg-cyan-950/30";
         default:
           return "bg-card dark:bg-card";
       }
@@ -169,13 +178,40 @@ export function Journal() {
         {/* Header section with icon, title and actions */}
         <div className="flex items-center gap-3 p-3 border-b">
           <Avatar className="h-10 w-10 shadow-sm bg-background">
-            <div className="flex h-full w-full items-center justify-center rounded-full font-medium">
-              {(product.category && categoryIcons[product.category]) || (
-                <div className="bg-primary/10 text-primary">
-                  <Beaker className="h-4 w-4" />
+            {(() => {
+              const category = product.category || 'Other';
+              const IconComponent = {
+                cleanser: Droplets,
+                toner: Beaker,
+                serum: Pipette,
+                moisturizer: CircleDot,
+                sunscreen: Sun,
+                mask: Layers,
+                'eye cream': Eye,
+                treatment: Zap,
+                other: Package
+              }[category.toLowerCase()] || Package;
+
+              const getIconColor = () => {
+                switch (category.toLowerCase()) {
+                  case 'cleanser': return "bg-green-500/10 text-green-500";
+                  case 'toner': return "bg-pink-500/10 text-pink-500";
+                  case 'serum': return "bg-purple-500/10 text-purple-500";
+                  case 'moisturizer': return "bg-blue-500/10 text-blue-500";
+                  case 'sunscreen': return "bg-amber-500/10 text-amber-500";
+                  case 'mask': return "bg-indigo-500/10 text-indigo-500";
+                  case 'eye cream': return "bg-cyan-500/10 text-cyan-500";
+                  case 'treatment': return "bg-red-500/10 text-red-500";
+                  default: return "bg-gray-500/10 text-gray-500";
+                }
+              };
+
+              return (
+                <div className={`flex h-full w-full items-center justify-center rounded-full ${getIconColor()}`}>
+                  <IconComponent className="h-5 w-5" />
                 </div>
-              )}
-            </div>
+              );
+            })()}
           </Avatar>
 
           <div className="flex-1 min-w-0">
