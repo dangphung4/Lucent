@@ -4,6 +4,20 @@ import { useContext } from 'react';
 import { AuthContext } from '../lib/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
+/**
+ * A functional component that renders a mobile navigation bar.
+ * The navigation bar includes links to different sections of the application,
+ * such as Home, Calendar, Dashboard, Settings, and Login/Sign In.
+ * It also displays a theme toggle button and the user's avatar if logged in.
+ *
+ * @returns {JSX.Element} The rendered mobile navigation bar.
+ *
+ * @example
+ * // Usage in a parent component
+ * <MobileNav />
+ *
+ * @throws {Error} Throws an error if the user context is not available.
+ */
 export function MobileNav() {
   const location = useLocation();
   const { currentUser } = useContext(AuthContext);
@@ -11,12 +25,49 @@ export function MobileNav() {
   const isActive = (path: string) => location.pathname === path;
 
   // Get display name for avatar
+  /**
+   * Retrieves the display name of the current user.
+   * If the user has a display name, it returns that.
+   * Otherwise, it attempts to return the user's email prefix
+   * (the part before the '@' symbol). If neither is available,
+   * it defaults to returning 'User'.
+   *
+   * @returns {string} The display name of the user, or 'User' if not available.
+   *
+   * @example
+   * const name = getDisplayName();
+   * console.log(name); // Outputs the display name or 'User'
+   *
+   * @throws {Error} Throws an error if the currentUser is undefined.
+   */
   const getDisplayName = () => {
     if (currentUser?.displayName) return currentUser.displayName;
     return currentUser?.email?.split('@')[0] || 'User';
   };
 
   // Get avatar initial
+  /**
+   * Retrieves the initial character for the user's avatar.
+   *
+   * The function checks if the current user has a display name.
+   * If a display name exists, it returns the first character of the display name in uppercase.
+   * If the display name does not exist, it checks the user's email and returns the first character of the email in uppercase.
+   * If neither the display name nor the email is available, it defaults to returning 'U'.
+   *
+   * @returns {string} The uppercase initial character for the avatar, or 'U' if no valid initial can be determined.
+   *
+   * @example
+   * // Assuming currentUser.displayName is 'John Doe'
+   * getAvatarInitial(); // Returns 'J'
+   *
+   * @example
+   * // Assuming currentUser.email is 'johndoe@example.com'
+   * getAvatarInitial(); // Returns 'J'
+   *
+   * @example
+   * // Assuming currentUser.displayName and currentUser.email are both undefined
+   * getAvatarInitial(); // Returns 'U'
+   */
   const getAvatarInitial = () => {
     if (currentUser?.displayName) return currentUser.displayName.charAt(0).toUpperCase();
     return currentUser?.email?.charAt(0).toUpperCase() || 'U';
