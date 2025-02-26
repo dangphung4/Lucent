@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { useAuth } from '../lib/AuthContext';
 import { useTheme } from '../lib/ThemeProvider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 
 export function LandingPage() {
   const { currentUser } = useAuth();
@@ -341,6 +342,87 @@ export function LandingPage() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* PWA Installation Section */}
+      <section className="py-16 md:py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background pointer-events-none"></div>
+        <div className="container mx-auto px-4 md:px-6 max-w-screen-xl relative">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
+            <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur-sm">
+              Install the App
+            </div>
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70 px-4">
+              Use Skincare God Anywhere
+            </h2>
+            <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg leading-relaxed px-4">
+              Install our app on your device for the best experience. Access your skincare routine even when offline!
+            </p>
+          </div>
+
+          <div className="mx-auto max-w-3xl">
+            <Tabs defaultValue="desktop" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="desktop">Desktop</TabsTrigger>
+                <TabsTrigger value="android">Android</TabsTrigger>
+                <TabsTrigger value="ios">iOS</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="desktop" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Install on Desktop</CardTitle>
+                    <CardDescription>Chrome, Edge, or other Chromium browsers</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
+                      <li>Visit <span className="font-mono text-primary">skincaregod.vercel.app</span></li>
+                      <li>Click the install icon (⊕) in your browser's address bar</li>
+                      <li>Click "Install" in the prompt that appears</li>
+                      <li>The app will install and create a desktop shortcut</li>
+                    </ol>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="android" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Install on Android</CardTitle>
+                    <CardDescription>Chrome for Android</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
+                      <li>Visit <span className="font-mono text-primary">skincaregod.vercel.app</span> in Chrome</li>
+                      <li>Tap the menu icon (⋮) in the top right</li>
+                      <li>Tap "Add to Home screen"</li>
+                      <li>Choose a name and tap "Add"</li>
+                      <li>The app will appear on your home screen</li>
+                    </ol>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="ios" className="mt-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Install on iOS</CardTitle>
+                    <CardDescription>Safari on iPhone or iPad</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ol className="list-decimal list-inside space-y-3 text-muted-foreground">
+                      <li>Visit <span className="font-mono text-primary">skincaregod.vercel.app</span> in Safari</li>
+                      <li>Tap the Share button (rectangle with arrow)</li>
+                      <li>Scroll down and tap "Add to Home Screen"</li>
+                      <li>Choose a name and tap "Add"</li>
+                      <li>The app will appear on your home screen</li>
+                    </ol>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </section>
