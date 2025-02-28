@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { storage } from '../lib/firebase';
-import { ref, listAll, getDownloadURL, getMetadata } from 'firebase/storage';
+import { ref, listAll, getDownloadURL, getMetadata, uploadBytes } from 'firebase/storage';
 import { useAuth } from '../lib/AuthContext';
 import { Card } from './ui/card';
 import { 
@@ -19,9 +19,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { toast } from 'react-hot-toast';
 
 interface ProgressPhoto {
   url: string;
@@ -38,6 +38,7 @@ export function ProgressGallery() {
   const [selectedPhoto, setSelectedPhoto] = useState<ProgressPhoto | null>(null);
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const { currentUser } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadPhotos = async () => {
     if (!currentUser) return;
@@ -117,6 +118,31 @@ export function ProgressGallery() {
     return groups;
   }, {} as Record<string, ProgressPhoto[]>);
 
+  // Add this function to handle file selection
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !currentUser) return;
+
+    try {
+      setLoading(true);
+      const timestamp = new Date().getTime();
+      const storageRef = ref(storage, `progress/${currentUser.uid}/${timestamp}_${file.name}`);
+      await uploadBytes(storageRef, file);
+      await loadPhotos(); // Reload photos after upload
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast.error('Failed to upload photo');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Add this function to handle camera capture
+  const handleCameraCapture = async () => {
+    // You can implement camera capture here or use a modal/component
+    toast('Camera functionality coming soon');
+  };
+
   if (loading) {
     return (
       <div className="min-h-[200px] flex flex-col items-center justify-center p-6 gap-3">
@@ -131,39 +157,19 @@ export function ProgressGallery() {
 
   if (photos.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[40vh] p-4">
-        <div className="max-w-sm w-full space-y-6">
+      <div className="flex flex-col items-center justify-center min-h-[30vh] p-4">
+        <div className="max-w-sm w-full space-y-4">
           <div className="text-center">
-            <div className="relative mx-auto w-24 h-24 mb-6">
+            <div className="relative mx-auto w-16 h-16 mb-4">
               <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse" />
-              <div className="absolute inset-2 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 backdrop-blur-sm" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Camera className="h-8 w-8 text-primary" />
+                <Camera className="h-6 w-6 text-primary" />
               </div>
             </div>
-            <h2 className="text-xl font-semibold tracking-tight">Start Your Journey</h2>
-            <p className="text-sm text-muted-foreground mt-2 max-w-[20rem] mx-auto">
-              Document your progress with regular photos to track your skin's transformation over time
+            <h2 className="text-lg font-medium">Start Your Journey</h2>
+            <p className="text-sm text-muted-foreground mt-1.5">
+              Track your progress with regular photos
             </p>
-          </div>
-
-          <div className="space-y-3">
-            <Button 
-              className="w-full h-12 gap-2 bg-primary/10 hover:bg-primary/20 text-primary hover:text-primary"
-              variant="ghost"
-              onClick={() => {}}
-            >
-              <Camera className="h-5 w-5" />
-              Take Your First Photo
-            </Button>
-            <Button 
-              className="w-full h-12 gap-2"
-              variant="outline"
-              onClick={() => {}}
-            >
-              <Upload className="h-5 w-5" />
-              Upload from Device
-            </Button>
           </div>
         </div>
       </div>
@@ -171,59 +177,56 @@ export function ProgressGallery() {
   }
 
   return (
-    <div className="relative min-h-screen pb-16">
+    <div className="relative pb-16">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="flex items-center justify-between p-4 border-b">
-          <div>
-            <h2 className="text-xl font-semibold tracking-tight">Progress Gallery</h2>
-            <p className="text-sm text-muted-foreground">
-              {photos.length} {photos.length === 1 ? 'photo' : 'photos'} in your journey
-            </p>
+        <div className="flex items-center justify-between p-3 border-b">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+              <Camera className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-sm font-medium">Progress Gallery</h2>
+              <p className="text-xs text-muted-foreground">
+                {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-8 px-2 gap-1.5">
-                  <ArrowUpDown className="h-4 w-4" />
-                  {sortOrder === 'newest' ? 'Newest' : 'Oldest'}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
-                <DropdownMenuItem onClick={() => handleSortChange('newest')} className="gap-2">
-                  Newest first
-                  {sortOrder === 'newest' && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleSortChange('oldest')} className="gap-2">
-                  Oldest first
-                  {sortOrder === 'oldest' && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary" />}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <ArrowUpDown className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem onClick={() => handleSortChange('newest')} className="gap-2">
+                Newest first
+                {sortOrder === 'newest' && <div className="ml-auto w-1 h-1 rounded-full bg-primary" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleSortChange('oldest')} className="gap-2">
+                Oldest first
+                {sortOrder === 'oldest' && <div className="ml-auto w-1 h-1 rounded-full bg-primary" />}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
       {/* Timeline */}
       <div className="divide-y divide-border/50">
         {Object.entries(groupedPhotos).map(([month, monthPhotos]) => (
-          <div key={month} className="py-6 first:pt-4">
-            <div className="px-4 mb-4">
-              <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="text-xs font-medium text-primary">
-                    {format(monthPhotos[0].date, 'MMM')}
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium">{month}</h3>
-                  <p className="text-xs text-muted-foreground">
-                    {monthPhotos.length} {monthPhotos.length === 1 ? 'photo' : 'photos'}
-                  </p>
-                </div>
+          <div key={month} className="py-4 first:pt-3">
+            <div className="px-3 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
+                  {format(monthPhotos[0].date, 'MMM yyyy')}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {monthPhotos.length} {monthPhotos.length === 1 ? 'photo' : 'photos'}
+                </span>
               </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 px-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 px-3">
               <AnimatePresence mode="popLayout">
                 {monthPhotos.map((photo) => (
                   <motion.div
@@ -236,8 +239,8 @@ export function ProgressGallery() {
                   >
                     <Card 
                       className={cn(
-                        "overflow-hidden cursor-pointer",
-                        "hover:ring-2 hover:ring-primary/20 hover:shadow-lg",
+                        "overflow-hidden cursor-pointer group",
+                        "hover:ring-1 hover:ring-primary/20 hover:shadow-sm",
                         "transition-all duration-200 ease-in-out"
                       )}
                       onClick={() => handlePhotoClick(photo)}
@@ -249,18 +252,16 @@ export function ProgressGallery() {
                           className="w-full h-full object-cover"
                           loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="absolute bottom-0 left-0 right-0 p-3 text-white transform translate-y-full group-hover:translate-y-0 transition-transform">
-                          <div className="space-y-1">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute bottom-0 left-0 right-0 p-2">
+                          <div className="space-y-0.5">
                             {photo.name && (
-                              <p className="text-sm font-medium line-clamp-1">
+                              <p className="text-sm font-medium text-white line-clamp-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                 {photo.name}
                               </p>
                             )}
-                            <p className="text-xs text-white/90 flex items-center gap-1.5">
-                              <span>{format(photo.date, 'MMM d')}</span>
-                              <span className="w-1 h-1 rounded-full bg-white/50" />
-                              <span>{format(photo.date, 'h:mm a')}</span>
+                            <p className="text-[10px] text-white/90 opacity-0 group-hover:opacity-100 transition-opacity">
+                              {format(photo.date, 'MMM d, h:mm a')}
                             </p>
                           </div>
                         </div>
@@ -280,32 +281,30 @@ export function ProgressGallery() {
           <DropdownMenuTrigger asChild>
             <Button 
               size="icon" 
-              className="h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90"
+              className="h-12 w-12 rounded-full shadow-lg bg-primary hover:bg-primary/90"
             >
-              <Plus className="h-6 w-6" />
+              <Plus className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-64 p-2">
-            <DropdownMenuItem className="flex items-center gap-3 py-3 px-3 focus:bg-primary focus:text-primary-foreground">
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Camera className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-medium">Take Photo</span>
-                <span className="text-xs text-muted-foreground">Use your camera</span>
-              </div>
+          <DropdownMenuContent align="end" className="w-48 p-1">
+            <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer" onClick={handleCameraCapture}>
+              <Camera className="h-4 w-4" />
+              <span className="text-sm">Take Photo</span>
             </DropdownMenuItem>
-            <DropdownMenuItem className="flex items-center gap-3 py-3 px-3 focus:bg-primary focus:text-primary-foreground">
-              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                <Upload className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-medium">Upload Photo</span>
-                <span className="text-xs text-muted-foreground">Choose from your device</span>
-              </div>
+            <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+              <Upload className="h-4 w-4" />
+              <span className="text-sm">Upload Photo</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept="image/*"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
       </div>
 
       {selectedPhoto && (

@@ -229,27 +229,25 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             <Button
-              variant="outline"
-              className="h-20 sm:h-24 flex flex-col items-center justify-center gap-2 relative overflow-hidden group"
+              variant="ghost"
+              className="h-11 flex items-center justify-center gap-2 relative group"
               onClick={startCamera}
               disabled={isUploading}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Camera className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              <Camera className="h-4 w-4 text-primary" />
               <span className="text-sm">Take Photo</span>
             </Button>
             
             <Button
-              variant="outline"
-              className="h-20 sm:h-24 flex flex-col items-center justify-center gap-2 relative overflow-hidden group"
+              variant="ghost"
+              className="h-11 flex items-center justify-center gap-2 relative group"
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-              <Upload className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
-              <span className="text-sm">Upload Photo</span>
+              <Upload className="h-4 w-4 text-primary" />
+              <span className="text-sm">Upload</span>
             </Button>
           </div>
         )}
