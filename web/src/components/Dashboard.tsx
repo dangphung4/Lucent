@@ -11,8 +11,9 @@ import { Loader2 } from 'lucide-react';
 import { ProductList } from './ProductList';
 import { RoutineList } from './RoutineList';
 import { cn } from '@/lib/utils';
-import { Star, Droplets, FlaskConical, CircleDot, Sun, Layers, Sparkles, Eye, Zap, Package, Camera, Upload } from 'lucide-react';
+import { Star, Droplets, FlaskConical, CircleDot, Sun, Layers, Sparkles, Eye, Zap, Package, Camera, Upload, CheckCircle, Clock } from 'lucide-react';
 import { ProgressGallery } from './ProgressGallery';
+import { motion } from 'framer-motion';
 
 export interface ProductStats {
   total: number;
@@ -300,15 +301,31 @@ export function Dashboard() {
           </div>
           
           <TabsContent value="overview" className="mt-0">
-            {/* Overview Tab Content */}
-            <div className="space-y-8">
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background border p-6">
-                <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-                <div className="relative">
-                  <h2 className="text-2xl font-bold tracking-tight mb-2">Welcome to Your Dashboard</h2>
-                  <p className="text-muted-foreground max-w-xl">
-                    Track your skincare journey, monitor product usage, and see your progress over time.
-                  </p>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-8"
+            >
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
+                <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative flex flex-col md:flex-row md:items-center gap-6">
+                  <div className="flex-1 space-y-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-2">
+                      <Package className="h-4 w-4" />
+                      Dashboard Overview
+                    </div>
+                    <h2 className="text-2xl font-bold tracking-tight mb-2">Welcome to Your Dashboard</h2>
+                    <p className="text-muted-foreground max-w-xl">
+                      Track your skincare journey, monitor product usage, and see your progress over time.
+                    </p>
+                  </div>
+                  <div className="hidden md:block">
+                    <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                      <Package className="h-8 w-8 text-primary" />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -494,62 +511,99 @@ export function Dashboard() {
                   </CardContent>
                 </Card>
               </div>
-            </div>
+            </motion.div>
           </TabsContent>
           
           <TabsContent value="products" className="mt-0">
-            <div className="space-y-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
               {/* Header Section */}
               <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b pb-4">
-                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-background border p-6 mb-4">
-                  <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-                  <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="relative flex flex-col md:flex-row md:items-center gap-6">
+                    <div className="flex-1 space-y-2">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 text-sm font-medium mb-2">
+                        <Package className="h-4 w-4" />
+                        Product Management
+                      </div>
                       <h2 className="text-2xl font-bold tracking-tight mb-2">Your Products</h2>
                       <p className="text-muted-foreground max-w-xl">
                         Keep track of your skincare products, mark favorites, and manage your collection.
                       </p>
                     </div>
-                    <AddProductDialog 
-                      onProductAdded={() => {
-                        setActiveTab('products');
-                        productListRef.current?.loadProducts();
-                      }} 
-                    />
+                    <div className="flex items-center gap-4">
+                      <div className="hidden md:block">
+                        <div className="h-16 w-16 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+                          <Package className="h-8 w-8 text-blue-600" />
+                        </div>
+                      </div>
+                      <AddProductDialog 
+                        onProductAdded={() => {
+                          setActiveTab('products');
+                          productListRef.current?.loadProducts();
+                        }} 
+                      />
+                    </div>
                   </div>
                 </div>
 
                 {/* Quick Stats */}
-                <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  <Card className="bg-primary/5">
-                    <CardContent className="p-3">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground">Total Products</span>
-                        <span className="text-2xl font-bold">{productStats.total}</span>
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <Card className="group hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Package className="h-5 w-5 text-blue-600" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted-foreground">Total Products</span>
+                          <span className="text-2xl font-bold">{productStats.total}</span>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="bg-primary/5">
-                    <CardContent className="p-3">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground">Active</span>
-                        <span className="text-2xl font-bold">{productStats.active}</span>
+                  <Card className="group hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Sparkles className="h-5 w-5 text-green-600" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted-foreground">Active</span>
+                          <span className="text-2xl font-bold">{productStats.active}</span>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="bg-primary/5">
-                    <CardContent className="p-3">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground">Finished</span>
-                        <span className="text-2xl font-bold">{productStats.finished}</span>
+                  <Card className="group hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <CheckCircle className="h-5 w-5 text-purple-600" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted-foreground">Finished</span>
+                          <span className="text-2xl font-bold">{productStats.finished}</span>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
-                  <Card className="bg-primary/5">
-                    <CardContent className="p-3">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-muted-foreground">Would Repurchase</span>
-                        <span className="text-2xl font-bold">{productStats.repurchase}</span>
+                  <Card className="group hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Star className="h-5 w-5 text-amber-600" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs text-muted-foreground">Would Repurchase</span>
+                          <span className="text-2xl font-bold">{productStats.repurchase}</span>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -560,33 +614,37 @@ export function Dashboard() {
                   <Button 
                     variant={productFilter === 'all' ? 'default' : 'outline'} 
                     size="sm" 
-                    className="whitespace-nowrap"
+                    className="whitespace-nowrap gap-2"
                     onClick={() => handleFilterChange('all')}
                   >
+                    <Package className="h-4 w-4" />
                     All Products
                   </Button>
                   <Button 
                     variant={productFilter === 'active' ? 'default' : 'outline'} 
                     size="sm" 
-                    className="whitespace-nowrap"
+                    className="whitespace-nowrap gap-2"
                     onClick={() => handleFilterChange('active')}
                   >
+                    <Sparkles className="h-4 w-4" />
                     Active
                   </Button>
                   <Button 
                     variant={productFilter === 'finished' ? 'default' : 'outline'} 
                     size="sm" 
-                    className="whitespace-nowrap"
+                    className="whitespace-nowrap gap-2"
                     onClick={() => handleFilterChange('finished')}
                   >
+                    <CheckCircle className="h-4 w-4" />
                     Finished
                   </Button>
                   <Button 
                     variant={productFilter === 'repurchase' ? 'default' : 'outline'} 
                     size="sm" 
-                    className="whitespace-nowrap"
+                    className="whitespace-nowrap gap-2"
                     onClick={() => handleFilterChange('repurchase')}
                   >
+                    <Star className="h-4 w-4" />
                     Would Repurchase
                   </Button>
                 </div>
@@ -601,30 +659,53 @@ export function Dashboard() {
                   onStatsChange={handleProductsChange}
                 />
               </div>
-            </div>
+            </motion.div>
           </TabsContent>
           
           <TabsContent value="routines" className="mt-0">
-            <div className="space-y-4">
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-background border p-6">
-                <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-                <div className="relative">
-                  <h2 className="text-2xl font-bold tracking-tight mb-2">Your Routines</h2>
-                  <p className="text-muted-foreground max-w-xl">
-                    Create and customize your morning and evening skincare routines for optimal results.
-                  </p>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
+                <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative flex flex-col md:flex-row md:items-center gap-6">
+                  <div className="flex-1 space-y-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-600 text-sm font-medium mb-2">
+                      <Clock className="h-4 w-4" />
+                      Daily Routines
+                    </div>
+                    <h2 className="text-2xl font-bold tracking-tight mb-2">Your Routines</h2>
+                    <p className="text-muted-foreground max-w-xl">
+                      Create and customize your morning and evening skincare routines for optimal results.
+                    </p>
+                  </div>
+                  <div className="hidden md:block">
+                    <div className="h-16 w-16 rounded-2xl bg-purple-500/10 flex items-center justify-center">
+                      <Clock className="h-8 w-8 text-purple-600" />
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Routines List */}
               <RoutineList onRoutinesChange={() => setActiveTab('routines')} />
-            </div>
+            </motion.div>
           </TabsContent>
           
           <TabsContent value="progress" className="mt-0">
-            <div className="space-y-6">
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-green-500/10 via-green-500/5 to-background border">
-                <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-6"
+            >
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-green-500/10 via-green-500/5 to-background border group hover:shadow-lg transition-all duration-300">
+                <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative p-6">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                     <div className="space-y-2">
@@ -638,13 +719,24 @@ export function Dashboard() {
                       </p>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-3">
-                      <Button onClick={handleCameraCapture} className="gap-2" size="lg">
-                        <Camera className="h-4 w-4" />
-                        Take Photo
+                      <Button 
+                        onClick={handleCameraCapture} 
+                        className="group relative overflow-hidden gap-2" 
+                        size="lg"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Camera className="h-4 w-4 relative z-10" />
+                        <span className="relative z-10">Take Photo</span>
                       </Button>
-                      <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="gap-2" size="lg">
-                        <Upload className="h-4 w-4" />
-                        Upload Photo
+                      <Button 
+                        variant="outline" 
+                        onClick={() => fileInputRef.current?.click()} 
+                        className="group relative overflow-hidden gap-2" 
+                        size="lg"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Upload className="h-4 w-4 relative z-10" />
+                        <span className="relative z-10">Upload Photo</span>
                       </Button>
                     </div>
                   </div>
@@ -652,7 +744,7 @@ export function Dashboard() {
               </div>
 
               <ProgressGallery />
-            </div>
+            </motion.div>
           </TabsContent>
         </Tabs>
       </div>
