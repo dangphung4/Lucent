@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Camera, Upload, Loader2, X } from 'lucide-react';
@@ -14,10 +14,20 @@ interface ProgressUploadProps {
 export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const { currentUser } = useAuth();
+
+  // Clean up camera on unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
 
   const handleFileUpload = async (file: File) => {
     if (!currentUser) return;
@@ -54,6 +64,7 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
 
   const startCamera = async () => {
     try {
+      setIsCameraReady(false);
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { 
           facingMode: 'user',
@@ -66,25 +77,42 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
+        
+        // Wait for video to be ready
+        await new Promise((resolve) => {
+          if (videoRef.current) {
+            videoRef.current.onloadedmetadata = () => {
+              videoRef.current?.play();
+              resolve(null);
+            };
+          }
+        });
+        
+        setIsCameraReady(true);
       }
       
       setIsCameraOpen(true);
     } catch (error) {
       console.error('Error accessing camera:', error);
-      toast.error('Failed to access camera');
+      toast.error('Failed to access camera. Please make sure camera permissions are granted.');
+      setIsCameraOpen(false);
     }
   };
 
   const stopCamera = () => {
+    setIsCameraReady(false);
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
     }
     setIsCameraOpen(false);
   };
 
   const handleCameraCapture = async () => {
-    if (!videoRef.current) return;
+    if (!videoRef.current || !isCameraReady) return;
 
     try {
       // Create canvas and draw video frame
@@ -94,13 +122,17 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
       
       const context = canvas.getContext('2d');
       if (!context) throw new Error('Could not get canvas context');
+      
+      // Flip horizontally if using front camera
+      context.translate(canvas.width, 0);
+      context.scale(-1, 1);
       context.drawImage(videoRef.current, 0, 0);
       
       // Convert to blob
       const blob = await new Promise<Blob>((resolve) => {
         canvas.toBlob((b) => {
           if (b) resolve(b);
-        }, 'image/jpeg', 0.8);
+        }, 'image/jpeg', 0.9);
       });
       
       // Create file from blob
@@ -127,7 +159,7 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
               autoPlay
               playsInline
               muted
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover transform scale-x-[-1]"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
             <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-4 px-4">
@@ -144,10 +176,16 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
                 size="lg"
                 className="rounded-full h-14 w-14 bg-white text-black hover:bg-white/90 shadow-lg"
                 onClick={handleCameraCapture}
+                disabled={!isCameraReady}
               >
                 <Camera className="h-6 w-6" />
               </Button>
             </div>
+            {!isCameraReady && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                <Loader2 className="h-8 w-8 animate-spin text-white" />
+              </div>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-4">
