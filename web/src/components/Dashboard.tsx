@@ -11,8 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { ProductList } from './ProductList';
 import { RoutineList } from './RoutineList';
 import { cn } from '@/lib/utils';
-import { Star, Droplets, FlaskConical, CircleDot, Sun, Layers, Sparkles, Eye, Zap, Package } from 'lucide-react';
-import { ProgressUpload } from './ProgressUpload';
+import { Star, Droplets, FlaskConical, CircleDot, Sun, Layers, Sparkles, Eye, Zap, Package, Camera, Upload } from 'lucide-react';
 import { ProgressGallery } from './ProgressGallery';
 
 export interface ProductStats {
@@ -54,6 +53,7 @@ export function Dashboard() {
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
   const productListRef = useRef<{ loadProducts: () => Promise<void> }>(null);
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Get first name from email or use "there" as fallback
   const firstName = currentUser?.displayName || 'there';
@@ -224,6 +224,10 @@ export function Dashboard() {
     }
   };
 
+  const handleCameraCapture = () => {
+    // Implementation of handleCameraCapture
+  };
+
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-8">
       {/* Welcome Section with Gradient */}
@@ -298,6 +302,16 @@ export function Dashboard() {
           <TabsContent value="overview" className="mt-0">
             {/* Overview Tab Content */}
             <div className="space-y-8">
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background border p-6">
+                <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+                <div className="relative">
+                  <h2 className="text-2xl font-bold tracking-tight mb-2">Welcome to Your Dashboard</h2>
+                  <p className="text-muted-foreground max-w-xl">
+                    Track your skincare journey, monitor product usage, and see your progress over time.
+                  </p>
+                </div>
+              </div>
+
               {/* Quick Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 border-blue-200 dark:border-blue-800">
@@ -487,19 +501,22 @@ export function Dashboard() {
             <div className="space-y-4">
               {/* Header Section */}
               <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b pb-4">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold tracking-tight">Products</h2>
-                    <p className="text-muted-foreground text-sm">
-                      Manage your skincare products and track their usage.
-                    </p>
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-background border p-6 mb-4">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+                  <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <h2 className="text-2xl font-bold tracking-tight mb-2">Your Products</h2>
+                      <p className="text-muted-foreground max-w-xl">
+                        Keep track of your skincare products, mark favorites, and manage your collection.
+                      </p>
+                    </div>
+                    <AddProductDialog 
+                      onProductAdded={() => {
+                        setActiveTab('products');
+                        productListRef.current?.loadProducts();
+                      }} 
+                    />
                   </div>
-                  <AddProductDialog 
-                    onProductAdded={() => {
-                      setActiveTab('products');
-                      productListRef.current?.loadProducts();
-                    }} 
-                  />
                 </div>
 
                 {/* Quick Stats */}
@@ -589,12 +606,12 @@ export function Dashboard() {
           
           <TabsContent value="routines" className="mt-0">
             <div className="space-y-4">
-              {/* Header Section */}
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold tracking-tight">Routines</h2>
-                  <p className="text-muted-foreground text-sm">
-                    Create and manage your skincare routines.
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-background border p-6">
+                <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+                <div className="relative">
+                  <h2 className="text-2xl font-bold tracking-tight mb-2">Your Routines</h2>
+                  <p className="text-muted-foreground max-w-xl">
+                    Create and customize your morning and evening skincare routines for optimal results.
                   </p>
                 </div>
               </div>
@@ -605,20 +622,36 @@ export function Dashboard() {
           </TabsContent>
           
           <TabsContent value="progress" className="mt-0">
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight mb-2">Progress Photos</h2>
-                <p className="text-muted-foreground">
-                  Track your skin's journey by taking regular progress photos.
-                </p>
+            <div className="space-y-6">
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-green-500/10 via-green-500/5 to-background border">
+                <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+                <div className="relative p-6">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                    <div className="space-y-2">
+                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 text-green-600 text-sm font-medium mb-2">
+                        <Camera className="h-4 w-4" />
+                        Progress Photos
+                      </div>
+                      <h2 className="text-2xl font-bold tracking-tight">Track Your Journey</h2>
+                      <p className="text-muted-foreground max-w-xl">
+                        Document your skincare progress with photos. Compare and see your transformation over time.
+                      </p>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <Button onClick={handleCameraCapture} className="gap-2" size="lg">
+                        <Camera className="h-4 w-4" />
+                        Take Photo
+                      </Button>
+                      <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="gap-2" size="lg">
+                        <Upload className="h-4 w-4" />
+                        Upload Photo
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <ProgressUpload onUploadComplete={() => setActiveTab('progress')} />
-              
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Your Progress Gallery</h3>
-                <ProgressGallery />
-              </div>
+              <ProgressGallery />
             </div>
           </TabsContent>
         </Tabs>
