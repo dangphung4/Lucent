@@ -29,6 +29,31 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
     };
   }, []);
 
+  // Monitor video element state changes
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    const handlePlay = () => {
+      console.log('Video started playing');
+      setIsCameraReady(true);
+    };
+
+    const handleError = (error: Event) => {
+      console.error('Video error:', error);
+      toast.error('Error initializing camera preview');
+      stopCamera();
+    };
+
+    videoElement.addEventListener('play', handlePlay);
+    videoElement.addEventListener('error', handleError);
+
+    return () => {
+      videoElement.removeEventListener('play', handlePlay);
+      videoElement.removeEventListener('error', handleError);
+    };
+  }, [isCameraOpen]);
+
   const handleFileUpload = async (file: File) => {
     if (!currentUser) return;
 
@@ -65,6 +90,9 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
   const startCamera = async () => {
     try {
       setIsCameraReady(false);
+      setIsCameraOpen(true); // Set this first so the video element is in the DOM
+
+      console.log('Requesting camera access...');
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { 
           facingMode: 'user',
@@ -74,35 +102,37 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
         audio: false
       });
       
+      console.log('Camera access granted, setting up video stream...');
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         streamRef.current = stream;
         
-        // Wait for video to be ready
-        await new Promise((resolve) => {
-          if (videoRef.current) {
-            videoRef.current.onloadedmetadata = () => {
-              videoRef.current?.play();
-              resolve(null);
-            };
-          }
-        });
-        
-        setIsCameraReady(true);
+        try {
+          await videoRef.current.play();
+          console.log('Video playback started');
+        } catch (playError) {
+          console.error('Error playing video:', playError);
+          throw playError;
+        }
+      } else {
+        console.error('Video element not found');
+        throw new Error('Video element not found');
       }
-      
-      setIsCameraOpen(true);
     } catch (error) {
       console.error('Error accessing camera:', error);
       toast.error('Failed to access camera. Please make sure camera permissions are granted.');
-      setIsCameraOpen(false);
+      stopCamera();
     }
   };
 
   const stopCamera = () => {
+    console.log('Stopping camera...');
     setIsCameraReady(false);
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+        console.log('Track stopped:', track.label);
+      });
       streamRef.current = null;
     }
     if (videoRef.current) {
@@ -112,14 +142,19 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
   };
 
   const handleCameraCapture = async () => {
-    if (!videoRef.current || !isCameraReady) return;
+    if (!videoRef.current || !isCameraReady) {
+      console.log('Camera not ready for capture');
+      return;
+    }
 
     try {
+      console.log('Starting capture process...');
       // Create canvas and draw video frame
       const canvas = document.createElement('canvas');
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
       
+      console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
       const context = canvas.getContext('2d');
       if (!context) throw new Error('Could not get canvas context');
       
@@ -129,12 +164,14 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
       context.drawImage(videoRef.current, 0, 0);
       
       // Convert to blob
-      const blob = await new Promise<Blob>((resolve) => {
+      const blob = await new Promise<Blob>((resolve, reject) => {
         canvas.toBlob((b) => {
           if (b) resolve(b);
+          else reject(new Error('Failed to create blob'));
         }, 'image/jpeg', 0.9);
       });
       
+      console.log('Photo captured, preparing for upload...');
       // Create file from blob
       const file = new File([blob], `camera_${new Date().getTime()}.jpg`, { type: 'image/jpeg' });
       
@@ -153,13 +190,14 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
     <Card className="p-6">
       <div className="space-y-4">
         {isCameraOpen ? (
-          <div className="relative bg-black rounded-lg overflow-hidden" style={{ minHeight: '60vh' }}>
+          <div className="relative bg-black rounded-lg overflow-hidden" style={{ minHeight: '60vh', maxHeight: '80vh' }}>
             <video
               ref={videoRef}
               autoPlay
               playsInline
               muted
-              className="absolute inset-0 w-full h-full object-cover transform scale-x-[-1]"
+              className="absolute inset-0 w-full h-full object-contain transform scale-x-[-1]"
+              style={{ backgroundColor: 'black' }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
             <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-4 px-4">
@@ -183,7 +221,10 @@ export function ProgressUpload({ onUploadComplete }: ProgressUploadProps) {
             </div>
             {!isCameraReady && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                <Loader2 className="h-8 w-8 animate-spin text-white" />
+                <div className="text-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-white mx-auto mb-2" />
+                  <p className="text-white text-sm">Initializing camera...</p>
+                </div>
               </div>
             )}
           </div>
