@@ -8,7 +8,6 @@ import {
   Camera, 
   Upload, 
   ArrowUpDown,
-  Plus,
   Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
