@@ -8,7 +8,8 @@ import {
   Camera, 
   Upload, 
   ArrowUpDown,
-  Plus
+  Plus,
+  Calendar
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ProgressPhotoModal } from './ProgressPhotoModal';
@@ -145,31 +146,44 @@ export function ProgressGallery() {
 
   if (loading) {
     return (
-      <div className="min-h-[200px] flex flex-col items-center justify-center p-6 gap-3">
+      <div className="min-h-[50vh] flex flex-col items-center justify-center p-6 gap-4">
         <div className="relative">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <div className="absolute inset-0 h-6 w-6 animate-ping opacity-50 rounded-full bg-primary/10" />
+          <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse" style={{ padding: '2rem' }} />
+          <Loader2 className="h-8 w-8 animate-spin text-primary relative z-10" />
         </div>
-        <p className="text-sm text-muted-foreground animate-pulse">Loading your progress photos...</p>
+        <div className="text-center space-y-1">
+          <p className="font-medium">Loading your gallery</p>
+          <p className="text-sm text-muted-foreground">Please wait while we fetch your progress photos</p>
+        </div>
       </div>
     );
   }
 
   if (photos.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[30vh] p-4">
-        <div className="max-w-sm w-full space-y-4">
+      <div className="flex flex-col items-center justify-center min-h-[50vh] p-4">
+        <div className="max-w-sm w-full space-y-6">
           <div className="text-center">
-            <div className="relative mx-auto w-16 h-16 mb-4">
+            <div className="relative mx-auto w-20 h-20 mb-6">
               <div className="absolute inset-0 rounded-full bg-primary/10 animate-pulse" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Camera className="h-6 w-6 text-primary" />
+                <Camera className="h-8 w-8 text-primary" />
               </div>
             </div>
-            <h2 className="text-lg font-medium">Start Your Journey</h2>
-            <p className="text-sm text-muted-foreground mt-1.5">
-              Track your progress with regular photos
+            <h2 className="text-xl font-semibold mb-2">Start Your Journey</h2>
+            <p className="text-muted-foreground mb-6">
+              Track your skincare progress by taking regular photos. Watch your transformation over time.
             </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button onClick={handleCameraCapture} className="gap-2">
+                <Camera className="h-4 w-4" />
+                Take Photo
+              </Button>
+              <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="gap-2">
+                <Upload className="h-4 w-4" />
+                Upload Photo
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -177,25 +191,26 @@ export function ProgressGallery() {
   }
 
   return (
-    <div className="relative pb-16">
+    <div className="relative pb-20">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="flex items-center justify-between p-3 border-b">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-              <Camera className="h-4 w-4 text-primary" />
+        <div className="flex items-center justify-between p-4 border-b">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Camera className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h2 className="text-sm font-medium">Progress Gallery</h2>
-              <p className="text-xs text-muted-foreground">
-                {photos.length} {photos.length === 1 ? 'photo' : 'photos'}
+              <h2 className="text-base font-medium">Progress Gallery</h2>
+              <p className="text-sm text-muted-foreground">
+                {photos.length} {photos.length === 1 ? 'photo' : 'photos'} • {Object.keys(groupedPhotos).length} {Object.keys(groupedPhotos).length === 1 ? 'month' : 'months'}
               </p>
             </div>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <ArrowUpDown className="h-4 w-4" />
+              <Button variant="outline" size="sm" className="h-8 gap-2">
+                <ArrowUpDown className="h-3.5 w-3.5" />
+                {sortOrder === 'newest' ? 'Newest' : 'Oldest'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-32">
@@ -215,18 +230,29 @@ export function ProgressGallery() {
       {/* Timeline */}
       <div className="divide-y divide-border/50">
         {Object.entries(groupedPhotos).map(([month, monthPhotos]) => (
-          <div key={month} className="py-4 first:pt-3">
-            <div className="px-3 mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
-                  {format(monthPhotos[0].date, 'MMM yyyy')}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {monthPhotos.length} {monthPhotos.length === 1 ? 'photo' : 'photos'}
-                </span>
+          <motion.div
+            key={month}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="py-6 first:pt-4"
+          >
+            <div className="px-4 mb-4">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Calendar className="h-4 w-4 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-medium">
+                    {format(monthPhotos[0].date, 'MMMM yyyy')}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {monthPhotos.length} {monthPhotos.length === 1 ? 'photo' : 'photos'}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 px-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 px-4">
               <AnimatePresence mode="popLayout">
                 {monthPhotos.map((photo) => (
                   <motion.div
@@ -239,9 +265,10 @@ export function ProgressGallery() {
                   >
                     <Card 
                       className={cn(
-                        "overflow-hidden cursor-pointer group",
-                        "hover:ring-1 hover:ring-primary/20 hover:shadow-sm",
-                        "transition-all duration-200 ease-in-out"
+                        "overflow-hidden cursor-pointer group relative",
+                        "hover:ring-2 hover:ring-primary/20 hover:shadow-lg",
+                        "active:scale-95",
+                        "transition-all duration-200 ease-out"
                       )}
                       onClick={() => handlePhotoClick(photo)}
                     >
@@ -252,15 +279,15 @@ export function ProgressGallery() {
                           className="w-full h-full object-cover"
                           loading="lazy"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <div className="absolute bottom-0 left-0 right-0 p-2">
-                          <div className="space-y-0.5">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        <div className="absolute bottom-0 left-0 right-0 p-3">
+                          <div className="space-y-1">
                             {photo.name && (
-                              <p className="text-sm font-medium text-white line-clamp-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <p className="text-sm font-medium text-white line-clamp-1 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
                                 {photo.name}
                               </p>
                             )}
-                            <p className="text-[10px] text-white/90 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <p className="text-[10px] text-white/90 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 delay-75">
                               {format(photo.date, 'MMM d, h:mm a')}
                             </p>
                           </div>
@@ -271,41 +298,17 @@ export function ProgressGallery() {
                 ))}
               </AnimatePresence>
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-4 right-4 z-30">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button 
-              size="icon" 
-              className="h-12 w-12 rounded-full shadow-lg bg-primary hover:bg-primary/90"
-            >
-              <Plus className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 p-1">
-            <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer" onClick={handleCameraCapture}>
-              <Camera className="h-4 w-4" />
-              <span className="text-sm">Take Photo</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem className="flex items-center gap-2 py-2 cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-              <Upload className="h-4 w-4" />
-              <span className="text-sm">Upload Photo</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <input
-          type="file"
-          ref={fileInputRef}
-          accept="image/*"
-          onChange={handleFileSelect}
-          className="hidden"
-        />
-      </div>
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
 
       {selectedPhoto && (
         <ProgressPhotoModal
