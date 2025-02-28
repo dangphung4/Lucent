@@ -12,6 +12,8 @@ import { ProductList } from './ProductList';
 import { RoutineList } from './RoutineList';
 import { cn } from '@/lib/utils';
 import { Star, Droplets, FlaskConical, CircleDot, Sun, Layers, Sparkles, Eye, Zap, Package } from 'lucide-react';
+import { ProgressUpload } from './ProgressUpload';
+import { ProgressGallery } from './ProgressGallery';
 
 export interface ProductStats {
   total: number;
@@ -77,7 +79,7 @@ export function Dashboard() {
      * - Sets the loading state to true.
      * - Fetches user products and calculates product statistics such as total, active,
      *   finished, and repurchase counts.
-     * - Loads routine completions for calculating streaks and progress.
+     * - Loads routine completions for streak and progress calculation.
      * - Calculates the current streak of consecutive days with at least one completed routine.
      * - Counts the total number of completed routines where all steps are completed.
      * - Retrieves the five most recent products based on their creation date.
@@ -603,19 +605,20 @@ export function Dashboard() {
           </TabsContent>
           
           <TabsContent value="progress" className="mt-0">
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                </svg>
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold tracking-tight mb-2">Progress Photos</h2>
+                <p className="text-muted-foreground">
+                  Track your skin's journey by taking regular progress photos.
+                </p>
               </div>
-              <h2 className="text-2xl font-bold mb-2">No Progress Tracked</h2>
-              <p className="text-muted-foreground max-w-md mb-6">
-                Take photos and track your skin's progress over time to see what works best.
-              </p>
-              <Button size="lg" className="rounded-full">
-                Track Your First Progress Photo
-              </Button>
+
+              <ProgressUpload onUploadComplete={() => setActiveTab('progress')} />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Your Progress Gallery</h3>
+                <ProgressGallery />
+              </div>
             </div>
           </TabsContent>
         </Tabs>

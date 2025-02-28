@@ -96,12 +96,11 @@ export function Settings() {
       return;
     }
     
-    // Simple URL validation using regex
-    const urlPattern = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/;
-    if (!urlPattern.test(value)) {
-      setPhotoURLError('Please enter a valid URL');
-    } else {
+    try {
+      new URL(value);
       setPhotoURLError('');
+    } catch {
+      setPhotoURLError('Please enter a valid URL');
     }
   };
 
@@ -129,6 +128,17 @@ export function Settings() {
         }
       }
       
+      // Validate photo URL before updating
+      if (photoURL) {
+        try {
+          await fetch(photoURL, { method: 'HEAD' });
+        } catch {
+          setPhotoURLError('Unable to access this image URL. Please make sure it is publicly accessible.');
+          setIsUpdating(false);
+          return;
+        }
+      }
+      
       // Update user profile using the context function
       await updateUserData({
         displayName,
@@ -139,7 +149,8 @@ export function Settings() {
       toast.success('Profile updated successfully');
     } catch (error) {
       console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update profile';
+      toast.error(errorMessage);
     } finally {
       setIsUpdating(false);
     }
