@@ -11,7 +11,7 @@ import { Input } from './ui/input';
 import { Trash2, Edit2, Save, X, ZoomIn, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { storage } from '../lib/firebase';
-import { ref, deleteObject, updateMetadata } from 'firebase/storage';
+import { ref, deleteObject, updateMetadata, getDownloadURL } from 'firebase/storage';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -85,16 +85,19 @@ export function ProgressPhotoModal({
 
   const handleDownload = async () => {
     try {
-      const response = await fetch(photo.url);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      // Get a fresh download URL from Firebase Storage
+      const photoRef = ref(storage, photo.storagePath);
+      const freshUrl = await getDownloadURL(photoRef);
+      
+      // Create a temporary anchor element
       const a = document.createElement('a');
-      a.href = url;
+      a.href = freshUrl;
       a.download = `${photo.name || format(photo.date, 'yyyy-MM-dd')}.jpg`;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      
+      toast.success('Photo downloaded successfully');
     } catch (error) {
       console.error('Error downloading photo:', error);
       toast.error('Failed to download photo');

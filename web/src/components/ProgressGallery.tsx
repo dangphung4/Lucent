@@ -21,7 +21,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { toast } from 'react-hot-toast';
+import { toast } from 'sonner';
 
 interface ProgressPhoto {
   url: string;
