@@ -26,6 +26,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// PWA Launch Handler component
+const PWALaunchHandler = () => {
+  const { currentUser } = useContext(AuthContext);
+  
+  // Redirect based on authentication status
+  if (currentUser) {
+    return <Navigate to="/dashboard" replace />;
+  } else {
+    return <Navigate to="/login" replace />;
+  }
+};
+
 // Scroll to top component
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -108,6 +120,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route path="/pwa-launch" element={<PWALaunchHandler />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
           </Routes>

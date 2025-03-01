@@ -16,7 +16,7 @@ export default defineConfig({
       theme_color: '#ffffff',
       background_color: '#ffffff',
       display: 'standalone',
-      start_url: '/',
+      start_url: '/pwa-launch',
       scope: '/',
       icons: [
         {

@@ -14,6 +14,8 @@ const updateSW = registerSW({
   onOfflineReady() {
     console.log('App ready to work offline')
   },
+  // When the PWA is installed, it will use the start_url from the manifest
+  // which we've set to '/pwa-launch' to handle authentication redirects
 })
 
 createRoot(document.getElementById('root')!).render(
