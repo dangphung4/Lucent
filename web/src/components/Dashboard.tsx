@@ -447,7 +447,7 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-8">
       {/* Welcome Section with Enhanced Gradient */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-primary/90 via-[#b83280] to-[#805ad5] dark:from-[#4f46e5] dark:via-primary dark:to-[#7e22ce] pt-8 pb-12 md:pt-12 md:pb-16">
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary/90 via-[#b83280] to-[#805ad5] dark:from-[#4f46e5] dark:via-primary dark:to-[#7e22ce] pt-8 pb-20 md:pt-12 md:pb-24">
         {/* Animated gradient overlay with shimmer effect */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#f59e0b]/20 via-transparent to-[#8b5cf6]/20 dark:from-[#8b5cf6]/20 dark:to-[#ec4899]/20 animate-shimmer"></div>
         
@@ -497,18 +497,18 @@ export function Dashboard() {
             <span>Your Skincare Journey</span>
           </div>
 
-          <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+          <div className="relative flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div className="space-y-2">
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-md">
                 {greeting}, <span className="text-[#f59e0b] dark:text-[#fbbf24]">{displayName}!</span>
               </h1>
-              <p className="text-white/90 max-w-xl backdrop-blur-md bg-white/10 p-3 rounded-lg border border-white/20 shadow-lg">
+              <p className="text-white/90 max-w-xl backdrop-blur-md bg-white/10 p-2 rounded-lg border border-white/20 shadow-lg">
                 Track your skincare routine, monitor progress, and discover what
                 works best for your skin.
               </p>
             </div>
 
-            <div className="flex items-center gap-3 mt-4 md:mt-0">
+            <div className="flex items-center gap-3 mt-2 md:mt-0">
               <Button
                 variant="secondary"
                 size="sm"
@@ -575,7 +575,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      <div className="container max-w-7xl mx-auto px-4 -mt-6 md:-mt-10 relative z-10">
+      <div className="container max-w-7xl mx-auto px-4 -mt-14 md:-mt-18 relative z-10">
         {/* Dashboard Tabs */}
         <Tabs
           defaultValue="overview"
