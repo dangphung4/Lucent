@@ -234,8 +234,8 @@ export function LandingPage() {
                   <img
                     src={
                       theme === "light"
-                        ? "/dashboard-preview-light.png"
-                        : "/dashboard-preview.png"
+                        ? "/dashboard-preview-lightv2.png"
+                        : "/dashboard-previewv2.png"
                     }
                     alt="Skincare God Dashboard Preview"
                     className="w-full h-auto rounded-xl shadow-xl"
