@@ -910,169 +910,165 @@ export function Dashboard() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="space-y-4"
+              className="space-y-6"
             >
-              {/* Header Section */}
-              <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b pb-4">
-                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
-                  <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <div className="relative flex flex-col md:flex-row md:items-center gap-6">
-                    <div className="flex-1 space-y-2">
-                      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 text-sm font-medium mb-2">
-                        <Package className="h-4 w-4" />
-                        Product Management
-                      </div>
-                      <h2 className="text-2xl font-bold tracking-tight mb-2">
-                        Your Products
-                      </h2>
-                      <p className="text-muted-foreground max-w-xl">
-                        Keep track of your skincare products, mark favorites,
-                        and manage your collection.
-                      </p>
+              {/* Header Section - removed sticky positioning */}
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
+                <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="relative flex flex-col md:flex-row md:items-center gap-6">
+                  <div className="flex-1 space-y-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 text-sm font-medium mb-2">
+                      <Package className="h-4 w-4" />
+                      Product Management
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="hidden md:block">
-                        <div className="h-16 w-16 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-                          <Package className="h-8 w-8 text-blue-600" />
-                        </div>
+                    <h2 className="text-2xl font-bold tracking-tight mb-2">
+                      Your Products
+                    </h2>
+                    <p className="text-muted-foreground max-w-xl">
+                      Keep track of your skincare products, mark favorites,
+                      and manage your collection.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="hidden md:block">
+                      <div className="h-16 w-16 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+                        <Package className="h-8 w-8 text-blue-600" />
                       </div>
-                      <AddProductDialog
-                        onProductAdded={() => {
-                          setActiveTab("products");
-                          productListRef.current?.loadProducts();
-                        }}
-                      />
                     </div>
+                    <AddProductDialog
+                      onProductAdded={() => {
+                        setActiveTab("products");
+                        productListRef.current?.loadProducts();
+                      }}
+                    />
                   </div>
                 </div>
+              </div>
 
-                {/* Quick Stats */}
-                <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <Card className="group hover:shadow-lg transition-all duration-300">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Package className="h-5 w-5 text-blue-600" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-xs text-muted-foreground">
-                            Total Products
-                          </span>
-                          <span className="text-2xl font-bold">
-                            {productStats.total}
-                          </span>
-                        </div>
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Package className="h-5 w-5 text-blue-600" />
                       </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="group hover:shadow-lg transition-all duration-300">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Sparkles className="h-5 w-5 text-green-600" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-xs text-muted-foreground">
-                            Active
-                          </span>
-                          <span className="text-2xl font-bold">
-                            {productStats.active}
-                          </span>
-                        </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">
+                          Total Products
+                        </span>
+                        <span className="text-2xl font-bold">
+                          {productStats.total}
+                        </span>
                       </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="group hover:shadow-lg transition-all duration-300">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <CheckCircle className="h-5 w-5 text-purple-600" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-xs text-muted-foreground">
-                            Finished
-                          </span>
-                          <span className="text-2xl font-bold">
-                            {productStats.finished}
-                          </span>
-                        </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Sparkles className="h-5 w-5 text-green-600" />
                       </div>
-                    </CardContent>
-                  </Card>
-                  <Card className="group hover:shadow-lg transition-all duration-300">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          <Star className="h-5 w-5 text-amber-600" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-xs text-muted-foreground">
-                            Would Repurchase
-                          </span>
-                          <span className="text-2xl font-bold">
-                            {productStats.repurchase}
-                          </span>
-                        </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">
+                          Active
+                        </span>
+                        <span className="text-2xl font-bold">
+                          {productStats.active}
+                        </span>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <CheckCircle className="h-5 w-5 text-purple-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">
+                          Finished
+                        </span>
+                        <span className="text-2xl font-bold">
+                          {productStats.finished}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card className="group hover:shadow-lg transition-all duration-300">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Star className="h-5 w-5 text-amber-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs text-muted-foreground">
+                          Would Repurchase
+                        </span>
+                        <span className="text-2xl font-bold">
+                          {productStats.repurchase}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
 
-                {/* Filter/Sort Options */}
-                <div className="flex gap-2 mt-4 overflow-x-auto pb-2 scrollbar-none">
-                  <Button
-                    variant={productFilter === "all" ? "default" : "outline"}
-                    size="sm"
-                    className="whitespace-nowrap gap-2"
-                    onClick={() => handleFilterChange("all")}
-                  >
-                    <Package className="h-4 w-4" />
-                    All Products
-                  </Button>
-                  <Button
-                    variant={productFilter === "active" ? "default" : "outline"}
-                    size="sm"
-                    className="whitespace-nowrap gap-2"
-                    onClick={() => handleFilterChange("active")}
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    Active
-                  </Button>
-                  <Button
-                    variant={
-                      productFilter === "finished" ? "default" : "outline"
-                    }
-                    size="sm"
-                    className="whitespace-nowrap gap-2"
-                    onClick={() => handleFilterChange("finished")}
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                    Finished
-                  </Button>
-                  <Button
-                    variant={
-                      productFilter === "repurchase" ? "default" : "outline"
-                    }
-                    size="sm"
-                    className="whitespace-nowrap gap-2"
-                    onClick={() => handleFilterChange("repurchase")}
-                  >
-                    <Star className="h-4 w-4" />
-                    Would Repurchase
-                  </Button>
-                </div>
+              {/* Filter/Sort Options */}
+              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                <Button
+                  variant={productFilter === "all" ? "default" : "outline"}
+                  size="sm"
+                  className="whitespace-nowrap gap-2"
+                  onClick={() => handleFilterChange("all")}
+                >
+                  <Package className="h-4 w-4" />
+                  All Products
+                </Button>
+                <Button
+                  variant={productFilter === "active" ? "default" : "outline"}
+                  size="sm"
+                  className="whitespace-nowrap gap-2"
+                  onClick={() => handleFilterChange("active")}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Active
+                </Button>
+                <Button
+                  variant={
+                    productFilter === "finished" ? "default" : "outline"
+                  }
+                  size="sm"
+                  className="whitespace-nowrap gap-2"
+                  onClick={() => handleFilterChange("finished")}
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  Finished
+                </Button>
+                <Button
+                  variant={
+                    productFilter === "repurchase" ? "default" : "outline"
+                  }
+                  size="sm"
+                  className="whitespace-nowrap gap-2"
+                  onClick={() => handleFilterChange("repurchase")}
+                >
+                  <Star className="h-4 w-4" />
+                  Would Repurchase
+                </Button>
               </div>
 
               {/* Product List */}
-              <div className="mt-2">
-                <ProductList
-                  ref={productListRef}
-                  filter={productFilter}
-                  onProductsChange={() => setActiveTab("products")}
-                  onStatsChange={handleProductsChange}
-                />
-              </div>
+              <ProductList
+                ref={productListRef}
+                filter={productFilter}
+                onProductsChange={() => setActiveTab("products")}
+                onStatsChange={handleProductsChange}
+              />
             </motion.div>
           </TabsContent>
 
