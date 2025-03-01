@@ -63,6 +63,7 @@ export function Dashboard() {
   const [isCameraReady, setIsCameraReady] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const [galleryRefreshTrigger, setGalleryRefreshTrigger] = useState(0);
   
   // Get first name from email or use "there" as fallback
   const firstName = currentUser?.displayName || 'there';
@@ -285,6 +286,8 @@ export function Dashboard() {
       
       toast.success('Photo uploaded successfully');
       setActiveTab('progress');
+      // Trigger gallery refresh
+      setGalleryRefreshTrigger(prev => prev + 1);
     } catch (error) {
       console.error('Error uploading file:', error);
       toast.error('Failed to upload photo');
@@ -970,7 +973,7 @@ export function Dashboard() {
                 </div>
               )}
 
-              <ProgressGallery />
+              <ProgressGallery refreshTrigger={galleryRefreshTrigger} />
             </motion.div>
           </TabsContent>
         </Tabs>

@@ -32,7 +32,11 @@ interface ProgressPhoto {
 
 type SortOrder = 'newest' | 'oldest';
 
-export function ProgressGallery() {
+interface ProgressGalleryProps {
+  refreshTrigger?: number;
+}
+
+export function ProgressGallery({ refreshTrigger = 0 }: ProgressGalleryProps) {
   const [photos, setPhotos] = useState<ProgressPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState<ProgressPhoto | null>(null);
@@ -86,7 +90,7 @@ export function ProgressGallery() {
 
   useEffect(() => {
     loadPhotos();
-  }, [currentUser]);
+  }, [currentUser, refreshTrigger]);
 
   const handlePhotoClick = (photo: ProgressPhoto) => {
     setSelectedPhoto(photo);

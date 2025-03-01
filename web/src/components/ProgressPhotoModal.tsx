@@ -5,10 +5,11 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Trash2, Edit2, Save, X, ZoomIn, Download } from 'lucide-react';
+import { Trash2, Edit2, Save, X, ZoomIn, Download, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { storage } from '../lib/firebase';
 import { ref, deleteObject, updateMetadata, getDownloadURL } from 'firebase/storage';
@@ -39,6 +40,7 @@ export function ProgressPhotoModal({
   const [newName, setNewName] = useState(photo.name || '');
   const [isDeleting, setIsDeleting] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Update newName when photo changes
   useEffect(() => {
@@ -58,6 +60,7 @@ export function ProgressPhotoModal({
       toast.error('Failed to delete photo');
     } finally {
       setIsDeleting(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -104,12 +107,48 @@ export function ProgressPhotoModal({
     }
   };
 
+  // Delete confirmation dialog
+  if (showDeleteConfirm) {
+    return (
+      <Dialog open={true} onOpenChange={() => setShowDeleteConfirm(false)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              Confirm Delete
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this photo? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete Photo'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={cn(
         "max-w-[95vw] flex flex-col p-0 gap-0",
         isFullscreen ? "w-screen h-screen" : "w-[90vw] h-[90vh] max-h-[900px]"
-      )}>
+      )}
+      closeButton={false}
+      >
         <DialogHeader className="p-3 sm:p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
           <DialogTitle className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
@@ -179,14 +218,13 @@ export function ProgressPhotoModal({
               <Button
                 variant="destructive"
                 size="sm"
-                onClick={handleDelete}
-                disabled={isDeleting}
+                onClick={() => setShowDeleteConfirm(true)}
                 className="h-8 px-2"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
               <Button
-                variant="ghost"
+                variant="default"
                 size="sm"
                 onClick={onClose}
                 className="h-8 px-2"
