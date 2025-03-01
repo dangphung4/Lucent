@@ -173,18 +173,18 @@ export function LandingPage() {
                 )}
               </div>
               
-              {/* Feature highlights - 2 columns on mobile, 3 on larger screens */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-4 mt-4 md:mt-8 max-w-2xl mx-auto lg:mx-0">
-                <div className="flex flex-col items-center lg:items-start p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
-                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mb-1 md:mb-2 text-primary">
+              {/* Feature highlights - single row for both mobile and desktop */}
+              <div className="flex flex-row flex-wrap justify-center lg:justify-start gap-2 md:gap-4 mt-4 md:mt-8 max-w-2xl mx-auto lg:mx-0">
+                <div className="flex items-center p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mr-2 text-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"></path>
                     </svg>
                   </div>
-                  <span className="text-xs md:text-sm font-medium text-center lg:text-left">Track Products</span>
+                  <span className="text-xs md:text-sm font-medium">Track Products</span>
                 </div>
-                <div className="flex flex-col items-center lg:items-start p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
-                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mb-1 md:mb-2 text-primary">
+                <div className="flex items-center p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mr-2 text-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                       <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -192,17 +192,17 @@ export function LandingPage() {
                       <line x1="3" y1="10" x2="21" y2="10"></line>
                     </svg>
                   </div>
-                  <span className="text-xs md:text-sm font-medium text-center lg:text-left">Daily Routines</span>
+                  <span className="text-xs md:text-sm font-medium">Daily Routines</span>
                 </div>
-                <div className="flex flex-col items-center lg:items-start p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
-                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mb-1 md:mb-2 text-primary">
+                <div className="flex items-center p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mr-2 text-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M2 12h20"></path>
                       <path d="M16 6l6 6-6 6"></path>
                       <path d="M8 18l-6-6 6-6"></path>
                     </svg>
                   </div>
-                  <span className="text-xs md:text-sm font-medium text-center lg:text-left">Track Progress</span>
+                  <span className="text-xs md:text-sm font-medium">Track Progress</span>
                 </div>
               </div>
             </div>
@@ -397,8 +397,7 @@ export function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="group overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800 relative bg-gradient-to-b from-background to-primary/5">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
               <div className="h-2 bg-primary"></div>
               <CardHeader className="pb-2">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2 group-hover:scale-110 transition-transform">
@@ -415,8 +414,7 @@ export function LandingPage() {
                     className="text-primary"
                   >
                     <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
                 </div>
                 <CardTitle className="text-xl">Daily Routines</CardTitle>
@@ -481,9 +479,10 @@ export function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
-              <div className="h-2 bg-primary"></div>
-              <CardHeader className="pb-2">
+            <Card className="group overflow-hidden transition-all hover:shadow-xl border-gray-200/50 dark:border-gray-800/50 relative bg-gradient-to-b from-background to-primary/5">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="h-1.5 bg-gradient-to-r from-primary to-primary/60"></div>
+              <CardHeader className="pb-2 relative">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -497,22 +496,16 @@ export function LandingPage() {
                     strokeLinejoin="round"
                     className="text-primary"
                   >
-                    <rect
-                      x="3"
-                      y="4"
-                      width="18"
-                      height="18"
-                      rx="2"
-                      ry="2"
-                    ></rect>
-                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <line x1="10" y1="9" x2="8" y2="9"></line>
                   </svg>
                 </div>
-                <CardTitle className="text-xl">Routine Logging</CardTitle>
+                <CardTitle className="text-xl">Skincare Journal</CardTitle>
                 <CardDescription>
-                  Log all your skincare steps and instructions for others to see
+                  Document your skincare journey with detailed notes
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -532,7 +525,7 @@ export function LandingPage() {
                     >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Log skincare steps
+                    Record daily observations
                   </li>
                   <li className="flex items-center">
                     <svg
@@ -549,7 +542,7 @@ export function LandingPage() {
                     >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Add detailed instructions
+                    Track skin reactions
                   </li>
                   <li className="flex items-center">
                     <svg
@@ -566,7 +559,7 @@ export function LandingPage() {
                     >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Share routines with others
+                    Note environmental factors
                   </li>
                 </ul>
               </CardContent>
@@ -588,14 +581,13 @@ export function LandingPage() {
                     strokeLinejoin="round"
                     className="text-primary"
                   >
-                    <path d="M2 12h20"></path>
-                    <path d="M16 6l6 6-6 6"></path>
-                    <path d="M8 18l-6-6 6-6"></path>
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
                   </svg>
                 </div>
-                <CardTitle className="text-xl">Progress Tracking</CardTitle>
+                <CardTitle className="text-xl">Photo Progress</CardTitle>
                 <CardDescription>
-                  Monitor how your skin responds to different products over time
+                  Capture and compare photos to visualize your skin's transformation
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -615,7 +607,7 @@ export function LandingPage() {
                     >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Visual progress photos
+                    Take consistent photos
                   </li>
                   <li className="flex items-center">
                     <svg
@@ -632,7 +624,7 @@ export function LandingPage() {
                     >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Effectiveness insights
+                    Side-by-side comparisons
                   </li>
                   <li className="flex items-center">
                     <svg
@@ -649,7 +641,171 @@ export function LandingPage() {
                     >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    Trend analysis
+                    Add notes to photos
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="group overflow-hidden transition-all hover:shadow-xl border-gray-200/50 dark:border-gray-800/50 relative bg-gradient-to-b from-background to-primary/5">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="h-1.5 bg-gradient-to-r from-primary to-primary/60"></div>
+              <CardHeader className="pb-2 relative">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-primary"
+                  >
+                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                  </svg>
+                </div>
+                <CardTitle className="text-xl">Community Sharing</CardTitle>
+                <CardDescription>
+                  Share routines and get feedback from the skincare community
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span className="font-medium">Share your routines</span>
+                  </li>
+                  <li className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span className="font-medium">Get expert feedback</span>
+                  </li>
+                  <li className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span className="font-medium">Discover new products</span>
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
+              <div className="h-2 bg-primary"></div>
+              <CardHeader className="pb-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-primary"
+                  >
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                  </svg>
+                </div>
+                <CardTitle className="text-xl">Wishlist & Reviews</CardTitle>
+                <CardDescription>
+                  Keep track of products you want to try and review ones you've used
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span className="font-medium">Create product wishlists</span>
+                  </li>
+                  <li className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span className="font-medium">Write detailed reviews</span>
+                  </li>
+                  <li className="flex items-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-2 h-4 w-4 text-primary"
+                    >
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                    <span className="font-medium">Rate product effectiveness</span>
                   </li>
                 </ul>
               </CardContent>
