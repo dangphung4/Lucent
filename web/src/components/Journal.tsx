@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { useState, useEffect, useRef } from "react";
 import { Avatar } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import {
@@ -7,7 +8,6 @@ import {
   Clock,
   Star,
   FileText,
-  TrendingUp,
   Search,
   BookOpen,
   Pencil,
@@ -19,16 +19,27 @@ import {
   Layers,
   Eye,
   Zap,
-  Package
+  Package,
+  Camera,
+  Upload,
+  ArrowUpDown,
+  Plus,
+  X
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/AuthContext";
 import {
   getUserProducts,
   getUserJournalEntries,
+  getUserProgressLogs,
+  getUserProgressPhotos,
   type Product,
   type JournalEntry,
+  type ProgressLog,
+  type ProgressPhoto,
 } from "@/lib/db";
+import { storage } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL, updateMetadata } from "firebase/storage";
 import { Input } from "./ui/input";
 import { AddJournalEntryDialog } from "./AddJournalEntryDialog";
 import { UpdateUsageDialog } from "./UpdateUsageDialog";
@@ -37,7 +48,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Button } from "./ui/button";
 import { DiaryEntryDialog } from "./DiaryEntryDialog";
 import { EditDiaryEntryDialog } from "./EditDiaryEntryDialog";
+import { AddProgressLogDialog } from "./AddProgressLogDialog";
+import { EditProgressLogDialog } from "./EditProgressLogDialog";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Card } from "./ui/card";
 
 // Check if an entry is a diary entry (without specific product details)
 const isDiaryEntry = (entry: JournalEntry) => {
@@ -107,12 +127,26 @@ export function Journal() {
   const [activeTab, setActiveTab] = useState("tracking");
   const [products, setProducts] = useState<Product[]>([]);
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+  const [progressLogs, setProgressLogs] = useState<ProgressLog[]>([]);
+  const [progressPhotos, setProgressPhotos] = useState<ProgressPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProductId] = useState<string | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<JournalEntry | null>(null);
+  const [selectedLog, setSelectedLog] = useState<ProgressLog | null>(null);
+  const [, setSelectedPhoto] = useState<ProgressPhoto | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [logDialogOpen, setLogDialogOpen] = useState(false);
+  const [, setAddLogDialogOpen] = useState(false);
   const [expandedEntries, setExpandedEntries] = useState<Record<string, boolean>>({});
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [photosByMonth, setPhotosByMonth] = useState<Record<string, ProgressPhoto[]>>({});
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
+  const [isCameraReady, setIsCameraReady] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   // Load products and journal entries
   const loadData = async () => {
@@ -120,12 +154,20 @@ export function Journal() {
 
     setLoading(true);
     try {
-      const [fetchedProducts, fetchedEntries] = await Promise.all([
+      const [fetchedProducts, fetchedEntries, fetchedLogs, fetchedPhotos] = await Promise.all([
         getUserProducts(currentUser.uid),
         getUserJournalEntries(currentUser.uid),
+        getUserProgressLogs(currentUser.uid),
+        getUserProgressPhotos(currentUser.uid),
       ]);
       setProducts(fetchedProducts);
       setJournalEntries(fetchedEntries);
+      setProgressLogs(fetchedLogs);
+      
+      // Sort photos and group by month
+      const sortedPhotos = sortProgressPhotos(fetchedPhotos, sortOrder);
+      setProgressPhotos(sortedPhotos);
+      groupPhotosByMonth(sortedPhotos);
     } catch (error) {
       console.error("Error loading data:", error);
       toast.error("Failed to load data");
@@ -138,6 +180,86 @@ export function Journal() {
     loadData();
   }, [currentUser]);
 
+  // Group photos by month
+  const groupPhotosByMonth = (photos: ProgressPhoto[]) => {
+    const grouped = photos.reduce((acc, photo) => {
+      const monthKey = format(photo.date, 'MMMM yyyy');
+      if (!acc[monthKey]) {
+        acc[monthKey] = [];
+      }
+      acc[monthKey].push(photo);
+      return acc;
+    }, {} as Record<string, ProgressPhoto[]>);
+    
+    setPhotosByMonth(grouped);
+  };
+
+  // Sort progress photos
+  const sortProgressPhotos = (photos: ProgressPhoto[], order: 'newest' | 'oldest') => {
+    return [...photos].sort((a, b) => {
+      const comparison = b.date.getTime() - a.date.getTime();
+      return order === 'newest' ? comparison : -comparison;
+    });
+  };
+
+  // Handle sort change
+  const handleSortChange = (newOrder: 'newest' | 'oldest') => {
+    setSortOrder(newOrder);
+    const sortedPhotos = sortProgressPhotos(progressPhotos, newOrder);
+    setProgressPhotos(sortedPhotos);
+    groupPhotosByMonth(sortedPhotos);
+  };
+
+  // Handle file upload for progress photos
+  const handleFileUpload = async (file: File) => {
+    if (!currentUser) return;
+
+    try {
+      setIsUploading(true);
+      
+      // Create a reference to the file in Firebase Storage
+      const timestamp = new Date().getTime();
+      const storageRef = ref(storage, `progress/${currentUser.uid}/${timestamp}_${file.name}`);
+      
+      // Upload the file
+      await uploadBytes(storageRef, file);
+      
+      // Add metadata
+      await updateMetadata(storageRef, {
+        customMetadata: {
+          name: `Photo from ${format(new Date(), 'MMMM d, yyyy')}`
+        }
+      });
+      
+      // Get the download URL
+      const photoUrl = await getDownloadURL(storageRef);
+      
+      toast.success('Photo uploaded successfully');
+      setActiveTab('progress');
+      
+      // Reload photos
+      await loadData();
+      
+      return {
+        photoUrl,
+        photoStoragePath: storageRef.fullPath
+      };
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast.error('Failed to upload photo');
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    await handleFileUpload(file);
+  }; 
+  
   // Filter products based on search
   const filteredProducts = products.filter(
     (product) =>
@@ -505,6 +627,139 @@ export function Journal() {
     }));
   };
 
+  // Clean up camera on unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  // Monitor video element state changes
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement || !isCameraOpen) return;
+
+    const handlePlay = () => {
+      console.log('Video started playing');
+      setIsCameraReady(true);
+    };
+
+    const handleError = (error: Event) => {
+      console.error('Video error:', error);
+      toast.error('Error initializing camera preview');
+      stopCamera();
+    };
+
+    videoElement.addEventListener('play', handlePlay);
+    videoElement.addEventListener('error', handleError);
+
+    return () => {
+      videoElement.removeEventListener('play', handlePlay);
+      videoElement.removeEventListener('error', handleError);
+    };
+  }, [isCameraOpen]);
+
+  const startCamera = async () => {
+    try {
+      setIsCameraReady(false);
+      setIsCameraOpen(true);
+
+      console.log('Requesting camera access...');
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { 
+          facingMode: 'user',
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      });
+      
+      console.log('Camera access granted, setting up video stream...');
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        streamRef.current = stream;
+        
+        try {
+          await videoRef.current.play();
+          console.log('Video playback started');
+        } catch (playError) {
+          console.error('Error playing video:', playError);
+          throw playError;
+        }
+      } else {
+        console.error('Video element not found');
+        throw new Error('Video element not found');
+      }
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      toast.error('Failed to access camera. Please make sure camera permissions are granted.');
+      stopCamera();
+    }
+  };
+
+  const stopCamera = () => {
+    console.log('Stopping camera...');
+    setIsCameraReady(false);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+        console.log('Track stopped:', track.label);
+      });
+      streamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setIsCameraOpen(false);
+  };
+
+  const handleCameraCapture = async () => {
+    if (!videoRef.current || !isCameraReady || !currentUser) {
+      console.log('Camera not ready for capture');
+      return;
+    }
+
+    try {
+      console.log('Starting capture process...');
+      // Create canvas and draw video frame
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      
+      console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Could not get canvas context');
+      
+      // Flip horizontally if using front camera
+      context.translate(canvas.width, 0);
+      context.scale(-1, 1);
+      context.drawImage(videoRef.current, 0, 0);
+      
+      // Convert to blob
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((b) => {
+          if (b) resolve(b);
+          else reject(new Error('Failed to create blob'));
+        }, 'image/jpeg', 0.9);
+      });
+      
+      console.log('Photo captured, preparing for upload...');
+      // Create file from blob
+      const file = new File([blob], `camera_${new Date().getTime()}.jpg`, { type: 'image/jpeg' });
+      
+      // Stop camera
+      stopCamera();
+      
+      // Upload file
+      await handleFileUpload(file);
+    } catch (error) {
+      console.error('Error capturing photo:', error);
+      toast.error('Failed to capture photo');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
@@ -540,13 +795,36 @@ export function Journal() {
                 value="progress"
                 className="data-[state=active]:bg-transparent data-[state=active]:border-primary data-[state=active]:text-primary font-medium border-b-2 border-transparent rounded-none px-2 py-3 text-muted-foreground hover:text-foreground transition-colors"
               >
-                Progress Log
+                Progress Photos
               </TabsTrigger>
             </TabsList>
           </div>
 
           {/* Product Tracking Tab */}
           <TabsContent value="tracking" className="space-y-6">
+            {/* Hero Section */}
+            <div className="relative overflow-hidden rounded-xl sm:rounded-[2rem] bg-gradient-to-br from-teal-500 to-emerald-600 dark:from-teal-600 dark:to-emerald-700">
+              <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,0.2)_0%,transparent_70%)]"></div>
+              <div className="relative p-6 sm:p-10 md:p-12 text-white">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 sm:mb-4">Your Skincare Collection</h2>
+                <p className="text-white/80 text-base sm:text-lg max-w-xl mb-6 sm:mb-8">Track your products, monitor usage, and record your experiences with each item in your routine.</p>
+                <div className="flex flex-wrap gap-3">
+                  <Button 
+                    size="lg" 
+                    className="bg-white text-teal-600 hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300"
+                    onClick={() => window.location.href = '/products/add'}
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Add New Product
+                  </Button>
+                </div>
+              </div>
+              <div className="absolute -bottom-6 right-10 opacity-10">
+                <Beaker className="h-48 w-48 rotate-12" />
+              </div>
+            </div>
+
             {/* Search Bar */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -581,13 +859,14 @@ export function Journal() {
           {/* Journal Notes Tab */}
           <TabsContent value="notes" className="space-y-8">
             {/* Hero Section */}
-            <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-blue-500 to-violet-600 dark:from-blue-600 dark:to-violet-700">
+            <div className="relative overflow-hidden rounded-xl sm:rounded-[2rem] bg-gradient-to-br from-indigo-500 to-violet-600 dark:from-indigo-600 dark:to-violet-700">
               <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
-              <div className="relative p-8 sm:p-10 md:p-12 text-white">
-                <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">Your Skincare Story</h2>
-                <p className="text-white/80 text-lg max-w-xl mb-8">Document your journey, track your progress, and discover what works best for your skin.</p>
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.2)_0%,transparent_70%)]"></div>
+              <div className="relative p-6 sm:p-10 md:p-12 text-white">
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 sm:mb-4">Your Skincare Story</h2>
+                <p className="text-white/80 text-base sm:text-lg max-w-xl mb-6 sm:mb-8">Document your journey, track your progress, and discover what works best for your skin.</p>
                 <DiaryEntryDialog onEntryAdded={loadData}>
-                  <Button size="lg" className="bg-white text-blue-600 hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Button size="lg" className="bg-white text-indigo-600 hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300">
                     <BookOpen className="h-5 w-5 mr-2" />
                     Write New Entry
                   </Button>
@@ -760,13 +1039,6 @@ export function Journal() {
                               })}
                             </div>
                           )}
-
-                          {/* Edit indicator */}
-                          <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <div className="p-2 rounded-full bg-background/80 backdrop-blur-sm shadow-sm">
-                              <Pencil className="h-4 w-4 text-muted-foreground" />
-                            </div>
-                          </div>
                         </div>
                       </div>
                     );
@@ -776,22 +1048,424 @@ export function Journal() {
             </div>
           </TabsContent>
 
-          {/* Progress Log Tab */}
-          <TabsContent value="progress" className="space-y-4 mt-6">
-            <div className="text-center py-12 px-4 rounded-lg border bg-muted/30 shadow-sm">
-              <TrendingUp className="h-12 w-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-              <p className="font-medium text-foreground">
-                Progress tracking coming soon
-              </p>
-              <p className="text-sm text-muted-foreground/80 mt-1">
-                Track your skin's improvement with photos and notes
-              </p>
-            </div>
+          {/* Progress Photos Tab */}
+          <TabsContent value="progress" className="space-y-8">
+            {isCameraOpen ? (
+              <div className="relative bg-black rounded-lg overflow-hidden" style={{ minHeight: '60vh', maxHeight: '80vh' }}>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="absolute inset-0 w-full h-full object-contain transform scale-x-[-1]"
+                  style={{ backgroundColor: 'black' }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent pointer-events-none" />
+                <div className="absolute bottom-6 left-0 right-0 flex justify-center gap-4 px-4">
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="rounded-full h-14 w-14 shadow-lg"
+                    onClick={stopCamera}
+                  >
+                    <X className="h-6 w-6" />
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="lg"
+                    className="rounded-full h-14 w-14 bg-white text-black hover:bg-white/90 shadow-lg"
+                    onClick={handleCameraCapture}
+                    disabled={!isCameraReady}
+                  >
+                    <Camera className="h-6 w-6" />
+                  </Button>
+                </div>
+                {!isCameraReady && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                    <div className="text-center">
+                      <Loader2 className="h-8 w-8 animate-spin text-white mx-auto mb-2" />
+                      <p className="text-white text-sm">Initializing camera...</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                {/* Hero Section */}
+                <div className="relative overflow-hidden rounded-xl sm:rounded-[2rem] bg-gradient-to-br from-fuchsia-500 to-blue-600 dark:from-fuchsia-600 dark:to-blue-700">
+                  <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.5))]" />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.2)_0%,transparent_70%)]"></div>
+                  <div className="relative p-6 sm:p-10 md:p-12 text-white">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 sm:mb-4">Track Your Progress</h2>
+                    <p className="text-white/80 text-base sm:text-lg max-w-xl mb-6 sm:mb-8">Document your skincare journey with photos and add notes to track changes over time.</p>
+                    <div className="flex flex-wrap gap-3">
+                      <Button 
+                        size="lg" 
+                        className="bg-white text-fuchsia-600 hover:bg-white/90 shadow-lg hover:shadow-xl transition-all duration-300"
+                        onClick={startCamera}
+                      >
+                        <Camera className="h-5 w-5 mr-2" />
+                        Take Photo
+                      </Button>
+                      <Button 
+                        size="lg" 
+                        variant="outline"
+                        className="bg-white/20 text-white border-white/30 hover:bg-white/30 shadow-lg hover:shadow-xl transition-all duration-300"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload className="h-5 w-5 mr-2" />
+                        Upload Photo
+                      </Button>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleFileSelect}
+                      />
+                    </div>
+                  </div>
+                  <div className="absolute -bottom-6 right-10 opacity-10">
+                    <Camera className="h-48 w-48 rotate-12" />
+                  </div>
+                </div>
+
+                {/* Sort Controls */}
+                <div className="flex justify-between items-center">
+                  <h3 className="text-xl font-semibold">Your Photo Timeline</h3>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" size="sm" className="h-8 gap-1 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-sm">
+                        <ArrowUpDown className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">{sortOrder === 'newest' ? 'Newest First' : 'Oldest First'}</span>
+                        <span className="sm:hidden">Sort</span>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleSortChange('newest')}>
+                        Newest First
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleSortChange('oldest')}>
+                        Oldest First
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Progress Photos */}
+                {isUploading && (
+                  <div className="flex items-center justify-center p-4 bg-muted/50 rounded-lg">
+                    <Loader2 className="h-6 w-6 animate-spin mr-2" />
+                    <span>Uploading photo...</span>
+                  </div>
+                )}
+
+                {progressPhotos.length === 0 ? (
+                  <div className="relative overflow-hidden rounded-xl sm:rounded-3xl border bg-gradient-to-b from-muted/50 to-muted p-6 sm:p-12">
+                    <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:bg-grid-black/10" />
+                    <div className="relative text-center space-y-4">
+                      <Camera className="h-12 sm:h-16 w-12 sm:w-16 mx-auto text-muted-foreground/50" />
+                      <h3 className="font-semibold text-lg sm:text-xl">Start Tracking Your Progress</h3>
+                      <p className="text-muted-foreground max-w-sm mx-auto text-sm sm:text-base">
+                        Take photos and document your skincare journey to see how your skin improves over time
+                      </p>
+                      <div className="pt-4 flex flex-wrap justify-center gap-3">
+                        <Button onClick={startCamera} className="bg-purple-600 hover:bg-purple-700 text-white">
+                          <Camera className="h-4 w-4 mr-2" />
+                          Take Photo
+                        </Button>
+                        <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
+                          <Upload className="h-4 w-4 mr-2" />
+                          Upload Photo
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-10">
+                    {Object.entries(photosByMonth).map(([month, photos]) => {
+                      // Get month index from the month string (e.g., "January 2023" -> 0)
+                      const monthName = month.split(' ')[0];
+                      const monthIndex = [
+                        'January', 'February', 'March', 'April', 'May', 'June',
+                        'July', 'August', 'September', 'October', 'November', 'December'
+                      ].findIndex(m => m === monthName);
+                      
+                      // Get color theme based on month
+                      const getMonthColor = () => {
+                        const colors = [
+                          "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30", // January
+                          "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30", // February
+                          "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/30", // March
+                          "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30", // April
+                          "text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-950/30", // May
+                          "text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/30", // June
+                          "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30", // July
+                          "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/30", // August
+                          "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30", // September
+                          "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30", // October
+                          "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30", // November
+                          "text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/30", // December
+                        ];
+                        return colors[monthIndex !== -1 ? monthIndex : 0];
+                      };
+                      
+                      return (
+                        <div key={month} className="space-y-4">
+                          <h4 className={cn(
+                            "text-lg font-medium flex items-center gap-2 sticky top-0 backdrop-blur-sm py-2 z-10",
+                            "px-3 rounded-lg shadow-sm",
+                            getMonthColor()
+                          )}>
+                            <CalendarIcon className="h-5 w-5" />
+                            {month}
+                          </h4>
+                          <div className="space-y-6">
+                            {photos.map((photo) => {
+                              // Find the log for this photo if it exists
+                              const log = photo.hasLog && photo.logId 
+                                ? progressLogs.find(l => l.id === photo.logId) 
+                                : null;
+                              
+                              // Generate a unique gradient based on the month or photo date
+                              const getCardGradient = () => {
+                                // Use the month number to create a unique gradient
+                                const monthIndex = photo.date.getMonth();
+                                const dayOfMonth = photo.date.getDate();
+                                
+                                // Create different gradient styles based on month
+                                const gradients = [
+                                  // January - Cool blue
+                                  "from-blue-100 to-cyan-50 dark:from-blue-900/40 dark:to-cyan-900/20",
+                                  // February - Purple love
+                                  "from-purple-100 to-pink-50 dark:from-purple-900/40 dark:to-pink-900/20",
+                                  // March - Spring green
+                                  "from-green-100 to-emerald-50 dark:from-green-900/40 dark:to-emerald-900/20",
+                                  // April - Soft orange
+                                  "from-orange-100 to-amber-50 dark:from-orange-900/40 dark:to-amber-900/20",
+                                  // May - Blossom pink
+                                  "from-pink-100 to-rose-50 dark:from-pink-900/40 dark:to-rose-900/20",
+                                  // June - Ocean blue
+                                  "from-cyan-100 to-blue-50 dark:from-cyan-900/40 dark:to-blue-900/20",
+                                  // July - Summer yellow
+                                  "from-amber-100 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/20",
+                                  // August - Warm orange
+                                  "from-orange-100 to-red-50 dark:from-orange-900/40 dark:to-red-900/20",
+                                  // September - Autumn red
+                                  "from-red-100 to-orange-50 dark:from-red-900/40 dark:to-orange-900/20",
+                                  // October - Fall brown
+                                  "from-amber-100 to-orange-50 dark:from-amber-900/40 dark:to-orange-900/20",
+                                  // November - Deep purple
+                                  "from-indigo-100 to-purple-50 dark:from-indigo-900/40 dark:to-purple-900/20",
+                                  // December - Winter blue
+                                  "from-slate-100 to-blue-50 dark:from-slate-900/40 dark:to-blue-900/20"
+                                ];
+                                
+                                // If the photo has a log with mood, use mood-based gradient
+                                if (log?.mood) {
+                                  switch(log.mood) {
+                                    case "great":
+                                      return "from-green-100 via-emerald-50 to-teal-50 dark:from-green-900/40 dark:via-emerald-900/30 dark:to-teal-900/20";
+                                    case "good":
+                                      return "from-blue-100 via-sky-50 to-cyan-50 dark:from-blue-900/40 dark:via-sky-900/30 dark:to-cyan-900/20";
+                                    case "neutral":
+                                      return "from-gray-100 via-slate-50 to-zinc-50 dark:from-gray-900/40 dark:via-slate-900/30 dark:to-zinc-900/20";
+                                    case "concerned":
+                                      return "from-amber-100 via-yellow-50 to-orange-50 dark:from-amber-900/40 dark:via-yellow-900/30 dark:to-orange-900/20";
+                                    case "frustrated":
+                                      return "from-red-100 via-rose-50 to-pink-50 dark:from-red-900/40 dark:via-rose-900/30 dark:to-pink-900/20";
+                                    default:
+                                      return gradients[monthIndex];
+                                  }
+                                }
+                                
+                                // Add some variation based on day of month
+                                const variation = Math.floor(dayOfMonth / 10);
+                                const baseGradient = gradients[monthIndex];
+                                
+                                // For photos without logs, add a subtle pattern
+                                if (!photo.hasLog) {
+                                  return `${baseGradient} bg-[radial-gradient(circle_at_${(monthIndex % 3) * 30 + 10}%_${(variation % 3) * 30 + 10}%,rgba(255,255,255,0.8)_0%,transparent_60%)]`;
+                                }
+                                
+                                return baseGradient;
+                              };
+                              
+                              return (
+                                <Card 
+                                  key={photo.id}
+                                  className={cn(
+                                    "overflow-hidden",
+                                    "transition-all duration-300",
+                                    "hover:shadow-md",
+                                    "hover:scale-[1.01] hover:-translate-y-0.5",
+                                    "cursor-pointer",
+                                    "bg-gradient-to-br",
+                                    getCardGradient(),
+                                    photo.hasLog ? "border-purple-200 dark:border-purple-800" : "border-blue-200 dark:border-blue-800"
+                                  )}
+                                  onClick={() => {
+                                    setSelectedPhoto(photo);
+                                    if (photo.hasLog && log) {
+                                      setSelectedLog(log);
+                                      setLogDialogOpen(true);
+                                    } else {
+                                      setAddLogDialogOpen(true);
+                                    }
+                                  }}
+                                >
+                                  {/* Photo and basic info */}
+                                  <div className="flex flex-col sm:flex-row">
+                                    {/* Photo */}
+                                    <div className="sm:w-1/3 aspect-square sm:aspect-auto relative">
+                                      <img 
+                                        src={photo.url} 
+                                        alt={photo.name || format(photo.date, 'MMMM d, yyyy')} 
+                                        className="w-full h-full object-cover"
+                                      />
+                                      {/* Date overlay */}
+                                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent pt-8 pb-2 px-3 text-xs text-white">
+                                        {format(photo.date, 'MMMM d, yyyy')}
+                                      </div>
+                                      
+                                      {/* Status indicator */}
+                                      <div className={cn(
+                                        "absolute top-2 right-2 rounded-full p-1.5",
+                                        "backdrop-blur-sm shadow-sm",
+                                        photo.hasLog 
+                                          ? "bg-purple-100/90 dark:bg-purple-900/80 text-purple-600 dark:text-purple-300" 
+                                          : "bg-white/90 dark:bg-gray-800/80 text-muted-foreground"
+                                      )}>
+                                        {photo.hasLog ? (
+                                          <FileText className="h-4 w-4" />
+                                        ) : (
+                                          <Plus className="h-4 w-4" />
+                                        )}
+                                      </div>
+                                    </div>
+                                    
+                                    {/* Info and actions */}
+                                    <div className="p-4 flex-1 flex flex-col">
+                                      <div className="flex justify-between items-start gap-2 mb-2">
+                                        <h5 className="font-medium text-base sm:text-lg">
+                                          {photo.name || format(photo.date, 'MMMM d, yyyy')}
+                                        </h5>
+                                        
+                                        {/* Action buttons - simplified */}
+                                        <div>
+                                          {photo.hasLog ? (
+                                            <Button 
+                                              variant="ghost" 
+                                              size="sm"
+                                              className="h-8 text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300"
+                                              onClick={(e) => {
+                                                e.stopPropagation(); // Prevent event bubbling
+                                                setSelectedPhoto(photo);
+                                                if (log) {
+                                                  setSelectedLog(log);
+                                                  setLogDialogOpen(true);
+                                                } else {
+                                                  setAddLogDialogOpen(true);
+                                                }
+                                              }}
+                                            >
+                                              <Pencil className="h-3.5 w-3.5 mr-1" />
+                                              Edit Notes
+                                            </Button>
+                                          ) : null}
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Log content preview */}
+                                      {log ? (
+                                        <div className="space-y-3 flex-1">
+                                          {/* Title and mood */}
+                                          <div className="flex items-center justify-between">
+                                            <h6 className="font-medium text-sm text-muted-foreground">
+                                              {log.title}
+                                            </h6>
+                                            {log.mood && (
+                                              <Badge 
+                                                variant="secondary"
+                                                className={cn(
+                                                  "capitalize text-xs",
+                                                  log.mood === "great" && "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200",
+                                                  log.mood === "good" && "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200",
+                                                  log.mood === "neutral" && "bg-gray-100 text-gray-700 dark:bg-gray-900 dark:text-gray-200",
+                                                  log.mood === "concerned" && "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200",
+                                                  log.mood === "frustrated" && "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200"
+                                                )}
+                                              >
+                                                {log.mood}
+                                              </Badge>
+                                            )}
+                                          </div>
+                                          
+                                          {/* Description */}
+                                          <p className="text-sm line-clamp-2 text-muted-foreground">
+                                            {log.description}
+                                          </p>
+                                          
+                                          {/* Tags */}
+                                          <div className="flex flex-wrap gap-1.5 mt-auto pt-2">
+                                            {log.concerns && log.concerns.map((concern, index) => (
+                                              <Badge 
+                                                key={`concern-${index}`} 
+                                                variant="secondary"
+                                                className="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200 text-xs"
+                                              >
+                                                {concern}
+                                              </Badge>
+                                            ))}
+                                            {log.improvements && log.improvements.map((improvement, index) => (
+                                              <Badge 
+                                                key={`improvement-${index}`} 
+                                                variant="secondary"
+                                                className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200 text-xs"
+                                              >
+                                                {improvement}
+                                              </Badge>
+                                            ))}
+                                          </div>
+                                        </div>
+                                      ) : (
+                                        <AddProgressLogDialog
+                                          existingPhoto={photo}
+                                          onLogAdded={loadData}
+                                        >
+                                          <div 
+                                            className="flex flex-col items-center justify-center h-24 border-dashed border-2 rounded-md border-muted-foreground/20 bg-white/30 dark:bg-gray-900/20 backdrop-blur-sm cursor-pointer hover:bg-white/50 dark:hover:bg-gray-900/30 transition-all duration-300 hover:border-purple-300 dark:hover:border-purple-600 group"
+                                          >
+                                            <div className="flex items-center gap-1.5 text-muted-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                                              <div className="bg-purple-100 dark:bg-purple-900/70 rounded-full p-1 text-purple-500 dark:text-purple-300 group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
+                                                <Plus className="h-4 w-4" />
+                                              </div>
+                                              <span className="font-medium text-sm">Add Notes</span>
+                                            </div>
+                                            <p className="text-xs text-muted-foreground/70 mt-1.5 group-hover:text-muted-foreground transition-colors">
+                                              Document your progress and observations
+                                            </p>
+                                          </div>
+                                        </AddProgressLogDialog>
+                                      )}
+                                    </div>
+                                  </div>
+                                </Card>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </div>
 
-      {/* Edit Dialog */}
+      {/* Edit Journal Entry Dialog */}
       {selectedEntry && (
         <EditDiaryEntryDialog
           entry={selectedEntry}
@@ -799,6 +1473,17 @@ export function Journal() {
           onOpenChange={setEditDialogOpen}
           onEntryUpdated={loadData}
           onEntryDeleted={loadData}
+        />
+      )}
+
+      {/* Edit Progress Log Dialog */}
+      {selectedLog && (
+        <EditProgressLogDialog
+          log={selectedLog}
+          open={logDialogOpen}
+          onOpenChange={setLogDialogOpen}
+          onLogUpdated={loadData}
+          onLogDeleted={loadData}
         />
       )}
     </div>

@@ -3,6 +3,8 @@
 
 import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, getDocs, where, deleteDoc } from 'firebase/firestore';
 import { app } from './firebase';
+import { ref, listAll, getDownloadURL, getMetadata } from 'firebase/storage';
+import { storage } from './firebase';
 
 const db = getFirestore(app);
 
@@ -86,6 +88,34 @@ export interface JournalEntry {
   updatedAt?: Date;
   type?: 'diary' | 'product'; // Add type field to distinguish between diary entries and product reviews
   title?: string; // Add title field for diary entries
+}
+
+export interface ProgressLog {
+  id: string;
+  userId: string;
+  date: Date;
+  title: string;
+  description: string;
+  photoStoragePath: string; // Required - no longer optional
+  photoUrl: string; // Required - no longer optional
+  tags?: string[];
+  mood?: string;
+  concerns?: string[];
+  improvements?: string[];
+  relatedJournalEntryIds?: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ProgressPhoto {
+  id: string; // This will be the timestamp from the filename
+  userId: string;
+  date: Date;
+  name?: string;
+  storagePath: string;
+  url: string;
+  hasLog: boolean;
+  logId?: string;
 }
 
 /**
@@ -471,6 +501,159 @@ export const deleteJournalEntry = async (entryId: string): Promise<void> => {
     await deleteDoc(entryRef);
   } catch (error) {
     console.error('Error deleting journal entry:', error);
+    throw error;
+  }
+};
+
+/**
+ * Add a new progress log entry
+ */
+export const addProgressLog = async (log: Omit<ProgressLog, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
+  try {
+    const logsRef = doc(collection(db, 'progressLogs'));
+    
+    const logData = {
+      ...log,
+      id: logsRef.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    await setDoc(logsRef, logData);
+    return logsRef.id;
+  } catch (error) {
+    console.error('Error adding progress log:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get progress logs for a user
+ */
+export const getUserProgressLogs = async (userId: string): Promise<ProgressLog[]> => {
+  try {
+    const logsRef = collection(db, 'progressLogs');
+    const q = query(logsRef, where('userId', '==', userId));
+    const querySnapshot = await getDocs(q);
+    
+    return querySnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        ...data,
+        date: data.date?.toDate() || new Date(),
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+      } as ProgressLog;
+    });
+  } catch (error) {
+    console.error('Error getting user progress logs:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update a progress log
+ */
+export const updateProgressLog = async (logId: string, data: Partial<ProgressLog>): Promise<void> => {
+  try {
+    const logRef = doc(db, 'progressLogs', logId);
+    await updateDoc(logRef, {
+      ...data,
+      updatedAt: new Date(),
+    });
+  } catch (error) {
+    console.error('Error updating progress log:', error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a progress log
+ */
+export const deleteProgressLog = async (logId: string): Promise<void> => {
+  try {
+    const logRef = doc(db, 'progressLogs', logId);
+    await deleteDoc(logRef);
+  } catch (error) {
+    console.error('Error deleting progress log:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get all progress photos for a user, with information about whether they have logs
+ */
+export const getUserProgressPhotos = async (userId: string): Promise<ProgressPhoto[]> => {
+  try {
+    // First, get all logs to know which photos have logs
+    const logsRef = collection(db, 'progressLogs');
+    const logsQuery = query(logsRef, where('userId', '==', userId));
+    const logsSnapshot = await getDocs(logsQuery);
+    
+    // Create a map of photo paths to log IDs
+    const photoLogMap = new Map<string, string>();
+    logsSnapshot.docs.forEach(doc => {
+      const log = doc.data();
+      photoLogMap.set(log.photoStoragePath, doc.id);
+    });
+    
+    // Get all photos from Firebase Storage
+    const storageRef = ref(storage, `progress/${userId}`);
+    const result = await listAll(storageRef);
+    
+    // Map photos to ProgressPhoto objects
+    const photoPromises = result.items.map(async (item) => {
+      const url = await getDownloadURL(item);
+      const metadata = await getMetadata(item);
+      const timestamp = parseInt(item.name.split('_')[0]);
+      const hasLog = photoLogMap.has(item.fullPath);
+      
+      return {
+        id: timestamp.toString(),
+        userId,
+        date: new Date(timestamp),
+        name: metadata.customMetadata?.name,
+        storagePath: item.fullPath,
+        url,
+        hasLog,
+        logId: hasLog ? photoLogMap.get(item.fullPath) : undefined
+      };
+    });
+    
+    return await Promise.all(photoPromises);
+  } catch (error) {
+    console.error('Error getting user progress photos:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get a progress log by photo storage path
+ */
+export const getProgressLogByPhotoPath = async (userId: string, photoStoragePath: string): Promise<ProgressLog | null> => {
+  try {
+    const logsRef = collection(db, 'progressLogs');
+    const q = query(
+      logsRef, 
+      where('userId', '==', userId),
+      where('photoStoragePath', '==', photoStoragePath)
+    );
+    const querySnapshot = await getDocs(q);
+    
+    if (querySnapshot.empty) {
+      return null;
+    }
+    
+    const data = querySnapshot.docs[0].data();
+    return {
+      ...data,
+      id: querySnapshot.docs[0].id,
+      date: data.date?.toDate() || new Date(),
+      createdAt: data.createdAt?.toDate() || new Date(),
+      updatedAt: data.updatedAt?.toDate() || new Date(),
+    } as ProgressLog;
+  } catch (error) {
+    console.error('Error getting progress log by photo path:', error);
     throw error;
   }
 };
