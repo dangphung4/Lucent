@@ -670,7 +670,7 @@ export function Calendar() {
     <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 pb-12">
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {/* Calendar Section */}
-        <Card className="overflow-hidden calendar-container border-primary/20 shadow-lg relative bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-900/20 dark:to-purple-800/20">
+        <Card className="overflow-hidden calendar-container border-primary/20 shadow-lg relative bg-gradient-to-br from-primary/10 to-accent/20 dark:from-primary/20 dark:to-accent/10">
           {/* Subtle floating particles */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="particles-container">
@@ -692,13 +692,13 @@ export function Calendar() {
           </div>
           
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-500/20 rounded-full filter blur-xl opacity-70"></div>
-          <div className="absolute -top-10 -left-10 w-40 h-40 bg-purple-500/20 rounded-full filter blur-xl opacity-70"></div>
+          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-primary/20 rounded-full filter blur-xl opacity-70"></div>
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-accent/20 rounded-full filter blur-xl opacity-70"></div>
           
           <CardHeader className="pb-2 px-3 sm:px-6 relative">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500/50 to-purple-500/50 dark:from-blue-600/50 dark:to-purple-600/50 flex items-center justify-center shadow-md animate-pulse-slow">
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary/50 to-accent/50 dark:from-primary/60 dark:to-accent/40 flex items-center justify-center shadow-md animate-pulse-slow">
                   <CalendarIcon className="h-4 w-4 text-white dark:text-white" />
                 </div>
                 <CardTitle className="text-lg sm:text-xl text-primary dark:text-gradient">Skincare Calendar</CardTitle>
@@ -774,13 +774,13 @@ export function Calendar() {
         </Card>
         
         {/* Routine Section */}
-        <Card className="overflow-hidden border-primary/20 shadow-lg relative bg-gradient-to-br from-green-500/10 to-blue-500/10 dark:from-green-900/20 dark:to-blue-800/20">
+        <Card className="overflow-hidden border-primary/20 shadow-lg relative bg-gradient-to-br from-secondary/30 to-muted/50 dark:from-secondary/20 dark:to-accent/10">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-green-500/20 rounded-full filter blur-xl opacity-70"></div>
-          <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-500/20 rounded-full filter blur-xl opacity-70"></div>
+          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-secondary/20 rounded-full filter blur-xl opacity-70"></div>
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-muted/30 rounded-full filter blur-xl opacity-70"></div>
           
           <CardHeader className="px-3 sm:px-6 py-3 sm:py-4 relative">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-green-500/30 to-blue-500/30 dark:from-green-600/30 dark:to-blue-600/30 text-primary dark:text-primary text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-primary/40 animate-glow">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-primary/30 to-secondary/30 dark:from-primary/40 dark:to-secondary/20 text-primary dark:text-primary text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-primary/40 animate-glow">
               <CalendarIcon className="h-4 w-4" />
               Daily Routine
             </div>
