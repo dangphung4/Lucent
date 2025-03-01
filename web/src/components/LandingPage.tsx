@@ -19,6 +19,7 @@ import {
   Plus,
   ExternalLink,
 } from "lucide-react";
+import "./animations.css";
 
 /**
  * Renders the landing page of the skincare tracking application.
@@ -607,7 +608,7 @@ export function LandingPage() {
 
         <div className="container mx-auto px-4 md:px-6 max-w-screen-xl relative">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
-            <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur-sm">
+            <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur-sm animate-pulse-slow">
               How It Works
             </div>
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70 px-4">
@@ -619,44 +620,90 @@ export function LandingPage() {
           </div>
 
           <div className="mx-auto max-w-6xl px-4">
-            <div className="grid grid-cols-1 gap-8 md:gap-12 md:grid-cols-3">
-              <div className="relative flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-2xl font-bold mb-6 shadow-lg relative">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-primary to-primary/80 rounded-2xl"></div>
+            <div className="grid grid-cols-1 gap-12 md:grid-cols-3 relative">
+              {/* Connecting line for desktop */}
+              <div className="hidden md:block absolute top-24 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/10 via-primary/30 to-primary/10 z-0"></div>
+              
+              {/* Step 1 */}
+              <div className="relative flex flex-col items-center text-center group">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-2xl font-bold mb-8 shadow-xl relative z-10 group-hover:scale-110 transition-transform duration-300">
+                  <div className="absolute inset-0 rounded-full bg-primary opacity-20 animate-ping-slow"></div>
                   <span className="relative">1</span>
                 </div>
-                <div className="hidden md:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-4rem)] h-0.5 bg-gradient-to-r from-primary/30 to-primary/10"></div>
-                <h3 className="text-xl font-bold mb-3">Add Products</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Enter the skincare products you use regularly in your
-                  collection
-                </p>
+                
+                <div className="relative bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-primary/10 shadow-lg transition-all duration-300 group-hover:shadow-primary/20 group-hover:border-primary/30 group-hover:-translate-y-1 w-full">
+                  <div className="absolute -inset-px bg-gradient-to-r from-primary/20 to-primary/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                  <div className="relative">
+                    <div className="mb-4 mx-auto w-16 h-16 text-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"></path>
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold mb-3 text-foreground">Add Your Products</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Enter your favorite skincare products into your collection with details about ingredients and usage
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div className="relative flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-2xl font-bold mb-6 shadow-lg relative">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-primary to-primary/80 rounded-2xl"></div>
+              {/* Step 2 */}
+              <div className="relative flex flex-col items-center text-center group mt-8 md:mt-0">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-2xl font-bold mb-8 shadow-xl relative z-10 group-hover:scale-110 transition-transform duration-300">
+                  <div className="absolute inset-0 rounded-full bg-primary opacity-20 animate-ping-slow animation-delay-300"></div>
                   <span className="relative">2</span>
                 </div>
-                <div className="hidden md:block absolute top-8 left-[calc(50%+2rem)] w-[calc(100%-4rem)] h-0.5 bg-gradient-to-r from-primary/30 to-primary/10"></div>
-                <h3 className="text-xl font-bold mb-3">Log Routines</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Record which products you use each day in your morning and
-                  evening routines
-                </p>
+                
+                <div className="relative bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-primary/10 shadow-lg transition-all duration-300 group-hover:shadow-primary/20 group-hover:border-primary/30 group-hover:-translate-y-1 w-full">
+                  <div className="absolute -inset-px bg-gradient-to-r from-primary/20 to-primary/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                  <div className="relative">
+                    <div className="mb-4 mx-auto w-16 h-16 text-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold mb-3 text-foreground">Create Your Routines</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Build personalized morning and evening routines with your products in the optimal order
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex flex-col items-center text-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground text-2xl font-bold mb-6 shadow-lg relative">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-primary to-primary/80 rounded-2xl"></div>
+              {/* Step 3 */}
+              <div className="relative flex flex-col items-center text-center group mt-8 md:mt-0">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 text-primary-foreground text-2xl font-bold mb-8 shadow-xl relative z-10 group-hover:scale-110 transition-transform duration-300">
+                  <div className="absolute inset-0 rounded-full bg-primary opacity-20 animate-ping-slow animation-delay-600"></div>
                   <span className="relative">3</span>
                 </div>
-                <h3 className="text-xl font-bold mb-3">Track Results</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  See which products and routines work best for your skin over
-                  time
-                </p>
+                
+                <div className="relative bg-card/50 backdrop-blur-sm rounded-xl p-6 border border-primary/10 shadow-lg transition-all duration-300 group-hover:shadow-primary/20 group-hover:border-primary/30 group-hover:-translate-y-1 w-full">
+                  <div className="absolute -inset-px bg-gradient-to-r from-primary/20 to-primary/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"></div>
+                  <div className="relative">
+                    <div className="mb-4 mx-auto w-16 h-16 text-primary">
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2 12h20"></path>
+                        <path d="M16 6l6 6-6 6"></path>
+                        <path d="M8 18l-6-6 6-6"></path>
+                      </svg>
+                    </div>
+                    <h3 className="text-xl font-bold mb-3 text-foreground">Track Your Progress</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Monitor your skin's improvement over time and discover which products truly work for you
+                    </p>
+                  </div>
+                </div>
               </div>
+            </div>
+            
+            {/* Mobile indicator dots */}
+            <div className="flex justify-center space-x-2 mt-8 md:hidden">
+              <div className="w-2 h-2 rounded-full bg-primary"></div>
+              <div className="w-2 h-2 rounded-full bg-primary/50"></div>
+              <div className="w-2 h-2 rounded-full bg-primary/50"></div>
             </div>
           </div>
         </div>
