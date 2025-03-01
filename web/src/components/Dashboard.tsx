@@ -780,33 +780,13 @@ export function Dashboard() {
                 </motion.div>
               </div>
 
-              {/* Recent Products - Enhanced with better light mode visuals */}
+              {/* Recent Products - Simplified for better performance */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600/50 via-blue-500/40 to-blue-400/30 dark:from-blue-500/40 dark:via-blue-500/30 dark:to-background border p-6 group hover:shadow-lg transition-all duration-300">
-                  <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  {/* Subtle floating particles */}
-                  <div className="absolute inset-0 overflow-hidden">
-                    <div className="particles-container">
-                      {[...Array(5)].map((_, i) => (
-                        <div 
-                          key={i} 
-                          className={`particle particle-${i % 3}`}
-                          style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            animationDelay: `${Math.random() * 5}s`,
-                            opacity: 0.1 + Math.random() * 0.2,
-                            width: `${2 + Math.random() * 2}px`,
-                            height: `${2 + Math.random() * 2}px`
-                          }}
-                        ></div>
-                      ))}
-                    </div>
-                  </div>
+                <div className="relative overflow-hidden rounded-xl bg-blue-100 dark:bg-blue-900/30 border p-6 group hover:shadow-lg transition-all duration-300">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
                   <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 rounded-full bg-blue-500/40 flex items-center justify-center shadow-sm animate-pulse-slow">
+                      <div className="h-12 w-12 rounded-full bg-blue-500/40 flex items-center justify-center">
                         <Package className="h-6 w-6 text-blue-950 dark:text-blue-400" />
                       </div>
                       <div>
@@ -817,7 +797,7 @@ export function Dashboard() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="gap-1 text-blue-900 dark:text-blue-400 group-hover:bg-blue-500/15 transition-colors"
+                      className="gap-1 text-blue-900 dark:text-blue-400"
                       onClick={() => setActiveTab("products")}
                     >
                       <span>View All</span>
@@ -827,8 +807,7 @@ export function Dashboard() {
                 </div>
 
                 {recentProducts.length === 0 ? (
-                  <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500/20 via-background to-background border p-6 flex flex-col items-center justify-center min-h-[200px] group hover:shadow-md transition-all duration-300">
-                    <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                  <div className="relative overflow-hidden rounded-xl bg-blue-50 dark:bg-blue-900/10 border p-6 flex flex-col items-center justify-center min-h-[200px]">
                     <Package className="h-12 w-12 text-muted-foreground mb-4 opacity-50" />
                     <p className="text-muted-foreground text-center mb-4">No products added yet</p>
                     <AddProductDialog
@@ -837,25 +816,20 @@ export function Dashboard() {
                         productListRef.current?.loadProducts();
                       }}
                     >
-                      <Button className="relative overflow-hidden group bg-blue-600 hover:bg-blue-700 text-white">
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <Plus className="h-4 w-4 mr-2 relative z-10" />
-                        <span className="relative z-10">Add Your First Product</span>
+                      <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                        <Plus className="h-4 w-4 mr-2" />
+                        <span>Add Your First Product</span>
                       </Button>
                     </AddProductDialog>
                   </div>
                 ) : (
-                  <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500/20 via-background to-background border p-6 group hover:shadow-md transition-all duration-300">
-                    <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                  <div className="relative overflow-hidden rounded-xl bg-blue-50 dark:bg-blue-900/10 border p-6">
                     <div className="space-y-4">
                       {recentProducts.map((product) => (
-                        <motion.div
+                        <div
                           key={product.id}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3 }}
                           className={cn(
-                            "flex items-center gap-3 p-3 rounded-lg transition-all duration-300 hover:bg-blue-500/10 group/item",
+                            "flex items-center gap-3 p-3 rounded-lg hover:bg-blue-500/10",
                             product.wouldRepurchase
                               ? "border-l-4 border-l-green-500"
                               : product.status === "finished"
@@ -880,13 +854,13 @@ export function Dashboard() {
                             <div className="flex items-center gap-2">
                               <h4 className="font-medium truncate">{product.name}</h4>
                               {product.wouldRepurchase && (
-                                <Badge variant="outline" className="bg-green-500/15 text-green-700 dark:text-green-400 border-green-300 dark:border-green-800 group-hover/item:bg-green-500/25 transition-colors">
+                                <Badge variant="outline" className="bg-green-500/15 text-green-700 dark:text-green-400 border-green-300 dark:border-green-800">
                                   <ThumbsUp className="h-3 w-3 mr-1" />
                                   Repurchase
                                 </Badge>
                               )}
                               {product.status === "finished" && !product.wouldRepurchase && (
-                                <Badge variant="outline" className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-800 group-hover/item:bg-amber-500/25 transition-colors">
+                                <Badge variant="outline" className="bg-amber-500/15 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-800">
                                   <Check className="h-3 w-3 mr-1" />
                                   Finished
                                 </Badge>
@@ -898,7 +872,7 @@ export function Dashboard() {
                               <span>{product.category}</span>
                             </div>
                           </div>
-                        </motion.div>
+                        </div>
                       ))}
                     </div>
                   </div>
