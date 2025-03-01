@@ -619,153 +619,225 @@ export function Dashboard() {
               transition={{ duration: 0.3 }}
               className="space-y-8"
             >
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary/10 via-primary/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/20 via-primary/10 to-background border p-6 group hover:shadow-lg transition-all duration-300">
                 <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                {/* Animated light streaks */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="light-streak light-streak-1"></div>
+                  <div className="light-streak light-streak-2"></div>
+                </div>
+                {/* Subtle floating particles */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="particles-container">
+                    {[...Array(10)].map((_, i) => (
+                      <div 
+                        key={i} 
+                        className={`particle particle-${i % 3}`}
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          animationDelay: `${Math.random() * 5}s`,
+                          opacity: 0.1 + Math.random() * 0.2,
+                          width: `${3 + Math.random() * 3}px`,
+                          height: `${3 + Math.random() * 3}px`
+                        }}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
                 <div className="relative flex flex-col md:flex-row md:items-center gap-6">
                   <div className="flex-1 space-y-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium mb-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 text-primary text-sm font-medium mb-2 shadow-sm backdrop-blur-sm border border-primary/20 animate-glow">
                       <Package className="h-4 w-4" />
                       Dashboard Overview
                     </div>
-                    <h2 className="text-2xl font-bold tracking-tight mb-2">
+                    <h2 className="text-2xl font-bold tracking-tight mb-2 text-gradient">
                       Welcome to Your Dashboard
                     </h2>
-                    <p className="text-muted-foreground max-w-xl">
+                    <p className="text-muted-foreground max-w-xl backdrop-blur-sm bg-background/30 p-2 rounded-lg border border-primary/10 shadow-sm">
                       Track your skincare journey, monitor product usage, and
                       see your progress over time.
                     </p>
                   </div>
                   <div className="hidden md:block">
-                    <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                    <div className="h-16 w-16 rounded-2xl bg-primary/20 flex items-center justify-center shadow-glow animate-pulse-slow">
                       <Package className="h-8 w-8 text-primary" />
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Quick Stats */}
-
-              {/* When pressed, takes user to Product tab */}
+              {/* Quick Stats - Enhanced with animations and better gradients */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card
-                  className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 border-blue-200 dark:border-blue-800 cursor-pointer"
-                  onClick={() => setActiveTab("products")}
+                <motion.div 
+                  whileHover={{ scale: 1.03 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex flex-col">
-                      <span className="text-blue-600 dark:text-blue-400 text-sm font-medium">
-                        Products
-                      </span>
-                      <span className="text-3xl font-bold mt-1">
-                        {productStats.total}
-                      </span>
-                      <span className="text-muted-foreground text-xs mt-1">
-                        {productStats.active} active
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
+                  <Card
+                    className="bg-gradient-to-br from-blue-100/80 to-blue-50/50 dark:from-blue-900/30 dark:to-blue-800/20 border-blue-200/50 dark:border-blue-800/30 cursor-pointer overflow-hidden relative group"
+                    onClick={() => setActiveTab("products")}
+                  >
+                    <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                    <CardContent className="p-6 relative">
+                      <div className="flex flex-col">
+                        <span className="text-blue-600 dark:text-blue-400 text-sm font-medium flex items-center gap-2">
+                          <Package className="h-4 w-4" />
+                          Products
+                        </span>
+                        <span className="text-3xl font-bold mt-1 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
+                          {productStats.total}
+                        </span>
+                        <span className="text-muted-foreground text-xs mt-1 group-hover:text-blue-600/70 dark:group-hover:text-blue-400/70 transition-colors">
+                          {productStats.active} active
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
 
-                {/* When pressed, navigates to calendar page /calendar  */}
-                <Card
-                  className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/20 dark:to-green-900/20 border-green-200 dark:border-green-800 cursor-pointer"
-                  onClick={() => navigate("/calendar")}
+                <motion.div 
+                  whileHover={{ scale: 1.03 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex flex-col">
-                      <span className="text-green-600 dark:text-green-400 text-sm font-medium">
-                        Streak
-                      </span>
-                      <span className="text-3xl font-bold mt-1">{streak}</span>
-                      <span className="text-muted-foreground text-xs mt-1">
-                        Days in a row
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
+                  <Card
+                    className="bg-gradient-to-br from-green-100/80 to-green-50/50 dark:from-green-900/30 dark:to-green-800/20 border-green-200/50 dark:border-green-800/30 cursor-pointer overflow-hidden relative group"
+                    onClick={() => navigate("/calendar")}
+                  >
+                    <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-green-500/10 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                    <CardContent className="p-6 relative">
+                      <div className="flex flex-col">
+                        <span className="text-green-600 dark:text-green-400 text-sm font-medium flex items-center gap-2">
+                          <CheckCircle className="h-4 w-4" />
+                          Streak
+                        </span>
+                        <span className="text-3xl font-bold mt-1 group-hover:text-green-700 dark:group-hover:text-green-300 transition-colors">
+                          {streak}
+                        </span>
+                        <span className="text-muted-foreground text-xs mt-1 group-hover:text-green-600/70 dark:group-hover:text-green-400/70 transition-colors">
+                          Days in a row
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
 
-                {/* When pressed, takes user to Routine tab */}
-                <Card
-                  className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/20 dark:to-amber-900/20 border-amber-200 dark:border-amber-800 cursor-pointer"
-                  onClick={() => setActiveTab("routines")}
+                <motion.div 
+                  whileHover={{ scale: 1.03 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex flex-col">
-                      <span className="text-amber-600 dark:text-amber-400 text-sm font-medium">
-                        Progress
-                      </span>
-                      <span className="text-3xl font-bold mt-1">
-                        {completedRoutines}
-                      </span>
-                      <span className="text-muted-foreground text-xs mt-1">
-                        Routines completed
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
+                  <Card
+                    className="bg-gradient-to-br from-amber-100/80 to-amber-50/50 dark:from-amber-900/30 dark:to-amber-800/20 border-amber-200/50 dark:border-amber-800/30 cursor-pointer overflow-hidden relative group"
+                    onClick={() => setActiveTab("routines")}
+                  >
+                    <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                    <CardContent className="p-6 relative">
+                      <div className="flex flex-col">
+                        <span className="text-amber-600 dark:text-amber-400 text-sm font-medium flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          Progress
+                        </span>
+                        <span className="text-3xl font-bold mt-1 group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors">
+                          {completedRoutines}
+                        </span>
+                        <span className="text-muted-foreground text-xs mt-1 group-hover:text-amber-600/70 dark:group-hover:text-amber-400/70 transition-colors">
+                          Routines completed
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
 
-                {/* When pressed, takes user to Progress tab */}
-                <Card
-                  className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 border-purple-200 dark:border-purple-800 cursor-pointer"
-                  onClick={() => setActiveTab("progress")}
+                <motion.div 
+                  whileHover={{ scale: 1.03 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex flex-col">
-                      <span className="text-purple-600 dark:text-purple-400 text-sm font-medium">
-                        Finished
-                      </span>
-                      <span className="text-3xl font-bold mt-1">
-                        {productStats.finished}
-                      </span>
-                      <span className="text-muted-foreground text-xs mt-1">
-                        {productStats.repurchase} would repurchase
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
+                  <Card
+                    className="bg-gradient-to-br from-purple-100/80 to-purple-50/50 dark:from-purple-900/30 dark:to-purple-800/20 border-purple-200/50 dark:border-purple-800/30 cursor-pointer overflow-hidden relative group"
+                    onClick={() => setActiveTab("progress")}
+                  >
+                    <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                    <CardContent className="p-6 relative">
+                      <div className="flex flex-col">
+                        <span className="text-purple-600 dark:text-purple-400 text-sm font-medium flex items-center gap-2">
+                          <Star className="h-4 w-4" />
+                          Finished
+                        </span>
+                        <span className="text-3xl font-bold mt-1 group-hover:text-purple-700 dark:group-hover:text-purple-300 transition-colors">
+                          {productStats.finished}
+                        </span>
+                        <span className="text-muted-foreground text-xs mt-1 group-hover:text-purple-600/70 dark:group-hover:text-purple-400/70 transition-colors">
+                          {productStats.repurchase} would repurchase
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               </div>
 
-              {/* Recent Products */}
+              {/* Recent Products - Enhanced with better visuals */}
               <div>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold">Recent Products</h2>
+                  <h2 className="text-xl font-semibold flex items-center gap-2">
+                    <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Package className="h-3 w-3 text-primary" />
+                    </div>
+                    Recent Products
+                  </h2>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="text-primary"
+                    className="text-primary hover:bg-primary/10 hover:text-primary"
                     onClick={() => setActiveTab("products")}
                   >
                     View All
                   </Button>
                 </div>
 
-                <Card>
-                  <CardContent className="p-6">
+                <Card className="overflow-hidden border-primary/20 shadow-lg relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent"></div>
+                  <CardContent className="p-6 relative">
                     {loading ? (
                       <div className="flex items-center justify-center py-8">
                         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
                       </div>
                     ) : recentProducts.length === 0 ? (
-                      <div className="text-center py-8">
+                      <div className="text-center py-8 relative overflow-hidden">
+                        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+                        <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/10 rounded-full filter blur-xl opacity-70"></div>
                         <h3 className="text-lg font-semibold mb-2">
                           No products yet
                         </h3>
-                        <p className="text-muted-foreground mb-4">
-                          Start by adding your first skincare product
+                        <p className="text-muted-foreground mb-4 max-w-md mx-auto">
+                          Start by adding your first skincare product to track your routine
                         </p>
                         <AddProductDialog
                           onProductAdded={() => {
                             setActiveTab("products");
                             productListRef.current?.loadProducts();
                           }}
-                        />
+                        >
+                          <Button
+                            className="relative overflow-hidden group"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            <span className="relative z-10">Add Your First Product</span>
+                          </Button>
+                        </AddProductDialog>
                       </div>
                     ) : (
                       <div className="space-y-6">
                         {recentProducts.map((product) => (
-                          <div
+                          <motion.div
                             key={product.id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3 }}
+                            whileHover={{ scale: 1.01, x: 5 }}
                             className={cn(
                               "flex items-center justify-between group relative",
                               "pb-6 last:pb-0 border-b last:border-0",
@@ -779,15 +851,15 @@ export function Dashboard() {
                             <div className="flex items-start gap-4 flex-1 min-w-0">
                               <div
                                 className={cn(
-                                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-full",
+                                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-md group-hover:shadow-lg transition-shadow",
                                   product.status !== "finished" &&
                                     !product.wouldRepurchase &&
-                                    "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+                                    "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-700/30",
                                   product.status === "finished" &&
                                     !product.wouldRepurchase &&
-                                    "bg-purple-500/10 text-purple-600 dark:text-purple-400",
+                                    "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200/50 dark:border-purple-700/30",
                                   product.wouldRepurchase &&
-                                    "bg-green-500/10 text-green-600 dark:text-green-400"
+                                    "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-200/50 dark:border-green-700/30"
                                 )}
                               >
                                 {product.imageUrl ? (
@@ -802,7 +874,7 @@ export function Dashboard() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                  <h4 className="text-base font-medium truncate">
+                                  <h4 className="text-base font-medium truncate group-hover:text-primary transition-colors">
                                     {product.name}
                                   </h4>
                                   {product.wouldRepurchase && (
@@ -829,10 +901,10 @@ export function Dashboard() {
                             {product.status === "finished" && (
                               <div
                                 className={cn(
-                                  "ml-4 px-3 py-1 rounded-full text-xs font-medium shrink-0",
+                                  "ml-4 px-3 py-1 rounded-full text-xs font-medium shrink-0 shadow-sm",
                                   product.wouldRepurchase
-                                    ? "bg-green-500/10 text-green-600 dark:text-green-400"
-                                    : "bg-purple-500/10 text-purple-600 dark:text-purple-400"
+                                    ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-200/50 dark:border-green-700/30"
+                                    : "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200/50 dark:border-purple-700/30"
                                 )}
                               >
                                 {product.wouldRepurchase
@@ -840,7 +912,7 @@ export function Dashboard() {
                                   : "Finished"}
                               </div>
                             )}
-                          </div>
+                          </motion.div>
                         ))}
                       </div>
                     )}
@@ -848,15 +920,36 @@ export function Dashboard() {
                 </Card>
               </div>
 
-              {/* Tips & Recommendations */}
+              {/* Tips & Recommendations - Enhanced with better visuals */}
               <div>
-                <h2 className="text-xl font-semibold mb-4">
-                  Tips & Recommendations
-                </h2>
-                <Card className="bg-gradient-to-r from-primary/5 to-primary/10 border-primary/20">
-                  <CardContent className="p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="text-primary"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <path d="M12 8v4"></path>
+                      <path d="M12 16h.01"></path>
+                    </svg>
+                  </div>
+                  <h2 className="text-xl font-semibold">Tips & Recommendations</h2>
+                </div>
+                
+                <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-transparent border-primary/20 shadow-lg relative overflow-hidden">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+                  <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-primary/10 rounded-full filter blur-3xl opacity-70"></div>
+                  <CardContent className="p-6 relative">
                     <div className="flex flex-col md:flex-row gap-4 items-start">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary border border-primary/30 shadow-glow">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -873,11 +966,11 @@ export function Dashboard() {
                           <path d="M12 16h.01"></path>
                         </svg>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-medium mb-1">
+                      <div className="space-y-3">
+                        <h3 className="text-lg font-medium">
                           Track Your Progress
                         </h3>
-                        <p className="text-muted-foreground">
+                        <p className="text-muted-foreground backdrop-blur-sm bg-background/30 p-3 rounded-lg border border-primary/10 shadow-sm">
                           {productStats.total === 0
                             ? "Start by adding your skincare products to track their effectiveness and build your perfect routine."
                             : `You have ${productStats.active} active products. Keep track of how they work for your skin and mark them as finished when done.`}
@@ -890,9 +983,10 @@ export function Dashboard() {
                             }}
                           >
                             <Button
-                              variant="link"
-                              className="p-0 h-auto mt-2 text-primary font-medium"
+                              variant="outline"
+                              className="mt-2 border-primary/20 hover:bg-primary/10 hover:text-primary transition-all"
                             >
+                              <Package className="h-4 w-4 mr-2" />
                               Add your first product
                             </Button>
                           </AddProductDialog>
@@ -1272,6 +1366,10 @@ export function Dashboard() {
             animation: glow 4s ease-in-out infinite;
           }
           
+          .shadow-glow {
+            box-shadow: 0 0 15px 0 rgba(var(--primary), 0.3);
+          }
+          
           .particles-container {
             position: absolute;
             width: 100%;
@@ -1348,6 +1446,12 @@ export function Dashboard() {
             50% { opacity: 0.3; }
             90% { opacity: 0.6; }
             100% { transform: translateX(100%) rotate(-45deg); opacity: 0; }
+          }
+          
+          .text-gradient {
+            background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary)/0.8));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
           }
         `}
       </style>
