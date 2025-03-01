@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
@@ -13,14 +13,16 @@ import {
   Calendar as CalendarIcon, 
   Settings,
   Droplets,
-  Beaker,
+  PillBottle,
   Pipette,
-  CircleDot,
+  CircleDashed,
   Layers,
   Sparkles,
   Eye,
   Zap,
-  Package
+  Package,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/AuthContext';
@@ -67,13 +69,12 @@ const STATUSES: Status[] = [
 // Add this after the STATUSES constant
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
   cleanser: Droplets,
-  toner: Beaker,
+  toner: PillBottle,
   serum: Pipette,
-  moisturizer: CircleDot,
+  moisturizer: CircleDashed,
   sunscreen: Sun,
   mask: Layers,
-  exfoliant: Sparkles,
-  'eye cream': Eye,
+  "eye cream": Eye,
   treatment: Zap,
   other: Package,
 };

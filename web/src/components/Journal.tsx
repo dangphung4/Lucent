@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect, useRef } from "react";
-import { Avatar } from "./ui/avatar";
+import { Avatar, AvatarImage } from "./ui/avatar";
 import { Badge } from "./ui/badge";
 import {
   Loader2,
@@ -24,7 +24,13 @@ import {
   Upload,
   ArrowUpDown,
   Plus,
-  X
+  X,
+  PillBottle,
+  CircleDashed,
+  Sparkles,
+  Trash2,
+  Edit,
+  Image as ImageIcon
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/AuthContext";
@@ -57,7 +63,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Card } from "./ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Textarea } from "./ui/textarea";
+import { Label } from "./ui/label";
+import { Separator } from "./ui/separator";
 
 // Check if an entry is a diary entry (without specific product details)
 const isDiaryEntry = (entry: JournalEntry) => {
@@ -85,9 +94,9 @@ const filterJournalEntries = (
 // Replace the categoryIcons mapping with Lucide icons
 const categoryIcons: Record<string, React.ReactNode> = {
   Cleanser: <div className="bg-green-500/10 text-green-500"><Droplets className="h-4 w-4" /></div>,
-  Toner: <div className="bg-pink-500/10 text-pink-500"><Beaker className="h-4 w-4" /></div>,
+  Toner: <div className="bg-pink-500/10 text-pink-500"><PillBottle className="h-4 w-4" /></div>,
   Serum: <div className="bg-purple-500/10 text-purple-500"><Pipette className="h-4 w-4" /></div>,
-  Moisturizer: <div className="bg-blue-500/10 text-blue-500"><CircleDot className="h-4 w-4" /></div>,
+  Moisturizer: <div className="bg-blue-500/10 text-blue-500"><CircleDashed className="h-4 w-4" /></div>,
   Sunscreen: <div className="bg-amber-500/10 text-amber-500"><Sun className="h-4 w-4" /></div>,
   Mask: <div className="bg-indigo-500/10 text-indigo-500"><Layers className="h-4 w-4" /></div>,
   "Eye Cream": <div className="bg-cyan-500/10 text-cyan-500"><Eye className="h-4 w-4" /></div>,

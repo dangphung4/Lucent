@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, forwardRef, useImperativeHandle } from 'r
 import { Card, CardContent } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { Star, Plus, Trash, Loader2, Droplets, FlaskConical, CircleDot, Sun, Layers, Sparkles, Eye, Zap, Package } from 'lucide-react';
+import { Star, Plus, Trash, Loader2, Droplets, PillBottle, CircleDashed, Sun, Layers, Sparkles, Eye, Zap, Package, Pipette } from 'lucide-react';
 import { toast } from 'sonner';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
 import { EditProductDialog } from './EditProductDialog';
@@ -30,11 +30,11 @@ const getCategoryIcon = (category: string | null | undefined) => {
     case 'cleanser':
       return <Droplets className="h-5 w-5" />;
     case 'toner':
-      return <FlaskConical className="h-5 w-5" />;
+      return <PillBottle className="h-5 w-5" />;
     case 'serum':
-      return <FlaskConical className="h-5 w-5" />;
+      return <Pipette className="h-5 w-5" />;
     case 'moisturizer':
-      return <CircleDot className="h-5 w-5" />;
+      return <CircleDashed className="h-5 w-5" />;
     case 'sunscreen':
       return <Sun className="h-5 w-5" />;
     case 'mask':

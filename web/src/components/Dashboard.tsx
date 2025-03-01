@@ -7,15 +7,13 @@ import { Avatar, AvatarImage } from "./ui/avatar";
 import { useNavigate } from "react-router-dom";
 import { AddProductDialog } from "./AddProductDialog";
 import { getUserProducts, getRoutineCompletions, Product } from "@/lib/db";
-import { Loader2, X } from "lucide-react";
+import { Loader2, X, ArrowRight, Plus, ThumbsUp, Check } from "lucide-react";
 import { ProductList } from "./ProductList";
 import { RoutineList } from "./RoutineList";
 import { cn } from "@/lib/utils";
 import {
   Star,
   Droplets,
-  FlaskConical,
-  CircleDot,
   Sun,
   Layers,
   Sparkles,
@@ -26,12 +24,17 @@ import {
   Upload,
   CheckCircle,
   Clock,
+  PillBottle,
+  CircleDashed,
+  Pipette
 } from "lucide-react";
 import { ProgressGallery } from "./ProgressGallery";
+import { Badge } from "./ui/badge";
 import { motion } from "framer-motion";
 import { storage } from "../lib/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { toast } from "sonner";
+
 export interface ProductStats {
   total: number;
   active: number;
@@ -59,7 +62,7 @@ export function Dashboard() {
   const [activeTab, setActiveTab] = useState("overview");
   const [greeting, setGreeting] = useState("Hello");
   const [productFilter, setProductFilter] = useState<
-    "all" | "active" | "finished" | "repurchase"
+    "all" | "active" | "finished" | "repurchase" | undefined
   >("all");
   const [productStats, setProductStats] = useState<ProductStats>({
     total: 0,
@@ -67,7 +70,6 @@ export function Dashboard() {
     finished: 0,
     repurchase: 0,
   });
-  const [loading, setLoading] = useState(true);
   const [streak, setStreak] = useState(0);
   const [completedRoutines, setCompletedRoutines] = useState(0);
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
@@ -123,7 +125,6 @@ export function Dashboard() {
      * });
      */
     const loadData = async () => {
-      setLoading(true);
       try {
         const fetchedProducts = await getUserProducts(currentUser.uid);
 
@@ -212,8 +213,6 @@ export function Dashboard() {
         setRecentProducts(sorted.slice(0, 5));
       } catch (error) {
         console.error("Error loading data:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -234,33 +233,8 @@ export function Dashboard() {
     setProductStats(stats);
   };
 
-  const handleFilterChange = (filter: typeof productFilter) => {
+  const handleFilterChange = (filter: "all" | "active" | "finished" | "repurchase" | undefined) => {
     setProductFilter(filter);
-  };
-
-  const getCategoryIcon = (category: string | null | undefined) => {
-    switch (category?.toLowerCase()) {
-      case "cleanser":
-        return <Droplets className="h-5 w-5" />;
-      case "toner":
-        return <FlaskConical className="h-5 w-5" />;
-      case "serum":
-        return <FlaskConical className="h-5 w-5" />;
-      case "moisturizer":
-        return <CircleDot className="h-5 w-5" />;
-      case "sunscreen":
-        return <Sun className="h-5 w-5" />;
-      case "mask":
-        return <Layers className="h-5 w-5" />;
-      case "exfoliant":
-        return <Sparkles className="h-5 w-5" />;
-      case "eye cream":
-        return <Eye className="h-5 w-5" />;
-      case "treatment":
-        return <Zap className="h-5 w-5" />;
-      default:
-        return <Package className="h-5 w-5" />;
-    }
   };
 
   // Clean up camera on unmount
@@ -441,6 +415,32 @@ export function Dashboard() {
     } catch (error) {
       console.error("Error capturing photo:", error);
       toast.error("Failed to capture photo");
+    }
+  };
+
+  // Get icon based on product category
+  const getCategoryIcon = (category: string | null) => {
+    switch (category?.toLowerCase()) {
+      case "cleanser":
+        return <Droplets className="h-6 w-6 text-blue-600" />;
+      case "toner":
+        return <PillBottle className="h-6 w-6 text-blue-600" />;
+      case "serum":
+        return <Pipette className="h-6 w-6 text-blue-600" />;
+      case "moisturizer":
+        return <CircleDashed className="h-6 w-6 text-blue-600" />;
+      case "sunscreen":
+        return <Sun className="h-6 w-6 text-blue-600" />;
+      case "mask":
+        return <Layers className="h-6 w-6 text-blue-600" />;
+      case "exfoliant":
+        return <Sparkles className="h-6 w-6 text-blue-600" />;
+      case "eye cream":
+        return <Eye className="h-6 w-6 text-blue-600" />;
+      case "treatment":
+        return <Zap className="h-6 w-6 text-blue-600" />;
+      default:
+        return <Package className="h-6 w-6 text-blue-600" />;
     }
   };
 
@@ -780,144 +780,128 @@ export function Dashboard() {
               </div>
 
               {/* Recent Products - Enhanced with better visuals */}
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold flex items-center gap-2">
-                    <div className="h-6 w-6 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Package className="h-3 w-3 text-primary" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  {/* Subtle floating particles */}
+                  <div className="absolute inset-0 overflow-hidden">
+                    <div className="particles-container">
+                      {[...Array(5)].map((_, i) => (
+                        <div 
+                          key={i} 
+                          className={`particle particle-${i % 3}`}
+                          style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animationDelay: `${Math.random() * 5}s`,
+                            opacity: 0.1 + Math.random() * 0.2,
+                            width: `${2 + Math.random() * 2}px`,
+                            height: `${2 + Math.random() * 2}px`
+                          }}
+                        ></div>
+                      ))}
                     </div>
-                    Recent Products
-                  </h2>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-primary hover:bg-primary/10 hover:text-primary"
-                    onClick={() => setActiveTab("products")}
-                  >
-                    View All
-                  </Button>
+                  </div>
+                  <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-full bg-blue-500/10 flex items-center justify-center shadow-sm animate-pulse-slow">
+                        <Package className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold">Recent Products</h3>
+                        <p className="text-muted-foreground text-sm">Your latest skincare additions</p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1 group-hover:bg-blue-500/10 transition-colors"
+                      onClick={() => setActiveTab("products")}
+                    >
+                      <span>View All</span>
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
 
-                <Card className="overflow-hidden border-primary/20 shadow-lg relative">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent"></div>
-                  <CardContent className="p-6 relative">
-                    {loading ? (
-                      <div className="flex items-center justify-center py-8">
-                        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-                      </div>
-                    ) : recentProducts.length === 0 ? (
-                      <div className="text-center py-8 relative overflow-hidden">
-                        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-                        <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/10 rounded-full filter blur-xl opacity-70"></div>
-                        <h3 className="text-lg font-semibold mb-2">
-                          No products yet
-                        </h3>
-                        <p className="text-muted-foreground mb-4 max-w-md mx-auto">
-                          Start by adding your first skincare product to track your routine
-                        </p>
-                        <AddProductDialog
-                          onProductAdded={() => {
-                            setActiveTab("products");
-                            productListRef.current?.loadProducts();
-                          }}
+                {recentProducts.length === 0 ? (
+                  <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500/5 via-background to-background border p-6 flex flex-col items-center justify-center min-h-[200px] group hover:shadow-md transition-all duration-300">
+                    <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                    <Package className="h-12 w-12 text-muted-foreground mb-4 opacity-50" />
+                    <p className="text-muted-foreground text-center mb-4">No products added yet</p>
+                    <AddProductDialog
+                      onProductAdded={() => {
+                        setActiveTab("products");
+                        productListRef.current?.loadProducts();
+                      }}
+                    >
+                      <Button className="relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <Plus className="h-4 w-4 mr-2 relative z-10" />
+                        <span className="relative z-10">Add Your First Product</span>
+                      </Button>
+                    </AddProductDialog>
+                  </div>
+                ) : (
+                  <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500/5 via-background to-background border p-6 group hover:shadow-md transition-all duration-300">
+                    <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                    <div className="space-y-4">
+                      {recentProducts.map((product) => (
+                        <motion.div
+                          key={product.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className={cn(
+                            "flex items-center gap-3 p-3 rounded-lg transition-all duration-300 hover:bg-blue-500/5 group/item",
+                            product.wouldRepurchase
+                              ? "border-l-4 border-l-green-500"
+                              : product.status === "finished"
+                              ? "border-l-4 border-l-amber-500"
+                              : "border-l-4 border-l-transparent"
+                          )}
                         >
-                          <Button
-                            className="relative overflow-hidden group"
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            <span className="relative z-10">Add Your First Product</span>
-                          </Button>
-                        </AddProductDialog>
-                      </div>
-                    ) : (
-                      <div className="space-y-6">
-                        {recentProducts.map((product) => (
-                          <motion.div
-                            key={product.id}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.3 }}
-                            whileHover={{ scale: 1.01, x: 5 }}
-                            className={cn(
-                              "flex items-center justify-between group relative",
-                              "pb-6 last:pb-0 border-b last:border-0",
-                              product.status === "finished" &&
-                                !product.wouldRepurchase &&
-                                "border-purple-200/50 dark:border-purple-800/30",
-                              product.wouldRepurchase &&
-                                "border-green-200/50 dark:border-green-800/30"
-                            )}
-                          >
-                            <div className="flex items-start gap-4 flex-1 min-w-0">
-                              <div
-                                className={cn(
-                                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-md group-hover:shadow-lg transition-shadow",
-                                  product.status !== "finished" &&
-                                    !product.wouldRepurchase &&
-                                    "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-700/30",
-                                  product.status === "finished" &&
-                                    !product.wouldRepurchase &&
-                                    "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200/50 dark:border-purple-700/30",
-                                  product.wouldRepurchase &&
-                                    "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-200/50 dark:border-green-700/30"
-                                )}
-                              >
-                                {product.imageUrl ? (
-                                  <img
-                                    src={product.imageUrl}
-                                    alt={product.name}
-                                    className="h-full w-full rounded-full object-cover"
-                                  />
-                                ) : (
-                                  getCategoryIcon(product.category)
-                                )}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <h4 className="text-base font-medium truncate group-hover:text-primary transition-colors">
-                                    {product.name}
-                                  </h4>
-                                  {product.wouldRepurchase && (
-                                    <Star className="h-4 w-4 text-green-500 shrink-0" />
-                                  )}
-                                </div>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <p className="text-sm text-muted-foreground truncate">
-                                    {product.brand}
-                                  </p>
-                                  {product.category && (
-                                    <>
-                                      <span className="text-muted-foreground/40">
-                                        •
-                                      </span>
-                                      <span className="text-sm text-muted-foreground">
-                                        {product.category}
-                                      </span>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
+                          {product.imageUrl ? (
+                            <div className="h-12 w-12 rounded-md overflow-hidden border bg-background">
+                              <img
+                                src={product.imageUrl}
+                                alt={product.name}
+                                className="h-full w-full object-cover"
+                              />
                             </div>
-                            {product.status === "finished" && (
-                              <div
-                                className={cn(
-                                  "ml-4 px-3 py-1 rounded-full text-xs font-medium shrink-0 shadow-sm",
-                                  product.wouldRepurchase
-                                    ? "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-200/50 dark:border-green-700/30"
-                                    : "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-200/50 dark:border-purple-700/30"
-                                )}
-                              >
-                                {product.wouldRepurchase
-                                  ? "Would Repurchase"
-                                  : "Finished"}
-                              </div>
-                            )}
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+                          ) : (
+                            <div className="h-12 w-12 rounded-md border flex items-center justify-center bg-blue-500/5">
+                              {getCategoryIcon(product.category)}
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                              <h4 className="font-medium truncate">{product.name}</h4>
+                              {product.wouldRepurchase && (
+                                <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-200 dark:border-green-800 group-hover/item:bg-green-500/20 transition-colors">
+                                  <ThumbsUp className="h-3 w-3 mr-1" />
+                                  Repurchase
+                                </Badge>
+                              )}
+                              {product.status === "finished" && !product.wouldRepurchase && (
+                                <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-200 dark:border-amber-800 group-hover/item:bg-amber-500/20 transition-colors">
+                                  <Check className="h-3 w-3 mr-1" />
+                                  Finished
+                                </Badge>
+                              )}
+                            </div>
+                            <div className="text-sm text-muted-foreground flex items-center gap-2">
+                              <span>{product.brand}</span>
+                              <span className="text-xs">•</span>
+                              <span>{product.category}</span>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Tips & Recommendations - Enhanced with better visuals */}
@@ -1006,27 +990,50 @@ export function Dashboard() {
               transition={{ duration: 0.3 }}
               className="space-y-6"
             >
-              {/* Header Section - removed sticky positioning */}
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-blue-500/10 via-blue-500/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
+              {/* Header Section - enhanced with better visuals */}
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-500/10 via-blue-500/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
                 <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                {/* Animated light streaks */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="light-streak light-streak-1"></div>
+                  <div className="light-streak light-streak-2"></div>
+                </div>
+                {/* Subtle floating particles */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="particles-container">
+                    {[...Array(5)].map((_, i) => (
+                      <div 
+                        key={i} 
+                        className={`particle particle-${i % 3}`}
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          animationDelay: `${Math.random() * 5}s`,
+                          opacity: 0.1 + Math.random() * 0.2,
+                          width: `${2 + Math.random() * 2}px`,
+                          height: `${2 + Math.random() * 2}px`
+                        }}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
                 <div className="relative flex flex-col md:flex-row md:items-center gap-6">
                   <div className="flex-1 space-y-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 text-sm font-medium mb-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-600 text-sm font-medium mb-2 shadow-sm backdrop-blur-sm border border-blue-500/20 animate-glow">
                       <Package className="h-4 w-4" />
                       Product Management
                     </div>
-                    <h2 className="text-2xl font-bold tracking-tight mb-2">
+                    <h2 className="text-2xl font-bold tracking-tight mb-2 text-gradient">
                       Your Products
                     </h2>
-                    <p className="text-muted-foreground max-w-xl">
-                      Keep track of your skincare products, mark favorites,
-                      and manage your collection.
+                    <p className="text-muted-foreground max-w-xl backdrop-blur-sm bg-background/30 p-2 rounded-lg border border-blue-500/10 shadow-sm">
+                      Keep track of your skincare products, mark favorites, and manage your collection.
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="hidden md:block">
-                      <div className="h-16 w-16 rounded-2xl bg-blue-500/10 flex items-center justify-center">
+                      <div className="h-16 w-16 rounded-2xl bg-blue-500/20 flex items-center justify-center shadow-glow animate-pulse-slow">
                         <Package className="h-8 w-8 text-blue-600" />
                       </div>
                     </div>
@@ -1039,11 +1046,13 @@ export function Dashboard() {
                   </div>
                 </div>
               </div>
-
+              
               {/* Quick Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-4">
+                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-blue-100/80 to-blue-50/50 dark:from-blue-900/30 dark:to-blue-800/20 border-blue-200/50 dark:border-blue-800/30 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                  <CardContent className="p-4 relative">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <Package className="h-5 w-5 text-blue-600" />
@@ -1059,11 +1068,13 @@ export function Dashboard() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-4">
+                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-green-100/80 to-green-50/50 dark:from-green-900/30 dark:to-green-800/20 border-green-200/50 dark:border-green-800/30 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-green-500/10 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                  <CardContent className="p-4 relative">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Sparkles className="h-5 w-5 text-green-600" />
+                        <Package className="h-5 w-5 text-green-600" />
                       </div>
                       <div className="flex flex-col">
                         <span className="text-xs text-muted-foreground">
@@ -1076,11 +1087,13 @@ export function Dashboard() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-4">
+                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-purple-100/80 to-purple-50/50 dark:from-purple-900/30 dark:to-purple-800/20 border-purple-200/50 dark:border-purple-800/30 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/10 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                  <CardContent className="p-4 relative">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <CheckCircle className="h-5 w-5 text-purple-600" />
+                        <Package className="h-5 w-5 text-purple-600" />
                       </div>
                       <div className="flex flex-col">
                         <span className="text-xs text-muted-foreground">
@@ -1093,11 +1106,13 @@ export function Dashboard() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="group hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-4">
+                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-amber-100/80 to-amber-50/50 dark:from-amber-900/30 dark:to-amber-800/20 border-amber-200/50 dark:border-amber-800/30 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-amber-500/10 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                  <CardContent className="p-4 relative">
                     <div className="flex items-center gap-3">
                       <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Star className="h-5 w-5 text-amber-600" />
+                        <Package className="h-5 w-5 text-amber-600" />
                       </div>
                       <div className="flex flex-col">
                         <span className="text-xs text-muted-foreground">
@@ -1115,10 +1130,10 @@ export function Dashboard() {
               {/* Filter/Sort Options */}
               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
                 <Button
-                  variant={productFilter === "all" ? "default" : "outline"}
+                  variant={productFilter === undefined ? "default" : "outline"}
                   size="sm"
                   className="whitespace-nowrap gap-2"
-                  onClick={() => handleFilterChange("all")}
+                  onClick={() => handleFilterChange(undefined)}
                 >
                   <Package className="h-4 w-4" />
                   All Products
@@ -1129,29 +1144,25 @@ export function Dashboard() {
                   className="whitespace-nowrap gap-2"
                   onClick={() => handleFilterChange("active")}
                 >
-                  <Sparkles className="h-4 w-4" />
+                  <Package className="h-4 w-4" />
                   Active
                 </Button>
                 <Button
-                  variant={
-                    productFilter === "finished" ? "default" : "outline"
-                  }
+                  variant={productFilter === "finished" ? "default" : "outline"}
                   size="sm"
                   className="whitespace-nowrap gap-2"
                   onClick={() => handleFilterChange("finished")}
                 >
-                  <CheckCircle className="h-4 w-4" />
+                  <Package className="h-4 w-4" />
                   Finished
                 </Button>
                 <Button
-                  variant={
-                    productFilter === "repurchase" ? "default" : "outline"
-                  }
+                  variant={productFilter === "repurchase" ? "default" : "outline"}
                   size="sm"
                   className="whitespace-nowrap gap-2"
                   onClick={() => handleFilterChange("repurchase")}
                 >
-                  <Star className="h-4 w-4" />
+                  <Package className="h-4 w-4" />
                   Would Repurchase
                 </Button>
               </div>
@@ -1173,25 +1184,48 @@ export function Dashboard() {
               transition={{ duration: 0.3 }}
               className="space-y-4"
             >
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-purple-500/10 via-purple-500/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-500/10 via-purple-500/5 to-background border p-6 group hover:shadow-lg transition-all duration-300">
                 <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                {/* Animated light streaks */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="light-streak light-streak-1"></div>
+                  <div className="light-streak light-streak-2"></div>
+                </div>
+                {/* Subtle floating particles */}
+                <div className="absolute inset-0 overflow-hidden">
+                  <div className="particles-container">
+                    {[...Array(5)].map((_, i) => (
+                      <div 
+                        key={i} 
+                        className={`particle particle-${i % 3}`}
+                        style={{
+                          left: `${Math.random() * 100}%`,
+                          top: `${Math.random() * 100}%`,
+                          animationDelay: `${Math.random() * 5}s`,
+                          opacity: 0.1 + Math.random() * 0.2,
+                          width: `${2 + Math.random() * 2}px`,
+                          height: `${2 + Math.random() * 2}px`
+                        }}
+                      ></div>
+                    ))}
+                  </div>
+                </div>
                 <div className="relative flex flex-col md:flex-row md:items-center gap-6">
                   <div className="flex-1 space-y-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-600 text-sm font-medium mb-2">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-600 text-sm font-medium mb-2 shadow-sm backdrop-blur-sm border border-purple-500/20 animate-glow">
                       <Clock className="h-4 w-4" />
                       Daily Routines
                     </div>
-                    <h2 className="text-2xl font-bold tracking-tight mb-2">
+                    <h2 className="text-2xl font-bold tracking-tight mb-2 text-gradient">
                       Your Routines
                     </h2>
-                    <p className="text-muted-foreground max-w-xl">
-                      Create and customize your morning and evening skincare
-                      routines for optimal results.
+                    <p className="text-muted-foreground max-w-xl backdrop-blur-sm bg-background/30 p-2 rounded-lg border border-purple-500/10 shadow-sm">
+                      Create and customize your morning and evening skincare routines for optimal results.
                     </p>
                   </div>
                   <div className="hidden md:block">
-                    <div className="h-16 w-16 rounded-2xl bg-purple-500/10 flex items-center justify-center">
+                    <div className="h-16 w-16 rounded-2xl bg-purple-500/20 flex items-center justify-center shadow-glow animate-pulse-slow">
                       <Clock className="h-8 w-8 text-purple-600" />
                     </div>
                   </div>
@@ -1236,7 +1270,7 @@ export function Dashboard() {
                       onClick={handleCameraCapture}
                       disabled={!isCameraReady}
                     >
-                      <Camera className="h-6 w-6" />
+                      <Package className="h-6 w-6" />
                     </Button>
                   </div>
                   {!isCameraReady && (
@@ -1251,22 +1285,45 @@ export function Dashboard() {
                   )}
                 </div>
               ) : (
-                <div className="relative overflow-hidden rounded-xl bg-gradient-to-r from-green-500/10 via-green-500/5 to-background border group hover:shadow-lg transition-all duration-300">
+                <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-green-500/10 via-green-500/5 to-background border group hover:shadow-lg transition-all duration-300">
                   <div className="absolute inset-0 bg-grid-pattern opacity-10 group-hover:opacity-20 transition-opacity"></div>
                   <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  {/* Animated light streaks */}
+                  <div className="absolute inset-0 overflow-hidden">
+                    <div className="light-streak light-streak-1"></div>
+                    <div className="light-streak light-streak-2"></div>
+                  </div>
+                  {/* Subtle floating particles */}
+                  <div className="absolute inset-0 overflow-hidden">
+                    <div className="particles-container">
+                      {[...Array(5)].map((_, i) => (
+                        <div 
+                          key={i} 
+                          className={`particle particle-${i % 3}`}
+                          style={{
+                            left: `${Math.random() * 100}%`,
+                            top: `${Math.random() * 100}%`,
+                            animationDelay: `${Math.random() * 5}s`,
+                            opacity: 0.1 + Math.random() * 0.2,
+                            width: `${2 + Math.random() * 2}px`,
+                            height: `${2 + Math.random() * 2}px`
+                          }}
+                        ></div>
+                      ))}
+                    </div>
+                  </div>
                   <div className="relative p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                       <div className="space-y-2">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 text-green-600 text-sm font-medium mb-2">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/20 text-green-600 text-sm font-medium mb-2 shadow-sm backdrop-blur-sm border border-green-500/20 animate-glow">
                           <Camera className="h-4 w-4" />
                           Progress Photos
                         </div>
-                        <h2 className="text-2xl font-bold tracking-tight">
+                        <h2 className="text-2xl font-bold tracking-tight text-gradient">
                           Track Your Journey
                         </h2>
-                        <p className="text-muted-foreground max-w-xl">
-                          Document your skincare progress with photos. Compare
-                          and see your transformation over time.
+                        <p className="text-muted-foreground max-w-xl backdrop-blur-sm bg-background/30 p-2 rounded-lg border border-green-500/10 shadow-sm">
+                          Document your skincare progress with photos. Compare and see your transformation over time.
                         </p>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-3">
@@ -1276,7 +1333,7 @@ export function Dashboard() {
                           size="lg"
                           disabled={isUploading}
                         >
-                          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                           <Camera className="h-4 w-4 relative z-10" />
                           <span className="relative z-10">Take Photo</span>
                         </Button>
@@ -1287,7 +1344,7 @@ export function Dashboard() {
                           size="lg"
                           disabled={isUploading}
                         >
-                          <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                           <Upload className="h-4 w-4 relative z-10" />
                           <span className="relative z-10">Upload Photo</span>
                         </Button>
