@@ -12,6 +12,7 @@ interface DashboardHeaderProps {
 
 /**
  * DashboardHeader component - displays the welcome banner at the top of dashboard
+ * Includes enhanced animations for visual appeal
  */
 const DashboardHeader = memo(({
   greeting,
@@ -24,13 +25,90 @@ const DashboardHeader = memo(({
 
   return (
     <div className="relative overflow-hidden bg-gradient-to-br from-primary/90 via-[#b83280] to-[#805ad5] dark:from-[#4f46e5] dark:via-primary dark:to-[#7e22ce] pt-8 pb-20 md:pt-12 md:pb-24">
-      {/* Subtle texture overlay */}
-      <div className="absolute inset-0 bg-noise-pattern opacity-[0.03]"></div>
+      {/* Enhanced grid pattern - more prominent */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-[0.12] dark:opacity-[0.15]"></div>
+      
+      {/* Noise texture overlay */}
+      <div className="absolute inset-0 bg-noise-pattern opacity-[0.05]"></div>
+      
+      {/* Animated gradient overlay with diagonal movement */}
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-[0.06] animate-gradient-xy"></div>
+      
+      {/* Prominent diagonal gradient line */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
+        <div className="absolute -top-[30%] -left-[10%] w-[80%] h-[200%] bg-gradient-to-br from-white/0 via-white/10 to-white/0 rotate-[30deg] animate-slide-diagonal"></div>
+      </div>
+      
+      {/* Enhanced colorful sparkles */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="sparkles-container">
+          {/* Pink sparkles */}
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div 
+              key={`pink-${i}`} 
+              className="sparkle-pink"
+              style={{ 
+                left: `${Math.random() * 100}%`, 
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${3 + Math.random() * 7}s`
+              }}
+            />
+          ))}
+          
+          {/* Blue sparkles */}
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div 
+              key={`blue-${i}`} 
+              className="sparkle-blue"
+              style={{ 
+                left: `${Math.random() * 100}%`, 
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${3 + Math.random() * 7}s`
+              }}
+            />
+          ))}
+          
+          {/* Gold sparkles */}
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div 
+              key={`gold-${i}`} 
+              className="sparkle-gold"
+              style={{ 
+                left: `${Math.random() * 100}%`, 
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${3 + Math.random() * 7}s`
+              }}
+            />
+          ))}
+          
+          {/* White sparkles - larger */}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div 
+              key={`white-${i}`} 
+              className="sparkle-white"
+              style={{ 
+                left: `${Math.random() * 100}%`, 
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${3 + Math.random() * 7}s`
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      
+      {/* Enhanced light streak animations */}
+      <div className="absolute -top-40 -right-40 w-96 h-96 bg-white opacity-[0.04] blur-3xl rounded-full animate-pulse-slow"></div>
+      <div className="absolute -bottom-20 -left-20 w-60 h-60 bg-blue-200 dark:bg-blue-400 opacity-[0.04] blur-3xl rounded-full animate-pulse-slow-delay"></div>
+      <div className="absolute top-0 left-1/4 w-60 h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-25 blur-sm animate-slide"></div>
 
       <div className="container max-w-7xl mx-auto px-4 relative z-10">
         {/* Enhanced subtle badge with glow - now green */}
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10b981]/20 backdrop-blur-md text-white text-xs font-medium mb-1 shadow-md border border-[#10b981]/30">
-          <span className="inline-block w-2 h-2 rounded-full bg-[#10b981]"></span>
+          <span className="inline-block w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
           <span>Your Skincare Journey</span>
         </div>
 
@@ -69,7 +147,7 @@ const DashboardHeader = memo(({
               </svg>
               Edit Profile
             </Button>
-            <Avatar className="h-10 w-10 border-2 border-white/40 shadow-xl ring-2 ring-[#f59e0b]/30 dark:ring-[#fbbf24]/30 hover:ring-[#f59e0b]/50 dark:hover:ring-[#fbbf24]/50">
+            <Avatar className="h-10 w-10 border-2 border-white/40 shadow-xl ring-2 ring-[#f59e0b]/30 dark:ring-[#fbbf24]/30 hover:ring-[#f59e0b]/50 dark:hover:ring-[#fbbf24]/50 transition-all duration-300">
               <div className="flex h-full w-full items-center justify-center bg-primary-foreground text-primary font-medium">
                 {currentUser?.photoURL ? (
                   <AvatarImage src={currentUser.photoURL} alt={displayName} />
@@ -82,7 +160,7 @@ const DashboardHeader = memo(({
         </div>
       </div>
 
-      {/* Enhanced Wave Divider with double wave */}
+      {/* Enhanced Wave Divider with animated waves */}
       <div className="absolute bottom-0 left-0 right-0 h-12 md:h-16 overflow-hidden">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -99,7 +177,7 @@ const DashboardHeader = memo(({
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1440 320"
-          className="absolute bottom-0 w-full h-full opacity-50"
+          className="absolute bottom-0 w-full h-full opacity-50 animate-wave-slow"
           preserveAspectRatio="none"
         >
           <path

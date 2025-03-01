@@ -297,6 +297,101 @@ export function Dashboard() {
           .shadow-glow {
             box-shadow: 0 0 15px 0 rgba(var(--primary), 0.3);
           }
+          
+          @keyframes gradient-xy {
+            0% { background-position: 0% 0%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: 0% 0%; }
+          }
+          
+          .animate-gradient-xy {
+            background-size: 300% 300%;
+            animation: gradient-xy 15s ease infinite;
+          }
+          
+          @keyframes slide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+          
+          .animate-slide {
+            animation: slide 8s linear infinite;
+          }
+          
+          @keyframes slide-diagonal {
+            0% { transform: translateX(-100%) translateY(-30%) rotate(30deg); }
+            100% { transform: translateX(100%) translateY(30%) rotate(30deg); }
+          }
+          
+          .animate-slide-diagonal {
+            animation: slide-diagonal 15s linear infinite;
+          }
+          
+          .sparkle-pink, .sparkle-blue, .sparkle-gold, .sparkle-white {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+          }
+          
+          .sparkle-pink {
+            width: 3px;
+            height: 3px;
+            background-color: #ec4899;
+            box-shadow: 0 0 4px 1px rgba(236, 72, 153, 0.7);
+            animation: sparkle 5s ease-in-out infinite;
+          }
+          
+          .sparkle-blue {
+            width: 4px;
+            height: 4px;
+            background-color: #3b82f6;
+            box-shadow: 0 0 4px 1px rgba(59, 130, 246, 0.7);
+            animation: sparkle 6s ease-in-out infinite;
+          }
+          
+          .sparkle-gold {
+            width: 3px;
+            height: 3px;
+            background-color: #f59e0b;
+            box-shadow: 0 0 4px 1px rgba(245, 158, 11, 0.7);
+            animation: sparkle 7s ease-in-out infinite;
+          }
+          
+          .sparkle-white {
+            width: 5px;
+            height: 5px;
+            background-color: white;
+            box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.7);
+            animation: sparkle 6s ease-in-out infinite;
+          }
+          
+          @keyframes sparkle {
+            0% { opacity: 0; transform: scale(0) rotate(0deg); }
+            50% { opacity: 0.7; transform: scale(1) rotate(180deg); }
+            100% { opacity: 0; transform: scale(0) rotate(360deg); }
+          }
+          
+          .animate-pulse-slow {
+            animation: pulse 6s ease-in-out infinite;
+          }
+          
+          .animate-pulse-slow-delay {
+            animation: pulse 6s ease-in-out 3s infinite;
+          }
+          
+          @keyframes pulse {
+            0%, 100% { opacity: 0.1; }
+            50% { opacity: 0.3; }
+          }
+          
+          .animate-wave-slow {
+            animation: wave 15s ease-in-out infinite alternate;
+          }
+          
+          @keyframes wave {
+            0% { transform: translateX(-20px); }
+            100% { transform: translateX(20px); }
+          }
         `}
       </style>
     </div>
