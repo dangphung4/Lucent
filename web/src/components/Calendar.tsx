@@ -670,7 +670,7 @@ export function Calendar() {
     <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 pb-12">
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {/* Calendar Section */}
-        <Card className="overflow-hidden calendar-container border-primary/20 shadow-lg relative bg-gradient-to-br from-background to-background/80">
+        <Card className="overflow-hidden calendar-container border-primary/20 shadow-lg relative bg-gradient-to-br from-blue-500/10 to-purple-500/10 dark:from-blue-900/20 dark:to-purple-800/20">
           {/* Subtle floating particles */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="particles-container">
@@ -691,15 +691,19 @@ export function Calendar() {
             </div>
           </div>
           
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-500/20 rounded-full filter blur-xl opacity-70"></div>
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-purple-500/20 rounded-full filter blur-xl opacity-70"></div>
+          
           <CardHeader className="pb-2 px-3 sm:px-6 relative">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-primary/30 flex items-center justify-center shadow-sm">
-                  <CalendarIcon className="h-4 w-4 text-primary" />
+                <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500/50 to-purple-500/50 dark:from-blue-600/50 dark:to-purple-600/50 flex items-center justify-center shadow-md animate-pulse-slow">
+                  <CalendarIcon className="h-4 w-4 text-white dark:text-white" />
                 </div>
                 <CardTitle className="text-lg sm:text-xl text-primary dark:text-gradient">Skincare Calendar</CardTitle>
               </div>
-              <CardDescription className="hidden sm:block text-sm backdrop-blur-sm bg-background/50 px-2 py-1 rounded-md border border-primary/20">
+              <CardDescription className="hidden sm:block text-sm backdrop-blur-sm bg-background/50 px-2 py-1 rounded-md border border-primary/20 shadow-sm">
                 Track your skincare routine
               </CardDescription>
             </div>
@@ -720,8 +724,8 @@ export function Calendar() {
               >
                 <CalendarDate>
                   <div className="flex items-center gap-2 p-1">
-                    <CalendarMonthPicker className="w-24 sm:w-32 bg-primary/10 border-primary/20 rounded-md" />
-                    <CalendarYearPicker start={2020} end={2030} className="w-20 sm:w-24 bg-primary/10 border-primary/20 rounded-md" />
+                    <CalendarMonthPicker className="w-24 sm:w-32 bg-primary/10 border-primary/20 rounded-md shadow-sm" />
+                    <CalendarYearPicker start={2020} end={2030} className="w-20 sm:w-24 bg-primary/10 border-primary/20 rounded-md shadow-sm" />
                   </div>
                   <CalendarDatePagination />
                 </CalendarDate>
@@ -737,7 +741,7 @@ export function Calendar() {
                   </CalendarBody>
                 </div>
                 
-                <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs bg-background/50 p-2 rounded-md border border-primary/20 backdrop-blur-sm">
+                <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs bg-background/50 p-2 rounded-md border border-primary/20 backdrop-blur-sm shadow-sm">
                   {STATUSES.map(status => (
                     <div key={status.id} className="flex items-center gap-1.5">
                       <div 
@@ -770,38 +774,39 @@ export function Calendar() {
         </Card>
         
         {/* Routine Section */}
-        <Card className="overflow-hidden border-primary/20 shadow-lg relative bg-gradient-to-br from-background to-background/80">
+        <Card className="overflow-hidden border-primary/20 shadow-lg relative bg-gradient-to-br from-green-500/10 to-blue-500/10 dark:from-green-900/20 dark:to-blue-800/20">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/10 rounded-full filter blur-xl opacity-70"></div>
+          <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-green-500/20 rounded-full filter blur-xl opacity-70"></div>
+          <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-500/20 rounded-full filter blur-xl opacity-70"></div>
           
           <CardHeader className="px-3 sm:px-6 py-3 sm:py-4 relative">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/30 text-primary dark:text-primary text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-primary/40">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-green-500/30 to-blue-500/30 dark:from-green-600/30 dark:to-blue-600/30 text-primary dark:text-primary text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-primary/40 animate-glow">
               <CalendarIcon className="h-4 w-4" />
               Daily Routine
             </div>
             <CardTitle className="text-base sm:text-lg text-primary dark:text-gradient">
               {formatDateForDisplay(selectedDate)}
             </CardTitle>
-            <CardDescription className="text-xs sm:text-sm backdrop-blur-sm bg-background/50 p-1 rounded-md inline-block border border-primary/20">
+            <CardDescription className="text-xs sm:text-sm backdrop-blur-sm bg-background/50 p-1 rounded-md inline-block border border-primary/20 shadow-sm">
               Track your skincare progress
             </CardDescription>
           </CardHeader>
           <CardContent className="p-3 sm:p-6 pt-0 relative">
             <Tabs defaultValue="morning" onValueChange={(value) => setActiveTab(value as 'morning' | 'evening' | 'weekly' | 'custom')}>
-              <TabsList className="grid w-full grid-cols-4 mb-4 bg-background/80 backdrop-blur-sm border border-primary/20">
-                <TabsTrigger value="morning" className="flex items-center gap-1.5 data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400">
+              <TabsList className="grid w-full grid-cols-4 mb-4 bg-background/80 backdrop-blur-sm border border-primary/20 shadow-sm">
+                <TabsTrigger value="morning" className="flex items-center gap-1.5 data-[state=active]:bg-gradient-to-br data-[state=active]:from-amber-500/30 data-[state=active]:to-amber-400/20 data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400">
                   <Sun className="h-3.5 w-3.5" />
                   <span>Morning</span>
                 </TabsTrigger>
-                <TabsTrigger value="evening" className="flex items-center gap-1.5 data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400">
+                <TabsTrigger value="evening" className="flex items-center gap-1.5 data-[state=active]:bg-gradient-to-br data-[state=active]:from-indigo-500/30 data-[state=active]:to-indigo-400/20 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400">
                   <Moon className="h-3.5 w-3.5" />
                   <span>Evening</span>
                 </TabsTrigger>
-                <TabsTrigger value="weekly" className="flex items-center gap-1.5 data-[state=active]:bg-green-500/20 data-[state=active]:text-green-700 dark:data-[state=active]:text-green-400">
+                <TabsTrigger value="weekly" className="flex items-center gap-1.5 data-[state=active]:bg-gradient-to-br data-[state=active]:from-green-500/30 data-[state=active]:to-green-400/20 data-[state=active]:text-green-700 dark:data-[state=active]:text-green-400">
                   <CalendarIcon className="h-3.5 w-3.5" />
                   <span>Weekly</span>
                 </TabsTrigger>
-                <TabsTrigger value="custom" className="flex items-center gap-1.5 data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-700 dark:data-[state=active]:text-purple-400">
+                <TabsTrigger value="custom" className="flex items-center gap-1.5 data-[state=active]:bg-gradient-to-br data-[state=active]:from-purple-500/30 data-[state=active]:to-purple-400/20 data-[state=active]:text-purple-700 dark:data-[state=active]:text-purple-400">
                   <Settings className="h-3.5 w-3.5" />
                   <span>Custom</span>
                 </TabsTrigger>
@@ -814,7 +819,12 @@ export function Calendar() {
                       const completion = getRoutineCompletion(routine.id, 'morning');
                       return (
                         <div key={routine.id} className="space-y-2 sm:space-y-3">
-                          <h3 className="font-medium text-base sm:text-lg">{routine.name}</h3>
+                          <h3 className="font-medium text-base sm:text-lg flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400">
+                              <Sun className="h-3.5 w-3.5" />
+                            </span>
+                            {routine.name}
+                          </h3>
                           {routine.steps.map((step) => {
                             const product = products.find(p => p.id === step.productId);
                             const isCompleted = completion?.completedSteps.find(
@@ -827,7 +837,9 @@ export function Calendar() {
                                 className={cn(
                                   "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors",
                                   "border border-border/50 shadow-sm",
-                                  isCompleted ? "bg-primary/10 backdrop-blur-sm" : "bg-background/80"
+                                  isCompleted 
+                                    ? "bg-gradient-to-br from-amber-500/20 to-amber-400/10 backdrop-blur-sm" 
+                                    : "bg-background/80"
                                 )}
                               >
                                 <Button
@@ -835,7 +847,7 @@ export function Calendar() {
                                   size="icon"
                                   className={cn(
                                     "h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all duration-200",
-                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                                    isCompleted && "bg-amber-500 text-white hover:bg-amber-500/90 shadow-md"
                                   )}
                                   onClick={() => handleStepToggle(routine.id, step.productId, 'morning', !isCompleted)}
                                   disabled={saving}
@@ -870,7 +882,7 @@ export function Calendar() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20 backdrop-blur-sm border-primary/20">
+                  <div className="text-center py-6 sm:py-8 border rounded-md bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm border-primary/20 shadow-inner">
                     <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground text-sm">No routines scheduled for this day</p>
                   </div>
@@ -884,7 +896,12 @@ export function Calendar() {
                       const completion = getRoutineCompletion(routine.id, 'evening');
                       return (
                         <div key={routine.id} className="space-y-2 sm:space-y-3">
-                          <h3 className="font-medium text-base sm:text-lg">{routine.name}</h3>
+                          <h3 className="font-medium text-base sm:text-lg flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-indigo-500/20 text-indigo-700 dark:text-indigo-400">
+                              <Moon className="h-3.5 w-3.5" />
+                            </span>
+                            {routine.name}
+                          </h3>
                           {routine.steps.map((step) => {
                             const product = products.find(p => p.id === step.productId);
                             const isCompleted = completion?.completedSteps.find(
@@ -897,7 +914,9 @@ export function Calendar() {
                                 className={cn(
                                   "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors",
                                   "border border-border/50 shadow-sm",
-                                  isCompleted ? "bg-primary/10 backdrop-blur-sm" : "bg-background/80"
+                                  isCompleted 
+                                    ? "bg-gradient-to-br from-indigo-500/20 to-indigo-400/10 backdrop-blur-sm" 
+                                    : "bg-background/80"
                                 )}
                               >
                                 <Button
@@ -905,7 +924,7 @@ export function Calendar() {
                                   size="icon"
                                   className={cn(
                                     "h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all duration-200",
-                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                                    isCompleted && "bg-indigo-500 text-white hover:bg-indigo-500/90 shadow-md"
                                   )}
                                   onClick={() => handleStepToggle(routine.id, step.productId, 'evening', !isCompleted)}
                                   disabled={saving}
@@ -940,7 +959,7 @@ export function Calendar() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20 backdrop-blur-sm border-primary/20">
+                  <div className="text-center py-6 sm:py-8 border rounded-md bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm border-primary/20 shadow-inner">
                     <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground text-sm">No routines scheduled for this day</p>
                   </div>
@@ -954,7 +973,12 @@ export function Calendar() {
                       const completion = getRoutineCompletion(routine.id, 'weekly');
                       return (
                         <div key={routine.id} className="space-y-2 sm:space-y-3">
-                          <h3 className="font-medium text-base sm:text-lg">{routine.name}</h3>
+                          <h3 className="font-medium text-base sm:text-lg flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-green-500/20 text-green-700 dark:text-green-400">
+                              <CalendarIcon className="h-3.5 w-3.5" />
+                            </span>
+                            {routine.name}
+                          </h3>
                           {routine.steps.map((step) => {
                             const product = products.find(p => p.id === step.productId);
                             const isCompleted = completion?.completedSteps.find(
@@ -967,7 +991,9 @@ export function Calendar() {
                                 className={cn(
                                   "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors",
                                   "border border-border/50 shadow-sm",
-                                  isCompleted ? "bg-primary/10 backdrop-blur-sm" : "bg-background/80"
+                                  isCompleted 
+                                    ? "bg-gradient-to-br from-green-500/20 to-green-400/10 backdrop-blur-sm" 
+                                    : "bg-background/80"
                                 )}
                               >
                                 <Button
@@ -975,7 +1001,7 @@ export function Calendar() {
                                   size="icon"
                                   className={cn(
                                     "h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all duration-200",
-                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                                    isCompleted && "bg-green-500 text-white hover:bg-green-500/90 shadow-md"
                                   )}
                                   onClick={() => handleStepToggle(routine.id, step.productId, 'weekly', !isCompleted)}
                                   disabled={saving}
@@ -1010,9 +1036,9 @@ export function Calendar() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20 backdrop-blur-sm border-primary/20">
+                  <div className="text-center py-6 sm:py-8 border rounded-md bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm border-primary/20 shadow-inner">
                     <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground text-sm">No weekly routines scheduled for this day</p>
+                    <p className="text-muted-foreground text-sm">No routines scheduled for this day</p>
                   </div>
                 )}
               </TabsContent>
@@ -1024,7 +1050,12 @@ export function Calendar() {
                       const completion = getRoutineCompletion(routine.id, 'custom');
                       return (
                         <div key={routine.id} className="space-y-2 sm:space-y-3">
-                          <h3 className="font-medium text-base sm:text-lg">{routine.name}</h3>
+                          <h3 className="font-medium text-base sm:text-lg flex items-center gap-2">
+                            <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-purple-500/20 text-purple-700 dark:text-purple-400">
+                              <Settings className="h-3.5 w-3.5" />
+                            </span>
+                            {routine.name}
+                          </h3>
                           {routine.steps.map((step) => {
                             const product = products.find(p => p.id === step.productId);
                             const isCompleted = completion?.completedSteps.find(
@@ -1037,7 +1068,9 @@ export function Calendar() {
                                 className={cn(
                                   "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors",
                                   "border border-border/50 shadow-sm",
-                                  isCompleted ? "bg-primary/10 backdrop-blur-sm" : "bg-background/80"
+                                  isCompleted 
+                                    ? "bg-gradient-to-br from-purple-500/20 to-purple-400/10 backdrop-blur-sm" 
+                                    : "bg-background/80"
                                 )}
                               >
                                 <Button
@@ -1045,7 +1078,7 @@ export function Calendar() {
                                   size="icon"
                                   className={cn(
                                     "h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all duration-200",
-                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
+                                    isCompleted && "bg-purple-500 text-white hover:bg-purple-500/90 shadow-md"
                                   )}
                                   onClick={() => handleStepToggle(routine.id, step.productId, 'custom', !isCompleted)}
                                   disabled={saving}
@@ -1080,9 +1113,9 @@ export function Calendar() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20 backdrop-blur-sm border-primary/20">
+                  <div className="text-center py-6 sm:py-8 border rounded-md bg-gradient-to-br from-muted/30 to-muted/10 backdrop-blur-sm border-primary/20 shadow-inner">
                     <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground text-sm">No custom routines scheduled for this day</p>
+                    <p className="text-muted-foreground text-sm">No routines scheduled for this day</p>
                   </div>
                 )}
               </TabsContent>
