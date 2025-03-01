@@ -53,10 +53,10 @@ export function LandingPage() {
         <div className="container mx-auto px-4 md:px-6 max-w-screen-xl">
           <div className="flex flex-col items-center text-center space-y-8 relative z-10">
             <div className="space-y-6 max-w-3xl mx-auto">
-              <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4 backdrop-blur-sm">
+              <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4 backdrop-blur-sm animate-glow">
                 Your Personal Skincare Companion
               </div>
-              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/70 px-4">
+              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/70 px-4 text-gradient">
                 Your Skincare Journey, Tracked
               </h1>
               <p className="mx-auto max-w-[700px] text-muted-foreground text-lg md:text-xl leading-relaxed px-4">
@@ -70,17 +70,19 @@ export function LandingPage() {
                 <Button
                   onClick={() => navigate("/dashboard")}
                   size="lg"
-                  className="w-full sm:w-auto px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                  className="w-full sm:w-auto px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
                 >
-                  Dashboard
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="relative z-10">Dashboard</span>
                 </Button>
               ) : (
                 <Link to="/login" className="w-full sm:w-auto">
                   <Button
                     size="lg"
-                    className="w-full px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                    className="w-full px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
                   >
-                    Get Started Free
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="relative z-10">Get Started Free</span>
                   </Button>
                 </Link>
               )}
@@ -89,9 +91,10 @@ export function LandingPage() {
                   <Button
                     size="lg"
                     variant="outline"
-                    className="w-full px-8 rounded-full border-2"
+                    className="w-full px-8 rounded-full border-2 group relative overflow-hidden"
                   >
-                    Calendar
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="relative z-10">Calendar</span>
                   </Button>
                 </Link>
               ) : (
@@ -100,9 +103,10 @@ export function LandingPage() {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="w-full px-8 rounded-full border-2"
+                      className="w-full px-8 rounded-full border-2 group relative overflow-hidden"
                     >
-                      Sign In
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <span className="relative z-10">Sign In</span>
                     </Button>
                   </Link>
                 </>
@@ -111,9 +115,10 @@ export function LandingPage() {
                 <Button
                   size="lg"
                   variant="secondary"
-                  className="w-full px-8 rounded-full"
+                  className="w-full px-8 rounded-full group relative overflow-hidden"
                 >
-                  About Us
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="relative z-10">About Us</span>
                 </Button>
               </Link>
             </div>
@@ -121,12 +126,12 @@ export function LandingPage() {
             {/* App Preview Image */}
             <div className="relative w-full max-w-4xl mt-12 md:mt-20 px-4">
               {/* Enhanced background glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl blur-3xl -z-10 transform scale-110"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl blur-3xl -z-10 transform scale-110 animate-pulse-slow"></div>
 
               {/* Simplified container with enhanced effects */}
               <div className="relative">
                 {/* Enhanced border glow */}
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/40 to-primary/60 rounded-2xl blur-sm opacity-75"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/40 to-primary/60 rounded-2xl blur-sm opacity-75 animate-shimmer"></div>
 
                 {/* Main container with enhanced shadows */}
                 <div className="relative bg-card border rounded-2xl shadow-2xl overflow-hidden dark:border-gray-800/50 backdrop-blur-sm">
@@ -165,21 +170,75 @@ export function LandingPage() {
 
         {/* Enhanced decorative elements */}
         <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none select-none">
-          <div className="absolute left-[10%] top-[20%] h-[300px] w-[300px] rounded-full bg-gradient-to-r from-primary/10 to-primary/5 blur-3xl opacity-80"></div>
-          <div className="absolute right-[10%] bottom-[10%] h-[250px] w-[250px] rounded-full bg-gradient-to-l from-primary/10 to-primary/5 blur-3xl opacity-80"></div>
-          <div className="absolute left-[50%] bottom-0 h-[200px] w-[200px] -translate-x-1/2 rounded-full bg-gradient-to-t from-primary/10 to-primary/5 blur-3xl opacity-80"></div>
+          {/* Grid pattern background */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
+          
+          {/* Animated light streaks */}
+          <div className="light-streak light-streak-1 light-mode-visible"></div>
+          <div className="light-streak light-streak-2 light-mode-visible"></div>
+          <div className="light-streak light-streak-3 light-mode-visible"></div>
+          
+          {/* Floating particles */}
+          <div className="particles-container">
+            {[...Array(12)].map((_, i) => (
+              <div 
+                key={i} 
+                className={`particle particle-${i % 3} light-mode-visible`}
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 10}s`,
+                  opacity: 0.15 + Math.random() * 0.25,
+                  width: `${2 + Math.random() * 3}px`,
+                  height: `${2 + Math.random() * 3}px`
+                }}
+              ></div>
+            ))}
+          </div>
+          
+          <div className="absolute left-[10%] top-[20%] h-[300px] w-[300px] rounded-full bg-gradient-to-r from-primary/10 to-primary/5 blur-3xl opacity-80 animate-pulse-slow"></div>
+          <div className="absolute right-[10%] bottom-[10%] h-[250px] w-[250px] rounded-full bg-gradient-to-l from-primary/10 to-primary/5 blur-3xl opacity-80 animate-pulse-slower"></div>
+          <div className="absolute left-[50%] bottom-0 h-[200px] w-[200px] -translate-x-1/2 rounded-full bg-gradient-to-t from-primary/10 to-primary/5 blur-3xl opacity-80 animate-pulse-slow"></div>
         </div>
       </section>
 
       {/* Features Section with Cards */}
       <section className="py-16 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background pointer-events-none"></div>
+        <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+        
+        {/* Animated light streaks */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="light-streak light-streak-1 light-mode-visible"></div>
+          <div className="light-streak light-streak-2 light-mode-visible"></div>
+        </div>
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="particles-container">
+            {[...Array(8)].map((_, i) => (
+              <div 
+                key={i} 
+                className={`particle particle-${i % 3} light-mode-visible`}
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 8}s`,
+                  opacity: 0.1 + Math.random() * 0.2,
+                  width: `${2 + Math.random() * 2}px`,
+                  height: `${2 + Math.random() * 2}px`
+                }}
+              ></div>
+            ))}
+          </div>
+        </div>
+        
         <div className="container mx-auto px-4 md:px-6 max-w-screen-xl relative">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-16">
-            <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur-sm">
+            <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur-sm animate-glow">
               Features
             </div>
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70 px-4">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70 px-4 text-gradient">
               Everything You Need
             </h2>
             <p className="mx-auto max-w-[700px] text-muted-foreground md:text-lg leading-relaxed px-4">
@@ -278,10 +337,11 @@ export function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800">
+            <Card className="group overflow-hidden transition-all hover:shadow-lg border-gray-200 dark:border-gray-800 relative bg-gradient-to-b from-background to-primary/5">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
               <div className="h-2 bg-primary"></div>
               <CardHeader className="pb-2">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 mb-2 group-hover:scale-110 transition-transform">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -926,7 +986,7 @@ export function LandingPage() {
       {/* CTA Section */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-background to-primary/5 dark:from-background dark:to-primary/10 relative overflow-hidden">
         <div className="absolute inset-0 -z-10 pointer-events-none">
-          <div className="absolute inset-0 bg-grid-primary/5 mask-gradient-to-b"></div>
+          <div className="absolute inset-0 bg-grid-pattern opacity-10 mask-gradient-to-b"></div>
           <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
         </div>
         <div className="container mx-auto px-4 md:px-6 max-w-screen-xl relative">
@@ -945,17 +1005,19 @@ export function LandingPage() {
                 <Button
                   onClick={() => navigate("/dashboard")}
                   size="lg"
-                  className="w-full sm:w-auto px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                  className="w-full sm:w-auto px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
                 >
-                  Go to Dashboard
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <span className="relative z-10">Go to Dashboard</span>
                 </Button>
               ) : (
                 <Link to="/login" className="w-full sm:w-auto">
                   <Button
                     size="lg"
-                    className="w-full px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary"
+                    className="w-full px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
                   >
-                    Get Started Free
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="relative z-10">Get Started Free</span>
                   </Button>
                 </Link>
               )}
@@ -963,6 +1025,171 @@ export function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Add CSS for animations and effects */}
+      <style>
+        {`
+         .bg-grid-pattern {
+           background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.2)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+         }
+         
+         .bg-noise-pattern {
+           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+         }
+         
+         @keyframes shimmer {
+           0% { opacity: 0.4; transform: translateY(-2%) scale(1.02); }
+           50% { opacity: 0.7; transform: translateY(0) scale(1); }
+           100% { opacity: 0.4; transform: translateY(-2%) scale(1.02); }
+         }
+         
+         .animate-shimmer {
+           animation: shimmer 12s ease-in-out infinite;
+         }
+         
+         @keyframes pulse-slow {
+           0%, 100% { opacity: 0.3; transform: scale(1); }
+           50% { opacity: 0.5; transform: scale(1.05); }
+         }
+         
+         @keyframes pulse-slower {
+           0%, 100% { opacity: 0.2; transform: scale(1); }
+           50% { opacity: 0.4; transform: scale(1.08); }
+         }
+         
+         .animate-pulse-slow {
+           animation: pulse-slow 8s ease-in-out infinite;
+         }
+         
+         .animate-pulse-slower {
+           animation: pulse-slower 12s ease-in-out infinite;
+         }
+         
+         @keyframes glow {
+           0%, 100% { box-shadow: 0 0 5px 0 rgba(255, 255, 255, 0.3); }
+           50% { box-shadow: 0 0 15px 0 rgba(255, 255, 255, 0.5); }
+         }
+         
+         .animate-glow {
+           animation: glow 4s ease-in-out infinite;
+         }
+         
+         .shadow-glow {
+           box-shadow: 0 0 15px 0 rgba(var(--primary), 0.3);
+         }
+         
+         .particles-container {
+           position: absolute;
+           width: 100%;
+           height: 100%;
+         }
+         
+         .particle {
+           position: absolute;
+           background: white;
+           border-radius: 50%;
+           filter: blur(1px);
+           animation: float 15s ease-in-out infinite;
+         }
+         
+         .dark .particle-0 {
+           background: rgba(255, 255, 255, 0.8);
+         }
+         
+         .dark .particle-1 {
+           background: rgba(251, 191, 36, 0.8);
+         }
+         
+         .dark .particle-2 {
+           background: rgba(236, 72, 153, 0.8);
+         }
+         
+         .particle-0 {
+           background: rgba(255, 255, 255, 0.8);
+         }
+         
+         .particle-1 {
+           background: rgba(245, 158, 11, 0.8);
+         }
+         
+         .particle-2 {
+           background: rgba(236, 72, 153, 0.8);
+         }
+         
+         /* Enhanced particles for light mode */
+         .light-mode-visible.particle-0 {
+           background: rgba(255, 255, 255, 0.9);
+           filter: blur(2px);
+         }
+         
+         .light-mode-visible.particle-1 {
+           background: rgba(255, 255, 255, 0.9);
+           filter: blur(2px);
+         }
+         
+         .light-mode-visible.particle-2 {
+           background: rgba(255, 255, 255, 0.9);
+           filter: blur(2px);
+         }
+         
+         @keyframes float {
+           0% { transform: translateY(0) translateX(0) rotate(0); opacity: 0; }
+           10% { opacity: 1; }
+           90% { opacity: 1; }
+           100% { transform: translateY(-120px) translateX(20px) rotate(360deg); opacity: 0; }
+         }
+         
+         .light-streak {
+           position: absolute;
+           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+           height: 1px;
+           width: 200%;
+           transform: rotate(-45deg);
+           animation: streak 8s linear infinite;
+           opacity: 0;
+         }
+         
+         /* Enhanced light streaks for light mode */
+         .light-mode-visible.light-streak {
+           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+           height: 2px;
+         }
+         
+         .light-streak-1 {
+           top: 30%;
+           animation-delay: 0s;
+         }
+         
+         .light-streak-2 {
+           top: 60%;
+           animation-delay: 3s;
+         }
+         
+         .light-streak-3 {
+           top: 10%;
+           animation-delay: 6s;
+         }
+         
+         @keyframes streak {
+           0% { transform: translateX(-100%) rotate(-45deg); opacity: 0; }
+           10% { opacity: 0.6; }
+           50% { opacity: 0.3; }
+           90% { opacity: 0.6; }
+           100% { transform: translateX(100%) rotate(-45deg); opacity: 0; }
+         }
+         
+         .text-gradient {
+           background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary)/0.8));
+           -webkit-background-clip: text;
+           -webkit-text-fill-color: transparent;
+         }
+         
+         .mask-gradient-to-b {
+           mask-image: linear-gradient(to bottom, white, transparent);
+           -webkit-mask-image: linear-gradient(to bottom, white, transparent);
+         }
+        `}
+      </style>
     </div>
   );
 }
