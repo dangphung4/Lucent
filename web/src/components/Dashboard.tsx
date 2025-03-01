@@ -446,23 +446,49 @@ export function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-8">
-      {/* Welcome Section with Gradient */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary/80 via-primary to-primary/90 pt-8 pb-12 md:pt-12 md:pb-16">
-        <div className="absolute inset-0 bg-grid-pattern [mask-image:linear-gradient(0deg,rgba(255,255,255,0.5),rgba(255,255,255,0.1))]"></div>
+      {/* Welcome Section with Enhanced Gradient */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-violet-600 via-primary to-pink-500 pt-8 pb-12 md:pt-12 md:pb-16">
+        {/* Animated gradient overlay */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-pink-400/20 via-transparent to-violet-600/20 animate-gradient-shift"></div>
+        
+        {/* Subtle floating particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="particles-container">
+            {[...Array(20)].map((_, i) => (
+              <div 
+                key={i} 
+                className="particle"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 5}s`,
+                  opacity: 0.1 + Math.random() * 0.2
+                }}
+              ></div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Grid pattern with enhanced mask */}
+        <div className="absolute inset-0 bg-grid-pattern [mask-image:linear-gradient(0deg,rgba(255,255,255,0.7),rgba(255,255,255,0.1))]"></div>
+        
+        {/* Glow effects */}
+        <div className="absolute -top-20 -left-20 w-60 h-60 bg-pink-500/30 rounded-full filter blur-3xl opacity-30"></div>
+        <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-violet-600/30 rounded-full filter blur-3xl opacity-30"></div>
 
-        <div className="container max-w-7xl mx-auto px-4">
-          {/* Subtle badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm text-white/90 text-xs font-medium mb-1 shadow-sm">
+        <div className="container max-w-7xl mx-auto px-4 relative z-10">
+          {/* Enhanced subtle badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white/95 text-xs font-medium mb-1 shadow-md border border-white/10">
             <span className="inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
             <span>Your Skincare Journey</span>
           </div>
 
           <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div className="space-y-2">
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white">
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-sm">
                 {greeting}, {displayName}!
               </h1>
-              <p className="text-primary-foreground/90 max-w-xl">
+              <p className="text-white/90 max-w-xl backdrop-blur-sm bg-white/5 p-2 rounded-lg border border-white/10 shadow-sm">
                 Track your skincare routine, monitor progress, and discover what
                 works best for your skin.
               </p>
@@ -472,7 +498,7 @@ export function Dashboard() {
               <Button
                 variant="secondary"
                 size="sm"
-                className="rounded-full text-sm font-medium"
+                className="rounded-full text-sm font-medium backdrop-blur-md bg-white/20 border border-white/10 hover:bg-white/30 transition-all"
                 onClick={handleEditProfile}
               >
                 <svg
@@ -492,7 +518,7 @@ export function Dashboard() {
                 </svg>
                 Edit Profile
               </Button>
-              <Avatar className="h-10 w-10 border-2 border-white">
+              <Avatar className="h-10 w-10 border-2 border-white/30 shadow-lg">
                 <div className="flex h-full w-full items-center justify-center bg-primary-foreground text-primary font-medium">
                   {currentUser?.photoURL ? (
                     <AvatarImage src={currentUser.photoURL} alt={displayName} />
@@ -505,12 +531,13 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Wave Divider */}
-        <div className="absolute bottom-0 left-0 right-0 h-8 md:h-12">
+        {/* Enhanced Wave Divider */}
+        <div className="absolute bottom-0 left-0 right-0 h-8 md:h-12 overflow-hidden">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1440 320"
             className="absolute bottom-0 w-full h-full"
+            preserveAspectRatio="none"
           >
             <path
               fill="hsl(var(--background))"
@@ -518,6 +545,7 @@ export function Dashboard() {
               d="M0,128L48,144C96,160,192,192,288,186.7C384,181,480,139,576,138.7C672,139,768,181,864,181.3C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
             ></path>
           </svg>
+          <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-background to-transparent"></div>
         </div>
       </div>
 
@@ -1174,11 +1202,44 @@ export function Dashboard() {
         </Tabs>
       </div>
 
-      {/* Add the CSS for the grid pattern */}
+      {/* Add the CSS for the grid pattern and new animations */}
       <style>
         {`
           .bg-grid-pattern {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.1)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+          }
+          
+          @keyframes gradient-shift {
+            0% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+            100% { opacity: 0.5; }
+          }
+          
+          .animate-gradient-shift {
+            animation: gradient-shift 8s ease infinite;
+          }
+          
+          .particles-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+          }
+          
+          .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            filter: blur(1px);
+            animation: float 15s ease-in-out infinite;
+          }
+          
+          @keyframes float {
+            0% { transform: translateY(0) translateX(0) rotate(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100px) translateX(20px) rotate(360deg); opacity: 0; }
           }
         `}
       </style>
