@@ -447,22 +447,31 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-8">
       {/* Welcome Section with Enhanced Gradient */}
-      <div className="relative overflow-hidden bg-gradient-to-br from-violet-600 via-primary to-pink-500 pt-8 pb-12 md:pt-12 md:pb-16">
-        {/* Animated gradient overlay */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-pink-400/20 via-transparent to-violet-600/20 animate-gradient-shift"></div>
+      <div className="relative overflow-hidden bg-gradient-to-br from-primary/90 via-[#b83280] to-[#805ad5] dark:from-[#4f46e5] dark:via-primary dark:to-[#7e22ce] pt-8 pb-12 md:pt-12 md:pb-16">
+        {/* Animated gradient overlay with shimmer effect */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#f59e0b]/20 via-transparent to-[#8b5cf6]/20 dark:from-[#8b5cf6]/20 dark:to-[#ec4899]/20 animate-shimmer"></div>
         
-        {/* Subtle floating particles */}
+        {/* Animated light streaks */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="light-streak light-streak-1"></div>
+          <div className="light-streak light-streak-2"></div>
+          <div className="light-streak light-streak-3"></div>
+        </div>
+        
+        {/* Enhanced floating particles with different sizes */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="particles-container">
-            {[...Array(20)].map((_, i) => (
+            {[...Array(30)].map((_, i) => (
               <div 
                 key={i} 
-                className="particle"
+                className={`particle particle-${i % 3}`}
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
-                  animationDelay: `${Math.random() * 5}s`,
-                  opacity: 0.1 + Math.random() * 0.2
+                  animationDelay: `${Math.random() * 10}s`,
+                  opacity: 0.1 + Math.random() * 0.3,
+                  width: `${4 + Math.random() * 4}px`,
+                  height: `${4 + Math.random() * 4}px`
                 }}
               ></div>
             ))}
@@ -470,25 +479,30 @@ export function Dashboard() {
         </div>
         
         {/* Grid pattern with enhanced mask */}
-        <div className="absolute inset-0 bg-grid-pattern [mask-image:linear-gradient(0deg,rgba(255,255,255,0.7),rgba(255,255,255,0.1))]"></div>
+        <div className="absolute inset-0 bg-grid-pattern [mask-image:linear-gradient(0deg,rgba(255,255,255,0.8),rgba(255,255,255,0.1))]"></div>
         
-        {/* Glow effects */}
-        <div className="absolute -top-20 -left-20 w-60 h-60 bg-pink-500/30 rounded-full filter blur-3xl opacity-30"></div>
-        <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-violet-600/30 rounded-full filter blur-3xl opacity-30"></div>
+        {/* Enhanced glow effects */}
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#f59e0b]/20 dark:bg-[#8b5cf6]/20 rounded-full filter blur-3xl opacity-40 animate-pulse-slow"></div>
+        <div className="absolute top-20 right-20 w-72 h-72 bg-[#ec4899]/20 dark:bg-[#ec4899]/20 rounded-full filter blur-3xl opacity-30 animate-pulse-slower"></div>
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-[#8b5cf6]/20 dark:bg-[#f59e0b]/20 rounded-full filter blur-3xl opacity-40 animate-pulse-slow"></div>
+        <div className="absolute bottom-10 left-1/4 w-64 h-64 bg-[#ec4899]/20 dark:bg-[#8b5cf6]/20 rounded-full filter blur-3xl opacity-30 animate-pulse-slower"></div>
+
+        {/* Subtle texture overlay */}
+        <div className="absolute inset-0 bg-noise-pattern opacity-[0.03]"></div>
 
         <div className="container max-w-7xl mx-auto px-4 relative z-10">
-          {/* Enhanced subtle badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-white/95 text-xs font-medium mb-1 shadow-md border border-white/10">
-            <span className="inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+          {/* Enhanced subtle badge with glow - now green */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10b981]/20 backdrop-blur-md text-white text-xs font-medium mb-1 shadow-md border border-[#10b981]/30 animate-glow">
+            <span className="inline-block w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
             <span>Your Skincare Journey</span>
           </div>
 
           <div className="relative flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div className="space-y-2">
-              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-sm">
-                {greeting}, {displayName}!
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-md">
+                {greeting}, <span className="text-[#f59e0b] dark:text-[#fbbf24]">{displayName}!</span>
               </h1>
-              <p className="text-white/90 max-w-xl backdrop-blur-sm bg-white/5 p-2 rounded-lg border border-white/10 shadow-sm">
+              <p className="text-white/90 max-w-xl backdrop-blur-md bg-white/10 p-3 rounded-lg border border-white/20 shadow-lg">
                 Track your skincare routine, monitor progress, and discover what
                 works best for your skin.
               </p>
@@ -498,7 +512,7 @@ export function Dashboard() {
               <Button
                 variant="secondary"
                 size="sm"
-                className="rounded-full text-sm font-medium backdrop-blur-md bg-white/20 border border-white/10 hover:bg-white/30 transition-all"
+                className="rounded-full text-sm font-medium backdrop-blur-md bg-white/20 border border-white/20 hover:bg-white/30 transition-all shadow-lg hover:shadow-xl hover:scale-105"
                 onClick={handleEditProfile}
               >
                 <svg
@@ -518,7 +532,7 @@ export function Dashboard() {
                 </svg>
                 Edit Profile
               </Button>
-              <Avatar className="h-10 w-10 border-2 border-white/30 shadow-lg">
+              <Avatar className="h-10 w-10 border-2 border-white/40 shadow-xl ring-2 ring-[#f59e0b]/30 dark:ring-[#fbbf24]/30 hover:ring-[#f59e0b]/50 dark:hover:ring-[#fbbf24]/50 transition-all">
                 <div className="flex h-full w-full items-center justify-center bg-primary-foreground text-primary font-medium">
                   {currentUser?.photoURL ? (
                     <AvatarImage src={currentUser.photoURL} alt={displayName} />
@@ -531,12 +545,12 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Enhanced Wave Divider */}
-        <div className="absolute bottom-0 left-0 right-0 h-8 md:h-12 overflow-hidden">
+        {/* Enhanced Wave Divider with double wave */}
+        <div className="absolute bottom-0 left-0 right-0 h-12 md:h-16 overflow-hidden">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 1440 320"
-            className="absolute bottom-0 w-full h-full"
+            className="absolute bottom-0 w-full h-full opacity-90"
             preserveAspectRatio="none"
           >
             <path
@@ -545,7 +559,19 @@ export function Dashboard() {
               d="M0,128L48,144C96,160,192,192,288,186.7C384,181,480,139,576,138.7C672,139,768,181,864,181.3C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
             ></path>
           </svg>
-          <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-background to-transparent"></div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 1440 320"
+            className="absolute bottom-0 w-full h-full opacity-50"
+            preserveAspectRatio="none"
+          >
+            <path
+              fill="hsl(var(--background))"
+              fillOpacity="0.8"
+              d="M0,96L60,106.7C120,117,240,139,360,138.7C480,139,600,117,720,112C840,107,960,117,1080,138.7C1200,160,1320,192,1380,208L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"
+            ></path>
+          </svg>
+          <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-background to-transparent"></div>
         </div>
       </div>
 
@@ -1209,14 +1235,45 @@ export function Dashboard() {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.1)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
           }
           
-          @keyframes gradient-shift {
-            0% { opacity: 0.5; }
-            50% { opacity: 0.8; }
-            100% { opacity: 0.5; }
+          .bg-noise-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
           }
           
-          .animate-gradient-shift {
-            animation: gradient-shift 8s ease infinite;
+          @keyframes shimmer {
+            0% { opacity: 0.4; transform: translateY(-2%) scale(1.02); }
+            50% { opacity: 0.7; transform: translateY(0) scale(1); }
+            100% { opacity: 0.4; transform: translateY(-2%) scale(1.02); }
+          }
+          
+          .animate-shimmer {
+            animation: shimmer 12s ease-in-out infinite;
+          }
+          
+          @keyframes pulse-slow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.05); }
+          }
+          
+          @keyframes pulse-slower {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.08); }
+          }
+          
+          .animate-pulse-slow {
+            animation: pulse-slow 8s ease-in-out infinite;
+          }
+          
+          .animate-pulse-slower {
+            animation: pulse-slower 12s ease-in-out infinite;
+          }
+          
+          @keyframes glow {
+            0%, 100% { box-shadow: 0 0 5px 0 rgba(255, 255, 255, 0.3); }
+            50% { box-shadow: 0 0 15px 0 rgba(255, 255, 255, 0.5); }
+          }
+          
+          .animate-glow {
+            animation: glow 4s ease-in-out infinite;
           }
           
           .particles-container {
@@ -1227,19 +1284,74 @@ export function Dashboard() {
           
           .particle {
             position: absolute;
-            width: 6px;
-            height: 6px;
             background: white;
             border-radius: 50%;
             filter: blur(1px);
             animation: float 15s ease-in-out infinite;
           }
           
+          .dark .particle-0 {
+            background: rgba(255, 255, 255, 0.8);
+          }
+          
+          .dark .particle-1 {
+            background: rgba(251, 191, 36, 0.8);
+          }
+          
+          .dark .particle-2 {
+            background: rgba(236, 72, 153, 0.8);
+          }
+          
+          .particle-0 {
+            background: rgba(255, 255, 255, 0.8);
+          }
+          
+          .particle-1 {
+            background: rgba(245, 158, 11, 0.8);
+          }
+          
+          .particle-2 {
+            background: rgba(236, 72, 153, 0.8);
+          }
+          
           @keyframes float {
             0% { transform: translateY(0) translateX(0) rotate(0); opacity: 0; }
             10% { opacity: 1; }
             90% { opacity: 1; }
-            100% { transform: translateY(-100px) translateX(20px) rotate(360deg); opacity: 0; }
+            100% { transform: translateY(-120px) translateX(20px) rotate(360deg); opacity: 0; }
+          }
+          
+          .light-streak {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            height: 1px;
+            width: 200%;
+            transform: rotate(-45deg);
+            animation: streak 8s linear infinite;
+            opacity: 0;
+          }
+          
+          .light-streak-1 {
+            top: 30%;
+            animation-delay: 0s;
+          }
+          
+          .light-streak-2 {
+            top: 60%;
+            animation-delay: 3s;
+          }
+          
+          .light-streak-3 {
+            top: 10%;
+            animation-delay: 6s;
+          }
+          
+          @keyframes streak {
+            0% { transform: translateX(-100%) rotate(-45deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            50% { opacity: 0.3; }
+            90% { opacity: 0.6; }
+            100% { transform: translateX(100%) rotate(-45deg); opacity: 0; }
           }
         `}
       </style>
