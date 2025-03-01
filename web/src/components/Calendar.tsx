@@ -659,7 +659,7 @@ export function Calendar() {
   if (loading) {
     return (
       <div className="min-h-[200px] flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -670,16 +670,41 @@ export function Calendar() {
     <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 pb-12">
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         {/* Calendar Section */}
-        <Card className="overflow-hidden calendar-container">
-          <CardHeader className="pb-2 px-3 sm:px-6">
+        <Card className="overflow-hidden calendar-container border-primary/20 shadow-lg relative bg-gradient-to-br from-background to-background/80">
+          {/* Subtle floating particles */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="particles-container">
+              {[...Array(8)].map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`particle particle-${i % 3} light-mode-visible`}
+                  style={{
+                    left: `${Math.random() * 100}%`,
+                    top: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 5}s`,
+                    opacity: 0.15 + Math.random() * 0.25,
+                    width: `${3 + Math.random() * 3}px`,
+                    height: `${3 + Math.random() * 3}px`
+                  }}
+                ></div>
+              ))}
+            </div>
+          </div>
+          
+          <CardHeader className="pb-2 px-3 sm:px-6 relative">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-lg sm:text-xl">Skincare Calendar</CardTitle>
-              <CardDescription className="hidden sm:block text-sm">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-primary/30 flex items-center justify-center shadow-sm">
+                  <CalendarIcon className="h-4 w-4 text-primary" />
+                </div>
+                <CardTitle className="text-lg sm:text-xl text-primary dark:text-gradient">Skincare Calendar</CardTitle>
+              </div>
+              <CardDescription className="hidden sm:block text-sm backdrop-blur-sm bg-background/50 px-2 py-1 rounded-md border border-primary/20">
                 Track your skincare routine
               </CardDescription>
             </div>
           </CardHeader>
-          <CardContent className="p-2 sm:p-4">
+          <CardContent className="p-2 sm:p-4 relative">
             {/* Wrap the calendar in a form with onSubmit handler to prevent page refresh */}
             <form 
               onSubmit={(e) => {
@@ -688,15 +713,15 @@ export function Calendar() {
               }}
             >
               <CalendarProvider 
-                className="h-full border rounded-md p-2 bg-card"
+                className="h-full border border-primary/30 rounded-md p-2 bg-card/80 backdrop-blur-sm shadow-inner"
                 onSelectDate={handleDateSelect}
                 selectedDate={selectedDate}
                 onMonthChange={handleMonthChange}
               >
                 <CalendarDate>
-                  <div className="flex items-center gap-2">
-                    <CalendarMonthPicker className="w-24 sm:w-32" />
-                    <CalendarYearPicker start={2020} end={2030} className="w-20 sm:w-24" />
+                  <div className="flex items-center gap-2 p-1">
+                    <CalendarMonthPicker className="w-24 sm:w-32 bg-primary/10 border-primary/20 rounded-md" />
+                    <CalendarYearPicker start={2020} end={2030} className="w-20 sm:w-24 bg-primary/10 border-primary/20 rounded-md" />
                   </div>
                   <CalendarDatePagination />
                 </CalendarDate>
@@ -712,11 +737,11 @@ export function Calendar() {
                   </CalendarBody>
                 </div>
                 
-                <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs">
+                <div className="mt-3 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs bg-background/50 p-2 rounded-md border border-primary/20 backdrop-blur-sm">
                   {STATUSES.map(status => (
                     <div key={status.id} className="flex items-center gap-1.5">
                       <div 
-                        className="h-3 w-3 rounded-full" 
+                        className="h-3 w-3 rounded-full shadow-sm" 
                         style={{ backgroundColor: status.color }}
                       />
                       <span>{status.name}</span>
@@ -745,31 +770,38 @@ export function Calendar() {
         </Card>
         
         {/* Routine Section */}
-        <Card className="overflow-hidden">
-          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4">
-            <CardTitle className="text-base sm:text-lg">
+        <Card className="overflow-hidden border-primary/20 shadow-lg relative bg-gradient-to-br from-background to-background/80">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/10 rounded-full filter blur-xl opacity-70"></div>
+          
+          <CardHeader className="px-3 sm:px-6 py-3 sm:py-4 relative">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/30 text-primary dark:text-primary text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-primary/40">
+              <CalendarIcon className="h-4 w-4" />
+              Daily Routine
+            </div>
+            <CardTitle className="text-base sm:text-lg text-primary dark:text-gradient">
               {formatDateForDisplay(selectedDate)}
             </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
+            <CardDescription className="text-xs sm:text-sm backdrop-blur-sm bg-background/50 p-1 rounded-md inline-block border border-primary/20">
               Track your skincare progress
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-3 sm:p-6 pt-0">
+          <CardContent className="p-3 sm:p-6 pt-0 relative">
             <Tabs defaultValue="morning" onValueChange={(value) => setActiveTab(value as 'morning' | 'evening' | 'weekly' | 'custom')}>
-              <TabsList className="grid w-full grid-cols-4 mb-4">
-                <TabsTrigger value="morning" className="flex items-center gap-1.5">
+              <TabsList className="grid w-full grid-cols-4 mb-4 bg-background/80 backdrop-blur-sm border border-primary/20">
+                <TabsTrigger value="morning" className="flex items-center gap-1.5 data-[state=active]:bg-amber-500/20 data-[state=active]:text-amber-700 dark:data-[state=active]:text-amber-400">
                   <Sun className="h-3.5 w-3.5" />
                   <span>Morning</span>
                 </TabsTrigger>
-                <TabsTrigger value="evening" className="flex items-center gap-1.5">
+                <TabsTrigger value="evening" className="flex items-center gap-1.5 data-[state=active]:bg-indigo-500/20 data-[state=active]:text-indigo-700 dark:data-[state=active]:text-indigo-400">
                   <Moon className="h-3.5 w-3.5" />
                   <span>Evening</span>
                 </TabsTrigger>
-                <TabsTrigger value="weekly" className="flex items-center gap-1.5">
+                <TabsTrigger value="weekly" className="flex items-center gap-1.5 data-[state=active]:bg-green-500/20 data-[state=active]:text-green-700 dark:data-[state=active]:text-green-400">
                   <CalendarIcon className="h-3.5 w-3.5" />
                   <span>Weekly</span>
                 </TabsTrigger>
-                <TabsTrigger value="custom" className="flex items-center gap-1.5">
+                <TabsTrigger value="custom" className="flex items-center gap-1.5 data-[state=active]:bg-purple-500/20 data-[state=active]:text-purple-700 dark:data-[state=active]:text-purple-400">
                   <Settings className="h-3.5 w-3.5" />
                   <span>Custom</span>
                 </TabsTrigger>
@@ -794,26 +826,26 @@ export function Calendar() {
                                 key={step.productId}
                                 className={cn(
                                   "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors",
-                                  "border border-border/50",
-                                  isCompleted ? "bg-primary/10" : "bg-background"
+                                  "border border-border/50 shadow-sm",
+                                  isCompleted ? "bg-primary/10 backdrop-blur-sm" : "bg-background/80"
                                 )}
                               >
                                 <Button
                                   variant="outline"
                                   size="icon"
                                   className={cn(
-                                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full",
-                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90"
+                                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all duration-200",
+                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                                   )}
                                   onClick={() => handleStepToggle(routine.id, step.productId, 'morning', !isCompleted)}
                                   disabled={saving}
                                 >
                                   <Check className={cn(
-                                    "h-3.5 w-3.5 sm:h-4 sm:w-4",
+                                    "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-opacity duration-200",
                                     isCompleted ? "opacity-100" : "opacity-0"
                                   )} />
                                 </Button>
-                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
+                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border border-primary/20 shadow-sm">
                                   <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
                                     {(() => {
                                       const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
@@ -838,7 +870,7 @@ export function Calendar() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20">
+                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20 backdrop-blur-sm border-primary/20">
                     <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground text-sm">No routines scheduled for this day</p>
                   </div>
@@ -864,26 +896,26 @@ export function Calendar() {
                                 key={step.productId}
                                 className={cn(
                                   "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors",
-                                  "border border-border/50",
-                                  isCompleted ? "bg-primary/10" : "bg-background"
+                                  "border border-border/50 shadow-sm",
+                                  isCompleted ? "bg-primary/10 backdrop-blur-sm" : "bg-background/80"
                                 )}
                               >
                                 <Button
                                   variant="outline"
                                   size="icon"
                                   className={cn(
-                                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full",
-                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90"
+                                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all duration-200",
+                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                                   )}
                                   onClick={() => handleStepToggle(routine.id, step.productId, 'evening', !isCompleted)}
                                   disabled={saving}
                                 >
                                   <Check className={cn(
-                                    "h-3.5 w-3.5 sm:h-4 sm:w-4",
+                                    "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-opacity duration-200",
                                     isCompleted ? "opacity-100" : "opacity-0"
                                   )} />
                                 </Button>
-                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
+                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border border-primary/20 shadow-sm">
                                   <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
                                     {(() => {
                                       const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
@@ -908,7 +940,7 @@ export function Calendar() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20">
+                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20 backdrop-blur-sm border-primary/20">
                     <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground text-sm">No routines scheduled for this day</p>
                   </div>
@@ -934,26 +966,26 @@ export function Calendar() {
                                 key={step.productId}
                                 className={cn(
                                   "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors",
-                                  "border border-border/50",
-                                  isCompleted ? "bg-primary/10" : "bg-background"
+                                  "border border-border/50 shadow-sm",
+                                  isCompleted ? "bg-primary/10 backdrop-blur-sm" : "bg-background/80"
                                 )}
                               >
                                 <Button
                                   variant="outline"
                                   size="icon"
                                   className={cn(
-                                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full",
-                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90"
+                                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all duration-200",
+                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                                   )}
                                   onClick={() => handleStepToggle(routine.id, step.productId, 'weekly', !isCompleted)}
                                   disabled={saving}
                                 >
                                   <Check className={cn(
-                                    "h-3.5 w-3.5 sm:h-4 sm:w-4",
+                                    "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-opacity duration-200",
                                     isCompleted ? "opacity-100" : "opacity-0"
                                   )} />
                                 </Button>
-                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
+                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border border-primary/20 shadow-sm">
                                   <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
                                     {(() => {
                                       const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
@@ -978,7 +1010,7 @@ export function Calendar() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20">
+                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20 backdrop-blur-sm border-primary/20">
                     <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground text-sm">No weekly routines scheduled for this day</p>
                   </div>
@@ -1004,26 +1036,26 @@ export function Calendar() {
                                 key={step.productId}
                                 className={cn(
                                   "flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg transition-colors",
-                                  "border border-border/50",
-                                  isCompleted ? "bg-primary/10" : "bg-background"
+                                  "border border-border/50 shadow-sm",
+                                  isCompleted ? "bg-primary/10 backdrop-blur-sm" : "bg-background/80"
                                 )}
                               >
                                 <Button
                                   variant="outline"
                                   size="icon"
                                   className={cn(
-                                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full",
-                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90"
+                                    "h-7 w-7 sm:h-8 sm:w-8 rounded-full transition-all duration-200",
+                                    isCompleted && "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md"
                                   )}
                                   onClick={() => handleStepToggle(routine.id, step.productId, 'custom', !isCompleted)}
                                   disabled={saving}
                                 >
                                   <Check className={cn(
-                                    "h-3.5 w-3.5 sm:h-4 sm:w-4",
+                                    "h-3.5 w-3.5 sm:h-4 sm:w-4 transition-opacity duration-200",
                                     isCompleted ? "opacity-100" : "opacity-0"
                                   )} />
                                 </Button>
-                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
+                                <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border border-primary/20 shadow-sm">
                                   <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
                                     {(() => {
                                       const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
@@ -1048,7 +1080,7 @@ export function Calendar() {
                     })}
                   </div>
                 ) : (
-                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20">
+                  <div className="text-center py-6 sm:py-8 border rounded-md bg-muted/20 backdrop-blur-sm border-primary/20">
                     <AlertCircle className="h-8 w-8 sm:h-10 sm:w-10 text-muted-foreground mx-auto mb-2" />
                     <p className="text-muted-foreground text-sm">No custom routines scheduled for this day</p>
                   </div>
