@@ -619,8 +619,8 @@ export function Dashboard() {
               transition={{ duration: 0.3 }}
               className="space-y-8"
             >
-              {/* Overview Card - Enhanced for better light mode visibility */}
-              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/90 via-primary/80 to-primary/70 dark:from-primary/30 dark:via-primary/20 dark:to-background border border-primary/40 dark:border-primary/30 p-6 group hover:shadow-lg transition-all duration-300">
+              {/* Overview Card - Consistent with dark mode pattern but with proper light mode contrast */}
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/40 via-primary/30 to-background border border-primary/40 dark:border-primary/30 p-6 group hover:shadow-lg transition-all duration-300">
                 <div className="absolute inset-0 bg-grid-pattern opacity-15 group-hover:opacity-25 transition-opacity"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 {/* Animated light streaks - enhanced for light mode */}
@@ -649,48 +649,48 @@ export function Dashboard() {
                 </div>
                 <div className="relative flex flex-col md:flex-row md:items-center gap-6">
                   <div className="flex-1 space-y-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/50 text-white text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-primary/40 animate-glow">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/30 text-primary dark:text-primary text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-primary/40 animate-glow">
                       <Package className="h-4 w-4" />
                       Dashboard Overview
                     </div>
-                    <h2 className="text-2xl font-bold tracking-tight mb-2 text-white dark:text-gradient">
+                    <h2 className="text-2xl font-bold tracking-tight mb-2 text-primary dark:text-gradient">
                       Welcome to Your Dashboard
                     </h2>
-                    <p className="text-white/95 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-primary/30 shadow-sm">
+                    <p className="text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-primary/30 shadow-sm">
                       Track your skincare journey, monitor product usage, and
                       see your progress over time.
                     </p>
                   </div>
                   <div className="hidden md:block">
-                    <div className="h-16 w-16 rounded-2xl bg-primary/60 flex items-center justify-center shadow-glow animate-pulse-slow">
-                      <Package className="h-8 w-8 text-white dark:text-primary" />
+                    <div className="h-16 w-16 rounded-2xl bg-primary/40 flex items-center justify-center shadow-glow animate-pulse-slow">
+                      <Package className="h-8 w-8 text-primary-foreground dark:text-primary" />
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Quick Stats - Enhanced with better light mode gradients and text contrast */}
+              {/* Quick Stats - Consistent with dark mode pattern but with proper light mode contrast */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <motion.div 
                   whileHover={{ scale: 1.03 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
                   <Card
-                    className="bg-gradient-to-br from-blue-700/60 to-blue-500/50 dark:from-blue-900/30 dark:to-blue-800/20 border-blue-300/60 dark:border-blue-800/30 cursor-pointer overflow-hidden relative group"
+                    className="bg-gradient-to-br from-blue-500/30 to-blue-400/20 dark:from-blue-900/30 dark:to-blue-800/20 border-blue-300/60 dark:border-blue-800/30 cursor-pointer overflow-hidden relative group"
                     onClick={() => setActiveTab("products")}
                   >
                     <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/30 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
                     <CardContent className="p-6 relative">
                       <div className="flex flex-col">
-                        <span className="text-white dark:text-blue-400 text-sm font-medium flex items-center gap-2">
+                        <span className="text-blue-700 dark:text-blue-400 text-sm font-medium flex items-center gap-2">
                           <Package className="h-4 w-4" />
                           Products
                         </span>
-                        <span className="text-3xl font-bold mt-1 text-white dark:text-blue-300 transition-colors">
+                        <span className="text-3xl font-bold mt-1 text-blue-800 group-hover:text-blue-900 dark:text-blue-300 dark:group-hover:text-blue-200 transition-colors">
                           {productStats.total}
                         </span>
-                        <span className="text-white/90 dark:text-blue-400/70 text-xs mt-1 transition-colors">
+                        <span className="text-blue-700/80 dark:text-blue-400/70 text-xs mt-1 group-hover:text-blue-800 dark:group-hover:text-blue-300 transition-colors">
                           {productStats.active} active
                         </span>
                       </div>
@@ -703,21 +703,21 @@ export function Dashboard() {
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
                   <Card
-                    className="bg-gradient-to-br from-green-700/60 to-green-500/50 dark:from-green-900/30 dark:to-green-800/20 border-green-300/60 dark:border-green-800/30 cursor-pointer overflow-hidden relative group"
+                    className="bg-gradient-to-br from-green-500/30 to-green-400/20 dark:from-green-900/30 dark:to-green-800/20 border-green-300/60 dark:border-green-800/30 cursor-pointer overflow-hidden relative group"
                     onClick={() => navigate("/calendar")}
                   >
                     <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-green-500/30 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-green-500/20 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
                     <CardContent className="p-6 relative">
                       <div className="flex flex-col">
-                        <span className="text-white dark:text-green-400 text-sm font-medium flex items-center gap-2">
+                        <span className="text-green-700 dark:text-green-400 text-sm font-medium flex items-center gap-2">
                           <CheckCircle className="h-4 w-4" />
                           Streak
                         </span>
-                        <span className="text-3xl font-bold mt-1 text-white dark:text-green-300 transition-colors">
+                        <span className="text-3xl font-bold mt-1 text-green-800 group-hover:text-green-900 dark:text-green-300 dark:group-hover:text-green-200 transition-colors">
                           {streak}
                         </span>
-                        <span className="text-white/90 dark:text-green-400/70 text-xs mt-1 transition-colors">
+                        <span className="text-green-700/80 dark:text-green-400/70 text-xs mt-1 group-hover:text-green-800 dark:group-hover:text-green-300 transition-colors">
                           Days in a row
                         </span>
                       </div>
@@ -730,21 +730,21 @@ export function Dashboard() {
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
                   <Card
-                    className="bg-gradient-to-br from-amber-700/60 to-amber-500/50 dark:from-amber-900/30 dark:to-amber-800/20 border-amber-300/60 dark:border-amber-800/30 cursor-pointer overflow-hidden relative group"
+                    className="bg-gradient-to-br from-amber-500/30 to-amber-400/20 dark:from-amber-900/30 dark:to-amber-800/20 border-amber-300/60 dark:border-amber-800/30 cursor-pointer overflow-hidden relative group"
                     onClick={() => setActiveTab("routines")}
                   >
                     <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-amber-500/30 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-amber-500/20 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
                     <CardContent className="p-6 relative">
                       <div className="flex flex-col">
-                        <span className="text-white dark:text-amber-400 text-sm font-medium flex items-center gap-2">
+                        <span className="text-amber-700 dark:text-amber-400 text-sm font-medium flex items-center gap-2">
                           <Clock className="h-4 w-4" />
                           Progress
                         </span>
-                        <span className="text-3xl font-bold mt-1 text-white dark:text-amber-300 transition-colors">
+                        <span className="text-3xl font-bold mt-1 text-amber-800 group-hover:text-amber-900 dark:text-amber-300 dark:group-hover:text-amber-200 transition-colors">
                           {completedRoutines}
                         </span>
-                        <span className="text-white/90 dark:text-amber-400/70 text-xs mt-1 transition-colors">
+                        <span className="text-amber-700/80 dark:text-amber-400/70 text-xs mt-1 group-hover:text-amber-800 dark:group-hover:text-amber-300 transition-colors">
                           Routines completed
                         </span>
                       </div>
@@ -757,21 +757,21 @@ export function Dashboard() {
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                 >
                   <Card
-                    className="bg-gradient-to-br from-purple-700/60 to-purple-500/50 dark:from-purple-900/30 dark:to-purple-800/20 border-purple-300/60 dark:border-purple-800/30 cursor-pointer overflow-hidden relative group"
+                    className="bg-gradient-to-br from-purple-500/30 to-purple-400/20 dark:from-purple-900/30 dark:to-purple-800/20 border-purple-300/60 dark:border-purple-800/30 cursor-pointer overflow-hidden relative group"
                     onClick={() => setActiveTab("progress")}
                   >
                     <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
-                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/30 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/20 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
                     <CardContent className="p-6 relative">
                       <div className="flex flex-col">
-                        <span className="text-white dark:text-purple-400 text-sm font-medium flex items-center gap-2">
+                        <span className="text-purple-700 dark:text-purple-400 text-sm font-medium flex items-center gap-2">
                           <Star className="h-4 w-4" />
                           Finished
                         </span>
-                        <span className="text-3xl font-bold mt-1 text-white dark:text-purple-300 transition-colors">
+                        <span className="text-3xl font-bold mt-1 text-purple-800 group-hover:text-purple-900 dark:text-purple-300 dark:group-hover:text-purple-200 transition-colors">
                           {productStats.finished}
                         </span>
-                        <span className="text-white/90 dark:text-purple-400/70 text-xs mt-1 transition-colors">
+                        <span className="text-purple-700/80 dark:text-purple-400/70 text-xs mt-1 group-hover:text-purple-800 dark:group-hover:text-purple-300 transition-colors">
                           {productStats.repurchase} would repurchase
                         </span>
                       </div>
@@ -807,17 +807,17 @@ export function Dashboard() {
                   <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex items-center gap-4">
                       <div className="h-12 w-12 rounded-full bg-blue-500/40 flex items-center justify-center shadow-sm animate-pulse-slow">
-                        <Package className="h-6 w-6 text-white dark:text-blue-400" />
+                        <Package className="h-6 w-6 text-blue-950 dark:text-blue-400" />
                       </div>
                       <div>
-                        <h3 className="text-xl font-bold text-white dark:text-blue-200">Recent Products</h3>
-                        <p className="text-white/90 dark:text-blue-400/80 text-sm">Your latest skincare additions</p>
+                        <h3 className="text-xl font-bold text-blue-950 dark:text-blue-200">Recent Products</h3>
+                        <p className="text-blue-800 dark:text-blue-400/80 text-sm">Your latest skincare additions</p>
                       </div>
                     </div>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="gap-1 text-white dark:text-blue-400 group-hover:bg-blue-500/15 transition-colors"
+                      className="gap-1 text-blue-900 dark:text-blue-400 group-hover:bg-blue-500/15 transition-colors"
                       onClick={() => setActiveTab("products")}
                     >
                       <span>View All</span>
@@ -991,7 +991,7 @@ export function Dashboard() {
               transition={{ duration: 0.3 }}
               className="space-y-6"
             >
-              {/* Header Section - enhanced for better light mode visibility */}
+              {/* Header Section - Updated with better text contrast for light mode */}
               <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600/60 via-blue-500/50 to-blue-400/40 dark:from-blue-500/20 dark:via-blue-500/15 dark:to-background border border-blue-500/40 dark:border-blue-500/30 p-6 group hover:shadow-lg transition-all duration-300">
                 <div className="absolute inset-0 bg-grid-pattern opacity-15 group-hover:opacity-25 transition-opacity"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -1021,21 +1021,21 @@ export function Dashboard() {
                 </div>
                 <div className="relative flex flex-col md:flex-row md:items-center gap-6">
                   <div className="flex-1 space-y-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/30 text-white dark:text-blue-400 text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-blue-500/40 animate-glow">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/30 text-blue-900 dark:text-blue-400 text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-blue-500/40 animate-glow">
                       <Package className="h-4 w-4" />
                       Product Management
                     </div>
-                    <h2 className="text-2xl font-bold tracking-tight mb-2 text-white dark:text-blue-200">
+                    <h2 className="text-2xl font-bold tracking-tight mb-2 text-blue-950 dark:text-blue-200">
                       Your Products
                     </h2>
-                    <p className="text-white/90 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-blue-500/30 shadow-sm">
+                    <p className="text-blue-800 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-blue-500/30 shadow-sm">
                       Keep track of your skincare products, mark favorites, and manage your collection.
                     </p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="hidden md:block">
                       <div className="h-16 w-16 rounded-2xl bg-blue-500/40 flex items-center justify-center shadow-glow animate-pulse-slow">
-                        <Package className="h-8 w-8 text-white dark:text-blue-400" />
+                        <Package className="h-8 w-8 text-blue-950 dark:text-blue-400" />
                       </div>
                     </div>
                     <AddProductDialog
@@ -1048,78 +1048,78 @@ export function Dashboard() {
                 </div>
               </div>
               
-              {/* Quick Stats - Enhanced with better light mode gradients */}
+              {/* Quick Stats - Consistent with dark mode pattern */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-blue-700/60 to-blue-500/50 dark:from-blue-900/30 dark:to-blue-800/20 border-blue-300/60 dark:border-blue-800/30 overflow-hidden relative">
+                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-blue-500/30 to-blue-400/20 dark:from-blue-900/30 dark:to-blue-800/20 border-blue-300/60 dark:border-blue-800/30 overflow-hidden relative">
                   <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
-                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/30 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-blue-500/20 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
                   <CardContent className="p-4 relative">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-blue-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Package className="h-5 w-5 text-white dark:text-blue-400" />
+                      <div className="h-10 w-10 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Package className="h-5 w-5 text-blue-700 dark:text-blue-400" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-xs text-white/90 dark:text-muted-foreground">
+                        <span className="text-xs text-blue-700/70 dark:text-muted-foreground">
                           Total Products
                         </span>
-                        <span className="text-2xl font-bold text-white dark:text-blue-200">
+                        <span className="text-2xl font-bold text-blue-800 dark:text-blue-200">
                           {productStats.total}
                         </span>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-green-700/60 to-green-500/50 dark:from-green-900/30 dark:to-green-800/20 border-green-300/60 dark:border-green-800/30 overflow-hidden relative">
+                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-green-500/30 to-green-400/20 dark:from-green-900/30 dark:to-green-800/20 border-green-300/60 dark:border-green-800/30 overflow-hidden relative">
                   <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
-                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-green-500/30 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-green-500/20 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
                   <CardContent className="p-4 relative">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-green-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Package className="h-5 w-5 text-white dark:text-green-400" />
+                      <div className="h-10 w-10 rounded-lg bg-green-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Package className="h-5 w-5 text-green-700 dark:text-green-400" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-xs text-white/90 dark:text-muted-foreground">
+                        <span className="text-xs text-green-700/70 dark:text-muted-foreground">
                           Active
                         </span>
-                        <span className="text-2xl font-bold text-white dark:text-green-200">
+                        <span className="text-2xl font-bold text-green-800 dark:text-green-200">
                           {productStats.active}
                         </span>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-purple-700/60 to-purple-500/50 dark:from-purple-900/30 dark:to-purple-800/20 border-purple-300/60 dark:border-purple-800/30 overflow-hidden relative">
+                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-purple-500/30 to-purple-400/20 dark:from-purple-900/30 dark:to-purple-800/20 border-purple-300/60 dark:border-purple-800/30 overflow-hidden relative">
                   <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
-                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/30 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/20 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
                   <CardContent className="p-4 relative">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-purple-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Package className="h-5 w-5 text-white dark:text-purple-400" />
+                      <div className="h-10 w-10 rounded-lg bg-purple-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Package className="h-5 w-5 text-purple-700 dark:text-purple-400" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-xs text-white/90 dark:text-muted-foreground">
+                        <span className="text-xs text-purple-700/70 dark:text-muted-foreground">
                           Finished
                         </span>
-                        <span className="text-2xl font-bold text-white dark:text-purple-200">
+                        <span className="text-2xl font-bold text-purple-800 dark:text-purple-200">
                           {productStats.finished}
                         </span>
                       </div>
                     </div>
                   </CardContent>
                 </Card>
-                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-amber-700/60 to-amber-500/50 dark:from-amber-900/30 dark:to-amber-800/20 border-amber-300/60 dark:border-amber-800/30 overflow-hidden relative">
+                <Card className="group hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-amber-500/30 to-amber-400/20 dark:from-amber-900/30 dark:to-amber-800/20 border-amber-300/60 dark:border-amber-800/30 overflow-hidden relative">
                   <div className="absolute inset-0 bg-grid-pattern opacity-5 group-hover:opacity-10 transition-opacity"></div>
-                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-amber-500/30 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-amber-500/20 rounded-full filter blur-xl opacity-70 group-hover:opacity-100 transition-opacity"></div>
                   <CardContent className="p-4 relative">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 rounded-lg bg-amber-500/40 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Package className="h-5 w-5 text-white dark:text-amber-400" />
+                      <div className="h-10 w-10 rounded-lg bg-amber-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Package className="h-5 w-5 text-amber-700 dark:text-amber-400" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-xs text-white/90 dark:text-muted-foreground">
+                        <span className="text-xs text-amber-700/70 dark:text-muted-foreground">
                           Would Repurchase
                         </span>
-                        <span className="text-2xl font-bold text-white dark:text-amber-200">
+                        <span className="text-2xl font-bold text-amber-800 dark:text-amber-200">
                           {productStats.repurchase}
                         </span>
                       </div>
@@ -1205,6 +1205,7 @@ export function Dashboard() {
               transition={{ duration: 0.3 }}
               className="space-y-4"
             >
+              {/* Routines Header - Updated with better text contrast for light mode */}
               <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-600/60 via-purple-500/50 to-purple-400/40 dark:from-purple-500/20 dark:via-purple-500/15 dark:to-background border border-purple-500/40 dark:border-purple-500/30 p-6 group hover:shadow-lg transition-all duration-300">
                 <div className="absolute inset-0 bg-grid-pattern opacity-15 group-hover:opacity-25 transition-opacity"></div>
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -1234,20 +1235,20 @@ export function Dashboard() {
                 </div>
                 <div className="relative flex flex-col md:flex-row md:items-center gap-6">
                   <div className="flex-1 space-y-2">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/30 text-white dark:text-purple-400 text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-purple-500/40 animate-glow">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/30 text-purple-900 dark:text-purple-400 text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-purple-500/40 animate-glow">
                       <Clock className="h-4 w-4" />
                       Daily Routines
                     </div>
-                    <h2 className="text-2xl font-bold tracking-tight mb-2 text-white dark:text-purple-200">
+                    <h2 className="text-2xl font-bold tracking-tight mb-2 text-purple-950 dark:text-purple-200">
                       Your Routines
                     </h2>
-                    <p className="text-white/90 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-purple-500/30 shadow-sm">
+                    <p className="text-purple-800 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-purple-500/30 shadow-sm">
                       Create and customize your morning and evening skincare routines for optimal results.
                     </p>
                   </div>
                   <div className="hidden md:block">
                     <div className="h-16 w-16 rounded-2xl bg-purple-500/40 flex items-center justify-center shadow-glow animate-pulse-slow">
-                      <Clock className="h-8 w-8 text-white dark:text-purple-400" />
+                      <Clock className="h-8 w-8 text-purple-950 dark:text-purple-400" />
                     </div>
                   </div>
                 </div>
@@ -1336,14 +1337,14 @@ export function Dashboard() {
                   <div className="relative p-6">
                     <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                       <div className="space-y-2">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/30 text-white dark:text-green-400 text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-green-500/40 animate-glow">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/30 text-green-900 dark:text-green-400 text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-green-500/40 animate-glow">
                           <Camera className="h-4 w-4" />
                           Progress Photos
                         </div>
-                        <h2 className="text-2xl font-bold tracking-tight text-white dark:text-green-200">
+                        <h2 className="text-2xl font-bold tracking-tight text-green-950 dark:text-green-200">
                           Track Your Journey
                         </h2>
-                        <p className="text-white/90 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-green-500/30 shadow-sm">
+                        <p className="text-green-800 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-green-500/30 shadow-sm">
                           Document your skincare progress with photos. Compare and see your transformation over time.
                         </p>
                       </div>
@@ -1361,7 +1362,7 @@ export function Dashboard() {
                         <Button
                           variant="outline"
                           onClick={() => fileInputRef.current?.click()}
-                          className="group relative overflow-hidden gap-2 border-green-300 text-white bg-green-500/20 hover:bg-green-500/30 dark:text-green-400 dark:bg-transparent dark:hover:bg-green-900/20"
+                          className="group relative overflow-hidden gap-2 border-green-300 text-green-900 bg-green-500/20 hover:bg-green-500/30 dark:text-green-400 dark:bg-transparent dark:hover:bg-green-900/20"
                           size="lg"
                           disabled={isUploading}
                         >
