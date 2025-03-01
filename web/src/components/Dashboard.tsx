@@ -17,7 +17,6 @@ import { motion } from 'framer-motion';
 import { storage } from '../lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'sonner';
-
 export interface ProductStats {
   total: number;
   active: number;
@@ -503,8 +502,12 @@ export function Dashboard() {
               </div>
 
               {/* Quick Stats */}
+
+              {/* When pressed, takes user to Product tab */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 border-blue-200 dark:border-blue-800">
+                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/20 dark:to-blue-900/20 border-blue-200 dark:border-blue-800 cursor-pointer"
+                onClick={() => setActiveTab('products')}
+                >
                   <CardContent className="p-6">
                     <div className="flex flex-col">
                       <span className="text-blue-600 dark:text-blue-400 text-sm font-medium">Products</span>
@@ -516,19 +519,11 @@ export function Dashboard() {
                   </CardContent>
                 </Card>
                 
-                <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 border-purple-200 dark:border-purple-800">
-                  <CardContent className="p-6">
-                    <div className="flex flex-col">
-                      <span className="text-purple-600 dark:text-purple-400 text-sm font-medium">Finished</span>
-                      <span className="text-3xl font-bold mt-1">{productStats.finished}</span>
-                      <span className="text-muted-foreground text-xs mt-1">
-                        {productStats.repurchase} would repurchase
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/20 dark:to-green-900/20 border-green-200 dark:border-green-800">
+          
+                {/* When pressed, navigates to calendar page /calendar  */}
+                <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/20 dark:to-green-900/20 border-green-200 dark:border-green-800 cursor-pointer"
+                onClick={() => navigate('/calendar')}
+                >
                   <CardContent className="p-6">
                     <div className="flex flex-col">
                       <span className="text-green-600 dark:text-green-400 text-sm font-medium">Streak</span>
@@ -538,12 +533,30 @@ export function Dashboard() {
                   </CardContent>
                 </Card>
                 
-                <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/20 dark:to-amber-900/20 border-amber-200 dark:border-amber-800">
+                {/* When pressed, takes user to Routine tab */}
+                <Card className="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-950/20 dark:to-amber-900/20 border-amber-200 dark:border-amber-800 cursor-pointer"
+                onClick={() => setActiveTab('routines')}
+                >
                   <CardContent className="p-6">
                     <div className="flex flex-col">
                       <span className="text-amber-600 dark:text-amber-400 text-sm font-medium">Progress</span>
                       <span className="text-3xl font-bold mt-1">{completedRoutines}</span>
                       <span className="text-muted-foreground text-xs mt-1">Routines completed</span>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* When pressed, takes user to Progress tab */}  
+                <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 border-purple-200 dark:border-purple-800 cursor-pointer"
+                onClick={() => setActiveTab('progress')}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex flex-col">
+                      <span className="text-purple-600 dark:text-purple-400 text-sm font-medium">Finished</span>
+                      <span className="text-3xl font-bold mt-1">{productStats.finished}</span>
+                      <span className="text-muted-foreground text-xs mt-1">
+                        {productStats.repurchase} would repurchase
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
