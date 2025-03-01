@@ -65,10 +65,13 @@ const DashboardProducts = React.memo(({
       
       {/* Quick Stats - Simplified for better performance */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <Card className={cn(
-          "border",
-          productFilter === "all" || productFilter === undefined ? "bg-blue-100 dark:bg-blue-900/30" : ""
-        )}>
+        <Card 
+          className={cn(
+            "border cursor-pointer hover:shadow-md transition-shadow",
+            productFilter === "all" || productFilter === undefined ? "bg-blue-100 dark:bg-blue-900/30" : ""
+          )}
+          onClick={() => onFilterChange(undefined)}
+        >
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
@@ -86,10 +89,13 @@ const DashboardProducts = React.memo(({
           </CardContent>
         </Card>
 
-        <Card className={cn(
-          "border",
-          productFilter === "active" ? "bg-green-100 dark:bg-green-900/30" : ""
-        )}>
+        <Card 
+          className={cn(
+            "border cursor-pointer hover:shadow-md transition-shadow",
+            productFilter === "active" ? "bg-green-100 dark:bg-green-900/30" : ""
+          )}
+          onClick={() => onFilterChange("active")}
+        >
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-green-500/20 flex items-center justify-center">
@@ -107,10 +113,13 @@ const DashboardProducts = React.memo(({
           </CardContent>
         </Card>
 
-        <Card className={cn(
-          "border",
-          productFilter === "finished" ? "bg-purple-100 dark:bg-purple-900/30" : ""
-        )}>
+        <Card 
+          className={cn(
+            "border cursor-pointer hover:shadow-md transition-shadow",
+            productFilter === "finished" ? "bg-purple-100 dark:bg-purple-900/30" : ""
+          )}
+          onClick={() => onFilterChange("finished")}
+        >
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
@@ -128,10 +137,13 @@ const DashboardProducts = React.memo(({
           </CardContent>
         </Card>
 
-        <Card className={cn(
-          "border",
-          productFilter === "repurchase" ? "bg-amber-100 dark:bg-amber-900/30" : ""
-        )}>
+        <Card 
+          className={cn(
+            "border cursor-pointer hover:shadow-md transition-shadow",
+            productFilter === "repurchase" ? "bg-amber-100 dark:bg-amber-900/30" : ""
+          )}
+          onClick={() => onFilterChange("repurchase")}
+        >
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 rounded-lg bg-amber-500/20 flex items-center justify-center">
