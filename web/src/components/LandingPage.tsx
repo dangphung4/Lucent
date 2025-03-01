@@ -15,8 +15,6 @@ import {
   Smartphone,
   Apple,
   Monitor,
-  Menu,
-  Plus,
   ExternalLink,
 } from "lucide-react";
 import "./animations.css";
@@ -50,141 +48,38 @@ export function LandingPage() {
   return (
     <div className="flex flex-col antialiased">
       {/* Hero Section with Gradient Background */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-background via-background to-primary/5 min-h-[90vh] flex items-center justify-center pt-16 pb-20 md:pt-24 md:pb-32">
-        <div className="container mx-auto px-4 md:px-6 max-w-screen-xl">
-          <div className="flex flex-col items-center text-center space-y-8 relative z-10">
-            <div className="space-y-6 max-w-3xl mx-auto">
-              <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary mb-4 backdrop-blur-sm animate-glow">
-                Your Personal Skincare Companion
-              </div>
-              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/70 px-4 text-gradient">
-                Your Skincare Journey, Tracked
-              </h1>
-              <p className="mx-auto max-w-[700px] text-muted-foreground text-lg md:text-xl leading-relaxed px-4">
-                Discover what works best for your skin by tracking products,
-                routines, and results in one beautiful app. Start your
-                skincare journey today.
-              </p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto px-4">
-              {currentUser ? (
-                <Button
-                  onClick={() => navigate("/dashboard")}
-                  size="lg"
-                  className="w-full sm:w-auto px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="relative z-10">Dashboard</span>
-                </Button>
-              ) : (
-                <Link to="/login" className="w-full sm:w-auto">
-                  <Button
-                    size="lg"
-                    className="w-full px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="relative z-10">Get Started Free</span>
-                  </Button>
-                </Link>
-              )}
-              {currentUser ? (
-                <Link to="/calendar" className="w-full sm:w-auto">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full px-8 rounded-full border-2 group relative overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className="relative z-10">Calendar</span>
-                  </Button>
-                </Link>
-              ) : (
-                <>
-                  <Link to="/login" className="w-full sm:w-auto">
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      className="w-full px-8 rounded-full border-2 group relative overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <span className="relative z-10">Sign In</span>
-                    </Button>
-                  </Link>
-                </>
-              )}
-              <Link to="/about" className="w-full sm:w-auto">
-                <Button
-                  size="lg"
-                  variant="secondary"
-                  className="w-full px-8 rounded-full group relative overflow-hidden"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <span className="relative z-10">About Us</span>
-                </Button>
-              </Link>
-            </div>
-
-            {/* App Preview Image */}
-            <div className="relative w-full max-w-4xl mt-12 md:mt-20 px-4">
-              {/* Enhanced background glow */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/5 to-primary/10 rounded-3xl blur-3xl -z-10 transform scale-110 animate-pulse-slow"></div>
-
-              {/* Simplified container with enhanced effects */}
-              <div className="relative">
-                {/* Enhanced border glow */}
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/40 to-primary/60 rounded-2xl blur-sm opacity-75 animate-shimmer"></div>
-
-                {/* Main container with enhanced shadows */}
-                <div className="relative bg-card border rounded-2xl shadow-2xl overflow-hidden dark:border-gray-800/50 backdrop-blur-sm">
-                  {/* Enhanced browser-like top bar */}
-                  <div className="bg-muted/40 border-b border-primary/10 p-3 flex items-center gap-2 backdrop-blur-sm">
-                    <div className="flex gap-2">
-                      <div className="h-3 w-3 rounded-full bg-red-500/90"></div>
-                      <div className="h-3 w-3 rounded-full bg-yellow-500/90"></div>
-                      <div className="h-3 w-3 rounded-full bg-green-500/90"></div>
-                    </div>
-                    <div className="flex-1 text-center">
-                      <div className="px-4 py-1.5 rounded-full bg-background/50 text-xs font-medium text-muted-foreground inline-block backdrop-blur-sm">
-                        skincaregod.vercel.app
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Enhanced image container */}
-                  <div className="p-1 bg-gradient-to-b from-transparent to-background/5">
-                    <img
-                      src={
-                        theme === "light"
-                          ? "/dashboard-preview-light.png"
-                          : "/dashboard-preview.png"
-                      }
-                      alt="Lucent Dashboard Preview"
-                      className="w-full h-auto rounded-xl shadow-xl"
-                      loading="lazy"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Enhanced decorative elements */}
-        <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none select-none">
-          {/* Grid pattern background */}
+      <section className="relative overflow-hidden min-h-[90vh] flex items-center justify-center pt-12 pb-16 md:pt-24 md:pb-32">
+        {/* Dynamic background with animated gradients */}
+        <div className="absolute inset-0 -z-10">
+          <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-primary/5"></div>
           <div className="absolute inset-0 bg-grid-pattern opacity-10"></div>
-          
-          {/* Animated light streaks */}
-          <div className="light-streak light-streak-1 light-mode-visible"></div>
-          <div className="light-streak light-streak-2 light-mode-visible"></div>
-          <div className="light-streak light-streak-3 light-mode-visible"></div>
-          
-          {/* Floating particles */}
+          <div className="absolute top-0 right-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-gradient-radial from-primary/20 to-transparent rounded-full blur-3xl opacity-70 animate-pulse-slow"></div>
+          <div className="absolute bottom-0 left-0 w-[300px] md:w-[500px] h-[300px] md:h-[500px] bg-gradient-radial from-primary/20 to-transparent rounded-full blur-3xl opacity-70 animate-pulse-slower"></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] md:w-[800px] h-[500px] md:h-[800px] bg-gradient-radial from-primary/5 to-transparent rounded-full blur-3xl opacity-50"></div>
+        </div>
+        
+        {/* Animated particles - fewer on mobile */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="particles-container">
-            {[...Array(12)].map((_, i) => (
+            {[...Array(10)].map((_, i) => (
               <div 
                 key={i} 
-                className={`particle particle-${i % 3} light-mode-visible`}
+                className={`particle particle-${i % 3} hidden sm:block`}
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 10}s`,
+                  opacity: 0.15 + Math.random() * 0.25,
+                  width: `${2 + Math.random() * 3}px`,
+                  height: `${2 + Math.random() * 3}px`
+                }}
+              ></div>
+            ))}
+            {/* Mobile optimized particles (fewer) */}
+            {[...Array(5)].map((_, i) => (
+              <div 
+                key={i + 10} 
+                className={`particle particle-${i % 3} sm:hidden`}
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
@@ -196,10 +91,174 @@ export function LandingPage() {
               ></div>
             ))}
           </div>
-          
-          <div className="absolute left-[10%] top-[20%] h-[300px] w-[300px] rounded-full bg-gradient-to-r from-primary/10 to-primary/5 blur-3xl opacity-80 animate-pulse-slow"></div>
-          <div className="absolute right-[10%] bottom-[10%] h-[250px] w-[250px] rounded-full bg-gradient-to-l from-primary/10 to-primary/5 blur-3xl opacity-80 animate-pulse-slower"></div>
-          <div className="absolute left-[50%] bottom-0 h-[200px] w-[200px] -translate-x-1/2 rounded-full bg-gradient-to-t from-primary/10 to-primary/5 blur-3xl opacity-80 animate-pulse-slow"></div>
+        </div>
+        
+        {/* Light streaks - fewer on mobile */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="light-streak light-streak-1"></div>
+          <div className="light-streak light-streak-2 hidden sm:block"></div>
+          <div className="light-streak light-streak-3 hidden sm:block"></div>
+        </div>
+
+        <div className="container mx-auto px-4 md:px-6 max-w-screen-xl relative z-10">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
+            {/* Left column - Hero content */}
+            <div className="flex flex-col space-y-6 md:space-y-8 text-center lg:text-left order-2 lg:order-1 mt-8 lg:mt-0">
+              <div className="space-y-4 md:space-y-6">
+                <div className="inline-flex items-center px-3 md:px-4 py-1 md:py-1.5 rounded-full bg-primary/10 text-xs md:text-sm font-medium text-primary backdrop-blur-sm animate-pulse-slow border border-primary/20 shadow-glow">
+                  <span className="flex h-1.5 md:h-2 w-1.5 md:w-2 rounded-full bg-primary mr-1.5 md:mr-2 animate-ping"></span>
+                  Your Personal Skincare Companion
+                </div>
+                
+                <h1 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl/none font-bold tracking-tight">
+                  <span className="block bg-clip-text text-transparent bg-gradient-to-r from-primary via-primary/90 to-primary/70 animate-gradient">
+                    Your Skincare
+                  </span>
+                  <span className="block bg-clip-text text-transparent bg-gradient-to-r from-primary/90 via-primary/80 to-primary/70 animate-gradient animation-delay-300">
+                    Journey, Tracked
+                  </span>
+                </h1>
+                
+                <p className="text-base md:text-lg xl:text-xl text-muted-foreground leading-relaxed max-w-[600px] mx-auto lg:mx-0">
+                  Discover what works best for your skin by tracking products,
+                  routines, and results in one beautiful app.
+                </p>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto justify-center lg:justify-start">
+                {currentUser ? (
+                  <Button
+                    onClick={() => navigate("/dashboard")}
+                    size="lg"
+                    className="w-full sm:w-auto px-6 md:px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <span className="relative z-10">Dashboard</span>
+                  </Button>
+                ) : (
+                  <Link to="/login" className="w-full sm:w-auto">
+                    <Button
+                      size="lg"
+                      className="w-full px-6 md:px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <span className="relative z-10">Get Started Free</span>
+                    </Button>
+                  </Link>
+                )}
+                {currentUser ? (
+                  <Link to="/calendar" className="w-full sm:w-auto">
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="w-full px-6 md:px-8 rounded-full border-2 group relative overflow-hidden"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <span className="relative z-10">Calendar</span>
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link to="/login" className="w-full sm:w-auto">
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        className="w-full px-6 md:px-8 rounded-full border-2 group relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <span className="relative z-10">Sign In</span>
+                      </Button>
+                    </Link>
+                  </>
+                )}
+              </div>
+              
+              {/* Feature highlights - 2 columns on mobile, 3 on larger screens */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 md:gap-4 mt-4 md:mt-8 max-w-2xl mx-auto lg:mx-0">
+                <div className="flex flex-col items-center lg:items-start p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mb-1 md:mb-2 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"></path>
+                    </svg>
+                  </div>
+                  <span className="text-xs md:text-sm font-medium text-center lg:text-left">Track Products</span>
+                </div>
+                <div className="flex flex-col items-center lg:items-start p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mb-1 md:mb-2 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </div>
+                  <span className="text-xs md:text-sm font-medium text-center lg:text-left">Daily Routines</span>
+                </div>
+                <div className="flex flex-col items-center lg:items-start p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mb-1 md:mb-2 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M2 12h20"></path>
+                      <path d="M16 6l6 6-6 6"></path>
+                      <path d="M8 18l-6-6 6-6"></path>
+                    </svg>
+                  </div>
+                  <span className="text-xs md:text-sm font-medium text-center lg:text-left">Track Progress</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Right column - App Preview */}
+            <div className="relative flex items-center justify-center order-1 lg:order-2">
+              {/* Decorative elements - simplified for mobile */}
+              <div className="absolute -inset-4 bg-gradient-conic from-primary/40 via-primary/0 to-primary/40 rounded-3xl opacity-30 blur-xl animate-spin-slow hidden sm:block"></div>
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-primary/50 rounded-2xl blur-sm opacity-60 animate-shimmer"></div>
+              
+              {/* Main container */}
+              <div className="relative w-full max-w-[280px] sm:max-w-sm md:max-w-md mx-auto bg-card border rounded-2xl shadow-2xl overflow-hidden dark:border-gray-800/50 backdrop-blur-sm">
+                {/* Browser-like top bar - simplified for mobile */}
+                <div className="bg-muted/40 border-b border-primary/10 p-2 md:p-3 flex items-center gap-2 backdrop-blur-sm">
+                  <div className="flex gap-1 md:gap-2">
+                    <div className="h-2 md:h-3 w-2 md:w-3 rounded-full bg-red-500/90"></div>
+                    <div className="h-2 md:h-3 w-2 md:w-3 rounded-full bg-yellow-500/90"></div>
+                    <div className="h-2 md:h-3 w-2 md:w-3 rounded-full bg-green-500/90"></div>
+                  </div>
+                  <div className="flex-1 text-center">
+                    <div className="px-2 md:px-4 py-1 md:py-1.5 rounded-full bg-background/50 text-[10px] md:text-xs font-medium text-muted-foreground inline-block backdrop-blur-sm">
+                      skincaregod.vercel.app
+                    </div>
+                  </div>
+                </div>
+
+                {/* App preview image */}
+                <div className="p-1 bg-gradient-to-b from-transparent to-background/5 relative">
+                  <img
+                    src={
+                      theme === "light"
+                        ? "/dashboard-preview-light.png"
+                        : "/dashboard-preview.png"
+                    }
+                    alt="Skincare God Dashboard Preview"
+                    className="w-full h-auto rounded-xl shadow-xl"
+                    loading="lazy"
+                  />
+                  
+                  {/* Floating elements - hide smallest one on mobile */}
+                  <div className="absolute top-4 right-4 p-1.5 md:p-2 bg-card/80 backdrop-blur-md rounded-lg border border-primary/20 shadow-lg animate-float-slow hidden sm:block">
+                    <div className="flex items-center gap-1.5 md:gap-2">
+                      <div className="h-2 md:h-3 w-2 md:w-3 rounded-full bg-primary"></div>
+                      <span className="text-[10px] md:text-xs font-medium">Track daily</span>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-8 left-4 p-1.5 md:p-2 bg-card/80 backdrop-blur-md rounded-lg border border-primary/20 shadow-lg animate-float-slow animation-delay-500">
+                    <div className="flex items-center gap-1.5 md:gap-2">
+                      <div className="h-2 md:h-3 w-2 md:w-3 rounded-full bg-green-500"></div>
+                      <span className="text-[10px] md:text-xs font-medium">Skin improving!</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -787,8 +846,10 @@ export function LandingPage() {
                         <div className="flex-1">
                           <p className="font-medium">Click the install icon</p>
                           <div className="mt-1 flex items-center gap-2 text-muted-foreground">
-                            <Plus className="h-4 w-4" /> in your browser's
-                            address bar
+                            <span className="font-mono text-primary">
+                              skincaregod.vercel.app
+                            </span>
+                            <ExternalLink className="h-4 w-4" />
                           </div>
                         </div>
                       </li>
@@ -846,7 +907,10 @@ export function LandingPage() {
                         <div className="flex-1">
                           <p className="font-medium">Tap the menu icon</p>
                           <div className="mt-1 flex items-center gap-2 text-muted-foreground">
-                            <Menu className="h-4 w-4" /> in the top right
+                            <span className="font-mono text-primary">
+                              skincaregod.vercel.app
+                            </span>
+                            <ExternalLink className="h-4 w-4" />
                           </div>
                         </div>
                       </li>
