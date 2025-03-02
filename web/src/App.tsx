@@ -124,7 +124,7 @@ function App() {
               <Route path="*" element={<Navigate to="/" />} />
             </Route>
           </Routes>
-          <Toaster />
+          <Toaster position="top-right" />
           <PWABadge />
         </Router>
       </AuthProvider>
