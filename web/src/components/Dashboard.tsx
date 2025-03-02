@@ -214,7 +214,7 @@ export function Dashboard() {
         onEditProfile={handleEditProfile}
       />
 
-      <div className="container max-w-7xl mx-auto px-4 -mt-14 md:-mt-18 relative z-10">
+      <div className="container max-w-7xl mx-auto px-4 -mt-10 md:-mt-18 relative z-10">
         {/* Dashboard Tabs */}
         <Tabs
           defaultValue="overview"

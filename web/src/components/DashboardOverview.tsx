@@ -48,7 +48,7 @@ const DashboardOverview = memo(({
 
   return (
     <div className="space-y-8">
-      {/* Overview Card */}
+      {/* Overview Card Header section */}
       <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary/40 via-primary/30 to-background border border-primary/40 dark:border-primary/30 p-6">
         <div className="absolute inset-0 bg-grid-pattern opacity-15"></div>
         <div className="relative flex flex-col md:flex-row md:items-center gap-6">
