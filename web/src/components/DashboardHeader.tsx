@@ -24,7 +24,7 @@ const DashboardHeader = memo(({
   const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-primary/90 via-[#b83280] to-[#805ad5] dark:from-[#4f46e5] dark:via-primary dark:to-[#7e22ce] pt-8 pb-20 md:pt-12 md:pb-24">
+    <div className="relative overflow-hidden bg-gradient-to-br from-primary/90 via-[#b83280] to-[#805ad5] dark:from-[#4f46e5] dark:via-primary dark:to-[#7e22ce] pt-6 pb-14 md:pt-8 md:pb-16">
       {/* Enhanced grid pattern - more prominent */}
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.12] dark:opacity-[0.15]"></div>
       
@@ -43,7 +43,7 @@ const DashboardHeader = memo(({
       <div className="absolute inset-0 overflow-hidden">
         <div className="sparkles-container">
           {/* Pink sparkles */}
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: 6 }).map((_, i) => (
             <div 
               key={`pink-${i}`} 
               className="sparkle-pink"
@@ -57,7 +57,7 @@ const DashboardHeader = memo(({
           ))}
           
           {/* Blue sparkles */}
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: 6 }).map((_, i) => (
             <div 
               key={`blue-${i}`} 
               className="sparkle-blue"
@@ -71,7 +71,7 @@ const DashboardHeader = memo(({
           ))}
           
           {/* Gold sparkles */}
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: 6 }).map((_, i) => (
             <div 
               key={`gold-${i}`} 
               className="sparkle-gold"
@@ -85,7 +85,7 @@ const DashboardHeader = memo(({
           ))}
           
           {/* White sparkles - larger */}
-          {Array.from({ length: 5 }).map((_, i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <div 
               key={`white-${i}`} 
               className="sparkle-white"
@@ -107,33 +107,33 @@ const DashboardHeader = memo(({
 
       <div className="container max-w-7xl mx-auto px-4 relative z-10">
         {/* Enhanced subtle badge with glow - now green */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10b981]/20 backdrop-blur-md text-white text-xs font-medium mb-1 shadow-md border border-[#10b981]/30">
+        <div className="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-[#10b981]/20 backdrop-blur-md text-white text-xs font-medium mb-1 shadow-md border border-[#10b981]/30">
           <span className="inline-block w-2 h-2 rounded-full bg-[#10b981] animate-pulse"></span>
           <span>Your Skincare Journey</span>
         </div>
 
-        <div className="relative flex flex-col md:flex-row md:items-start md:justify-between gap-4">
-          <div className="space-y-2">
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-white drop-shadow-md">
+        <div className="relative flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white drop-shadow-md">
               {greeting}, <span className="text-[#f59e0b] dark:text-[#fbbf24]">{displayName}!</span>
             </h1>
-            <p className="text-white/90 max-w-xl backdrop-blur-md bg-white/10 p-2 rounded-lg border border-white/20 shadow-lg">
+            <p className="text-white/90 max-w-xl backdrop-blur-md bg-white/10 p-1.5 rounded-lg border border-white/20 shadow-lg text-sm">
               Track your skincare routine, monitor progress, and discover what
               works best for your skin.
             </p>
           </div>
 
-          <div className="flex items-center gap-3 mt-2 md:mt-0">
+          <div className="flex items-center gap-3 mt-1 md:mt-0">
             <Button
               variant="secondary"
               size="sm"
-              className="rounded-full text-sm font-medium backdrop-blur-md bg-white/20 border border-white/20 hover:bg-white/30 shadow-lg"
+              className="rounded-full text-xs font-medium backdrop-blur-md bg-white/20 border border-white/20 hover:bg-white/30 shadow-lg h-8"
               onClick={onEditProfile}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
+                width="14"
+                height="14"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -147,8 +147,8 @@ const DashboardHeader = memo(({
               </svg>
               Edit Profile
             </Button>
-            <Avatar className="h-10 w-10 border-2 border-white/40 shadow-xl ring-2 ring-[#f59e0b]/30 dark:ring-[#fbbf24]/30 hover:ring-[#f59e0b]/50 dark:hover:ring-[#fbbf24]/50 transition-all duration-300">
-              <div className="flex h-full w-full items-center justify-center bg-primary-foreground text-primary font-medium">
+            <Avatar className="h-8 w-8 border-2 border-white/40 shadow-xl ring-2 ring-[#f59e0b]/30 dark:ring-[#fbbf24]/30 hover:ring-[#f59e0b]/50 dark:hover:ring-[#fbbf24]/50 transition-all duration-300">
+              <div className="flex h-full w-full items-center justify-center bg-primary-foreground text-primary font-medium text-xs">
                 {currentUser?.photoURL ? (
                   <AvatarImage src={currentUser.photoURL} alt={displayName} />
                 ) : (
@@ -161,7 +161,7 @@ const DashboardHeader = memo(({
       </div>
 
       {/* Enhanced Wave Divider with animated waves */}
-      <div className="absolute bottom-0 left-0 right-0 h-12 md:h-16 overflow-hidden">
+      <div className="absolute bottom-0 left-0 right-0 h-10 md:h-12 overflow-hidden">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 1440 320"
@@ -186,7 +186,7 @@ const DashboardHeader = memo(({
             d="M0,96L60,106.7C120,117,240,139,360,138.7C480,139,600,117,720,112C840,107,960,117,1080,138.7C1200,160,1320,192,1380,208L1440,224L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"
           ></path>
         </svg>
-        <div className="absolute bottom-0 left-0 right-0 h-6 bg-gradient-to-t from-background to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-background to-transparent"></div>
       </div>
     </div>
   );
