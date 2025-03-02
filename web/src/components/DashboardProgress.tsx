@@ -207,7 +207,7 @@ const DashboardProgress = React.memo(({ currentUserId }: DashboardProgressProps)
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {isCameraOpen ? (
         <div className="relative overflow-hidden rounded-xl bg-black aspect-video">
           <video
@@ -263,41 +263,41 @@ const DashboardProgress = React.memo(({ currentUserId }: DashboardProgressProps)
           )}
         </div>
       ) : (
-        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-green-600/60 via-green-500/50 to-green-400/40 dark:from-green-500/20 dark:via-green-500/15 dark:to-background border border-green-500/40 dark:border-green-500/30">
+        <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-green-600/60 via-green-500/50 to-green-400/40 dark:from-green-500/20 dark:via-green-500/15 dark:to-background border border-green-500/40 dark:border-green-500/30">
           <div className="absolute inset-0 bg-grid-pattern opacity-15"></div>
-          <div className="relative p-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/30 text-green-900 dark:text-green-400 text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-green-500/40">
+          <div className="relative p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex-1 mb-2 sm:mb-0">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-green-500/30 text-green-900 dark:text-green-400 text-xs font-medium mb-1 shadow-md backdrop-blur-sm border border-green-500/40">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
+                    width="12"
+                    height="12"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="h-4 w-4"
+                    className="h-3 w-3"
                   >
                     <rect x="2" y="6" width="20" height="12" rx="2"></rect>
                     <circle cx="12" cy="12" r="4"></circle>
                   </svg>
-                  Progress Photos
+                  <span>Progress Photos</span>
                 </div>
-                <h2 className="text-2xl font-bold tracking-tight text-green-950 dark:text-green-200">
+                <h2 className="text-xl font-bold tracking-tight text-green-950 dark:text-green-200">
                   Track Your Journey
                 </h2>
-                <p className="text-green-800 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-green-500/30 shadow-sm">
+                <p className="text-xs text-green-800 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-1.5 rounded-lg border border-green-500/30 shadow-sm hidden sm:block">
                   Document your skincare progress with photos. Compare and see your transformation over time.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex gap-3">
                 <Button
                   onClick={startCamera}
-                  className="gap-2 bg-green-600 hover:bg-green-700 text-white"
-                  size="lg"
+                  className="flex-1 sm:flex-none gap-2 bg-green-600 hover:bg-green-700 text-white"
+                  size="default"
                   disabled={isUploading}
                 >
                   <svg
@@ -320,8 +320,8 @@ const DashboardProgress = React.memo(({ currentUserId }: DashboardProgressProps)
                 <Button
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
-                  className="gap-2 border-green-300 text-green-900 bg-green-500/20 hover:bg-green-500/30 dark:text-green-400 dark:bg-transparent dark:hover:bg-green-900/20"
-                  size="lg"
+                  className="flex-1 sm:flex-none gap-2 border-green-300 text-green-900 bg-green-500/20 hover:bg-green-500/30 dark:text-green-400 dark:bg-transparent dark:hover:bg-green-900/20"
+                  size="default"
                   disabled={isUploading}
                 >
                   <svg
@@ -357,9 +357,9 @@ const DashboardProgress = React.memo(({ currentUserId }: DashboardProgressProps)
       />
 
       {isUploading && (
-        <div className="flex items-center justify-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800/30">
-          <Loader2 className="h-6 w-6 animate-spin mr-2 text-green-600 dark:text-green-400" />
-          <span className="text-green-700 dark:text-green-400">Uploading photo...</span>
+        <div className="flex items-center justify-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800/30">
+          <Loader2 className="h-5 w-5 animate-spin mr-2 text-green-600 dark:text-green-400" />
+          <span className="text-green-700 dark:text-green-400 text-sm">Uploading photo...</span>
         </div>
       )}
 
