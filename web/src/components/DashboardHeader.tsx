@@ -127,7 +127,7 @@ const DashboardHeader = memo(({
             <Button
               variant="secondary"
               size="sm"
-              className="rounded-full text-[10px] font-medium backdrop-blur-md bg-white/20 border border-white/20 hover:bg-white/30 shadow-lg h-7 px-2"
+              className="rounded-full text-[10px] font-medium backdrop-blur-md bg-white/20 border border-white/20 hover:bg-white/30 shadow-lg h-7 px-2 ml-auto md:ml-0"
               onClick={onEditProfile}
             >
               <svg

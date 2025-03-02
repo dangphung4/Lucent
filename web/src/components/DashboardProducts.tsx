@@ -29,27 +29,27 @@ const DashboardProducts = React.memo(({
   productListRef
 }: DashboardProductsProps) => {
   return (
-    <div className="space-y-6">
-      {/* Header Section - Simplified for better performance */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600/60 via-blue-500/50 to-blue-400/40 dark:from-blue-500/20 dark:via-blue-500/15 dark:to-background border border-blue-500/40 dark:border-blue-500/30 p-6">
+    <div className="space-y-4">
+      {/* Header Section - Simplified and more compact */}
+      <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-blue-600/60 via-blue-500/50 to-blue-400/40 dark:from-blue-500/20 dark:via-blue-500/15 dark:to-background border border-blue-500/40 dark:border-blue-500/30 p-3 md:p-4">
         <div className="absolute inset-0 bg-grid-pattern opacity-15"></div>
-        <div className="relative flex flex-col md:flex-row md:items-center gap-6">
-          <div className="flex-1 space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/30 text-blue-900 dark:text-blue-400 text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-blue-500/40">
-              <Package className="h-4 w-4" />
-              Product Management
+        <div className="relative flex items-center justify-between gap-3">
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-blue-500/30 text-blue-900 dark:text-blue-400 text-xs font-medium mb-1 shadow-md backdrop-blur-sm border border-blue-500/40">
+              <Package className="h-3 w-3" />
+              <span>Product Management</span>
             </div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2 text-blue-950 dark:text-blue-200">
+            <h2 className="text-lg md:text-xl font-bold tracking-tight text-blue-950 dark:text-blue-200">
               Your Products
             </h2>
-            <p className="text-blue-800 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-blue-500/30 shadow-sm">
+            <p className="text-xs text-blue-800 dark:text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-1.5 rounded-lg border border-blue-500/30 shadow-sm hidden md:block">
               Keep track of your skincare products, mark favorites, and manage your collection.
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
             <div className="hidden md:block">
-              <div className="h-16 w-16 rounded-2xl bg-blue-500/40 flex items-center justify-center shadow-glow">
-                <Package className="h-8 w-8 text-blue-950 dark:text-blue-400" />
+              <div className="h-12 w-12 rounded-xl bg-blue-500/40 flex items-center justify-center shadow-glow">
+                <Package className="h-6 w-6 text-blue-950 dark:text-blue-400" />
               </div>
             </div>
             <AddProductDialog
