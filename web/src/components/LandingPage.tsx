@@ -127,24 +127,38 @@ export function LandingPage() {
               
               <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full sm:w-auto justify-center lg:justify-start">
                 {currentUser ? (
-                  <Button
+                  <><Button
                     onClick={() => navigate("/dashboard")}
                     size="lg"
                     className="w-full sm:w-auto px-6 md:px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                     <span className="relative z-10">Dashboard</span>
-                  </Button>
+                  </Button><Button
+                    onClick={() => navigate("/about")}
+                    size="lg"
+                    className="w-full sm:w-auto px-6 md:px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/30 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
+                  >
+                      <span className="relative z-10">About</span>
+                    </Button></>
                 ) : (
-                  <Link to="/login" className="w-full sm:w-auto">
-                    <Button
-                      size="lg"
-                      className="w-full px-6 md:px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <span className="relative z-10">Get Started Free</span>
-                    </Button>
-                  </Link>
+                  <><Link to="/login" className="w-full sm:w-auto">
+                      <Button
+                        size="lg"
+                        className="w-full px-6 md:px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <span className="relative z-10">Get Started Free</span>
+                      </Button>
+                    </Link><Link to="/about" className="w-full sm:w-auto">
+                        <Button
+                          size="lg"
+                          className="w-full px-6 md:px-8 rounded-full shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-gradient-to-r from-primary to-primary/30 hover:from-primary/90 hover:to-primary group relative overflow-hidden"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <span className="relative z-10">About</span>
+                        </Button>
+                      </Link></>
                 )}
                 {currentUser ? (
                   <Link to="/calendar" className="w-full sm:w-auto">
