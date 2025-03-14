@@ -816,6 +816,11 @@ export function Calendar() {
                 {selectedRoutines.length > 0 ? (
                   <div className="space-y-4 sm:space-y-6">
                     {selectedRoutines.map(routine => {
+                      if (!routine || !routine.steps || !Array.isArray(routine.steps)) {
+                        console.error('Malformed routine detected:', routine?.id);
+                        return null; // Skip rendering this routine
+                      }
+                      
                       const completion = getRoutineCompletion(routine.id, 'morning');
                       return (
                         <div key={routine.id} className="space-y-2 sm:space-y-3">
@@ -826,12 +831,23 @@ export function Calendar() {
                             {routine.name}
                           </h3>
                           {routine.steps.map((step) => {
+                            if (!step || !step.productId) {
+                              console.error('Malformed step detected in routine:', routine.id);
+                              return null; // Skip rendering this step
+                            }
+                            
                             const product = products.find(p => p.id === step.productId);
-                            const isCompleted = completion?.completedSteps.find(
+                            const isCompleted = completion?.completedSteps?.find?.(
                               s => s.productId === step.productId
                             )?.completed || false;
                             
-                            return product ? (
+                            // Skip rendering this step if product not found
+                            if (!product) {
+                              console.warn(`Product not found for step: ${step.productId} in routine: ${routine.id}`);
+                              return null;
+                            }
+                            
+                            return (
                               <div 
                                 key={step.productId}
                                 className={cn(
@@ -860,7 +876,8 @@ export function Calendar() {
                                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border border-primary/20 shadow-sm">
                                   <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
                                     {(() => {
-                                      const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
+                                      const category = product.category?.toLowerCase() || 'other';
+                                      const IconComponent = CATEGORY_ICONS[category] || CATEGORY_ICONS['other'];
                                       return <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />;
                                     })()}
                                   </div>
@@ -875,7 +892,7 @@ export function Calendar() {
                                   </Badge>
                                 )}
                               </div>
-                            ) : null;
+                            );
                           })}
                         </div>
                       );
@@ -893,6 +910,11 @@ export function Calendar() {
                 {selectedRoutines.length > 0 ? (
                   <div className="space-y-4 sm:space-y-6">
                     {selectedRoutines.map(routine => {
+                      if (!routine || !routine.steps || !Array.isArray(routine.steps)) {
+                        console.error('Malformed routine detected:', routine?.id);
+                        return null; // Skip rendering this routine
+                      }
+                      
                       const completion = getRoutineCompletion(routine.id, 'evening');
                       return (
                         <div key={routine.id} className="space-y-2 sm:space-y-3">
@@ -903,12 +925,23 @@ export function Calendar() {
                             {routine.name}
                           </h3>
                           {routine.steps.map((step) => {
+                            if (!step || !step.productId) {
+                              console.error('Malformed step detected in routine:', routine.id);
+                              return null; // Skip rendering this step
+                            }
+                            
                             const product = products.find(p => p.id === step.productId);
-                            const isCompleted = completion?.completedSteps.find(
+                            const isCompleted = completion?.completedSteps?.find?.(
                               s => s.productId === step.productId
                             )?.completed || false;
                             
-                            return product ? (
+                            // Skip rendering this step if product not found
+                            if (!product) {
+                              console.warn(`Product not found for step: ${step.productId} in routine: ${routine.id}`);
+                              return null;
+                            }
+                            
+                            return (
                               <div 
                                 key={step.productId}
                                 className={cn(
@@ -937,7 +970,8 @@ export function Calendar() {
                                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border border-primary/20 shadow-sm">
                                   <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
                                     {(() => {
-                                      const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
+                                      const category = product.category?.toLowerCase() || 'other';
+                                      const IconComponent = CATEGORY_ICONS[category] || CATEGORY_ICONS['other'];
                                       return <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />;
                                     })()}
                                   </div>
@@ -952,7 +986,7 @@ export function Calendar() {
                                   </Badge>
                                 )}
                               </div>
-                            ) : null;
+                            );
                           })}
                         </div>
                       );
@@ -970,6 +1004,11 @@ export function Calendar() {
                 {selectedRoutines.length > 0 ? (
                   <div className="space-y-4 sm:space-y-6">
                     {selectedRoutines.map(routine => {
+                      if (!routine || !routine.steps || !Array.isArray(routine.steps)) {
+                        console.error('Malformed routine detected:', routine?.id);
+                        return null; // Skip rendering this routine
+                      }
+                      
                       const completion = getRoutineCompletion(routine.id, 'weekly');
                       return (
                         <div key={routine.id} className="space-y-2 sm:space-y-3">
@@ -980,12 +1019,23 @@ export function Calendar() {
                             {routine.name}
                           </h3>
                           {routine.steps.map((step) => {
+                            if (!step || !step.productId) {
+                              console.error('Malformed step detected in routine:', routine.id);
+                              return null; // Skip rendering this step
+                            }
+                            
                             const product = products.find(p => p.id === step.productId);
-                            const isCompleted = completion?.completedSteps.find(
+                            const isCompleted = completion?.completedSteps?.find?.(
                               s => s.productId === step.productId
                             )?.completed || false;
                             
-                            return product ? (
+                            // Skip rendering this step if product not found
+                            if (!product) {
+                              console.warn(`Product not found for step: ${step.productId} in routine: ${routine.id}`);
+                              return null;
+                            }
+                            
+                            return (
                               <div 
                                 key={step.productId}
                                 className={cn(
@@ -1014,7 +1064,8 @@ export function Calendar() {
                                 <Avatar className="h-8 w-8 sm:h-10 sm:w-10 border border-primary/20 shadow-sm">
                                   <div className="bg-primary/10 flex h-full w-full items-center justify-center rounded-full text-primary">
                                     {(() => {
-                                      const IconComponent = CATEGORY_ICONS[product.category?.toLowerCase() || 'other'];
+                                      const category = product.category?.toLowerCase() || 'other';
+                                      const IconComponent = CATEGORY_ICONS[category] || CATEGORY_ICONS['other'];
                                       return <IconComponent className="h-4 w-4 sm:h-5 sm:w-5" />;
                                     })()}
                                   </div>
@@ -1029,7 +1080,7 @@ export function Calendar() {
                                   </Badge>
                                 )}
                               </div>
-                            ) : null;
+                            );
                           })}
                         </div>
                       );
