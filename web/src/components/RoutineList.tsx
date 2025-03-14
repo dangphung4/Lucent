@@ -412,8 +412,8 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
             }
           }}
         >
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-hidden flex flex-col p-0 gap-0 sm:p-6 sm:gap-4">
-            <DialogHeader className="p-4 sm:p-0 border-b sm:border-0">
+          <DialogContent className="sm:max-w-[600px] h-[85vh] sm:max-h-[90vh] flex flex-col p-0 gap-0 sm:p-6 sm:gap-4">
+            <DialogHeader className="p-4 sm:p-0 border-b sm:border-0 shrink-0">
               <DialogTitle>{editingRoutine ? 'Edit Routine' : 'Create Routine'}</DialogTitle>
               <DialogDescription>
                 {editingRoutine 
@@ -421,13 +421,13 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                   : 'Set up a new skincare routine with your products.'}
               </DialogDescription>
             </DialogHeader>
-            <ScrollArea className="flex-1 p-4 sm:p-0">
-              <div className="grid gap-6">
+            <ScrollArea className="flex-1 overflow-auto p-4 sm:p-0 max-h-[calc(70vh-120px)]">
+              <div className="grid gap-6 pb-6">
                 <div className="grid gap-2">
                   <Label htmlFor="name">Name</Label>
-                  <Input 
-                    id="name" 
-                    placeholder="My Morning Routine" 
+                  <Input
+                    id="name"
+                    placeholder="My Morning Routine"
                     value={formState.name}
                     onChange={(e) => setFormState(prev => ({ ...prev, name: e.target.value }))}
                   />
@@ -506,7 +506,11 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                   <DragDropContext onDragEnd={handleDragEnd}>
                     <Droppable droppableId="steps">
                       {(provided) => (
-                        <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                        <div 
+                          {...provided.droppableProps} 
+                          ref={provided.innerRef} 
+                          className="space-y-2 touch-pan-y"
+                        >
                           {formState.steps.map((step, index) => {
                             const product = products.find(p => p.id === step.productId);
                             return (
@@ -521,8 +525,12 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                                     )}
                                   >
                                     <div className="flex items-center gap-3 w-full sm:w-auto">
-                                      <div {...provided.dragHandleProps} className="cursor-grab">
-                                        <GripVertical className="h-4 w-4 text-muted-foreground" />
+                                      <div 
+                                        {...provided.dragHandleProps} 
+                                        className="cursor-grab touch-manipulation p-1"
+                                        aria-label="Drag to reorder"
+                                      >
+                                        <GripVertical className="h-5 w-5 text-muted-foreground" />
                                       </div>
                                       <Badge 
                                         variant="outline" 
@@ -578,7 +586,7 @@ export const RoutineList = forwardRef<{ loadRoutines: () => Promise<void> }, Rou
                 </div>
               </div>
             </ScrollArea>
-            <DialogFooter className="p-4 sm:p-0 border-t sm:border-0">
+            <DialogFooter className="p-4 sm:p-0 border-t sm:border-0 shrink-0">
               <div className="flex flex-col-reverse sm:flex-row gap-2 w-full sm:w-auto">
                 <Button 
                   variant="outline" 
