@@ -348,6 +348,11 @@ export const addRoutineCompletion = async (completion: Omit<RoutineCompletion, '
   try {
     const completionsRef = doc(collection(db, 'routineCompletions'));
     
+    // Ensure type is a valid routine type
+    if (!['morning', 'evening', 'weekly', 'custom'].includes(completion.type)) {
+      throw new Error(`Invalid routine type: ${completion.type}`);
+    }
+    
     // Ensure date is a proper Firestore timestamp
     const completionData = {
       ...completion,
