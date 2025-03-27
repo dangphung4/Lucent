@@ -5,7 +5,8 @@ import { Textarea } from "./ui/textarea";
 import { CircleDashed, Sparkles, Bot, Send } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getUserProducts, getUserRoutines, getRoutineCompletions, Product, Routine } from "@/lib/db";
+import { getUserProducts, getUserRoutines, Product, Routine } from "@/lib/db";
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -17,6 +18,16 @@ interface UserData {
   routines: Routine[];
   skinConcerns: string[];
   skinType: string;
+  routineDetails: {
+    name: string;
+    type: string;
+    steps: {
+      productName: string;
+      productBrand: string;
+      category: string;
+      stepOrder: number;
+    }[];
+  }[];
 }
 
 /**
@@ -34,9 +45,9 @@ const DashboardAI = () => {
     routines: [],
     skinConcerns: [],
     skinType: 'combination',
+    routineDetails: []
   });
 
-  // this is markdown, will nee
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load user data
@@ -56,12 +67,34 @@ const DashboardAI = () => {
         const skinConcerns = ['acne', 'dryness'];
         const skinType = 'combination';
         
+        // Create detailed routine information
+        const routineDetails = await Promise.all(routines.map(async (routine) => {
+          const steps = routine.steps || [];
+          const detailedSteps = await Promise.all(steps.map(async (step, index) => {
+            // Find product details for this step
+            const product = products.find(p => p.id === step.productId);
+            return {
+              productName: product?.name || 'Unknown Product',
+              productBrand: product?.brand || 'Unknown Brand',
+              category: product?.category || 'Unknown Category',
+              stepOrder: index + 1
+            };
+          }));
+          
+          return {
+            name: routine.name || 'Unnamed Routine',
+            type: routine.type || 'daily',
+            steps: detailedSteps
+          };
+        }));
+        
         // Set user data
         setUserData({
           products,
           routines,
           skinConcerns,
           skinType,
+          routineDetails
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -92,7 +125,7 @@ const DashboardAI = () => {
       const genAI = new GoogleGenerativeAI(geminiApiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      // Create context from user data
+      // Create detailed context from user data
       const userContext = `
         User Information:
         - Skin Type: ${userData.skinType}
@@ -101,15 +134,15 @@ const DashboardAI = () => {
         Current Products (${userData.products.length}):
         ${userData.products.map(p => `- ${p.name} by ${p.brand} (${p.category}): ${p.status}`).join('\n')}
         
-        Current Routines:
-        ${userData.routines.map(r => {
-          // Ensure we have a name and handle potential missing properties
-          const routineName = r.name || 'Unnamed Routine';
-          // Since time may not exist on the Routine type, we'll use a default
-          const routineType = r.type || 'daily';
-          const steps = r.steps || [];
-          return `- ${routineName} (${routineType}): ${steps.length} steps`;
-        }).join('\n')}
+        Detailed Skincare Routines:
+        ${userData.routineDetails.map(routine => {
+          return `
+          ## ${routine.name} (${routine.type})
+          ${routine.steps.map(step => 
+            `${step.stepOrder}. ${step.productName} by ${step.productBrand} (${step.category})`
+          ).join('\n')}
+          `;
+        }).join('\n\n')}
       `;
 
       // Prepare chat history
@@ -124,7 +157,7 @@ const DashboardAI = () => {
         parts: [{ 
           text: `You are a skincare AI assistant that helps users with their skincare routines, product recommendations, and skincare advice. 
           
-          Here is information about the current user:
+          Here is detailed information about the current user:
           ${userContext}
           
           When giving advice:
@@ -133,6 +166,8 @@ const DashboardAI = () => {
           3. Focus on evidence-based skincare advice
           4. Always clarify when you're giving general advice vs. personalized recommendations
           5. Avoid making claims about treating medical conditions
+          6. Format your responses using Markdown for clarity - use headings, lists, and emphasis
+          7. When analyzing routines, comment on product order, potential interactions, and missing steps
           
           Now respond to the user's messages in a friendly, helpful tone.`
         }]
@@ -141,7 +176,7 @@ const DashboardAI = () => {
       // Add system response acknowledging the context
       const systemResponse = {
         role: "model" as const,
-        parts: [{ text: "I understand the user's profile and will provide personalized skincare advice." }]
+        parts: [{ text: "I understand the user's profile and will provide personalized skincare advice with proper formatting." }]
       };
 
       // Create chat history with system prompt
@@ -158,7 +193,7 @@ const DashboardAI = () => {
         contents: fullChatHistory,
         generationConfig: {
           temperature: 0.7,
-          maxOutputTokens: 800,
+          maxOutputTokens: 1000,
         },
       });
 
@@ -229,11 +264,15 @@ const DashboardAI = () => {
                 <div 
                   className={`max-w-[80%] p-3 rounded-lg ${
                     message.role === 'assistant' 
-                      ? 'bg-card border border-border shadow-sm' 
+                      ? 'bg-card border border-border shadow-sm prose prose-sm dark:prose-invert max-w-none' 
                       : 'bg-purple-500 text-white shadow'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{message.content}</p>
+                  {message.role === 'assistant' ? (
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  ) : (
+                    <p className="whitespace-pre-wrap">{message.content}</p>
+                  )}
                 </div>
                 {message.role === 'user' && (
                   <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center">
@@ -288,12 +327,12 @@ const DashboardAI = () => {
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {[
-              "What's a good morning routine for my skin type?",
-              "Can you recommend products for my skin concerns?",
-              "How should I layer my skincare products?",
-              "What ingredients should I look for to help with acne?",
-              "Can you analyze my current routine and suggest improvements?",
-              "How often should I exfoliate with my skin type?"
+              "Analyze my current skincare routine",
+              "How should I layer my products for maximum effectiveness?",
+              "Can you recommend a better order for my morning routine?",
+              "What ingredients in my products help with acne?",
+              "I have combination skin with both acne and dryness - how should I balance treatment?",
+              "Which products might be causing irritation?"
             ].map((question, idx) => (
               <Button 
                 key={idx} 

@@ -2,7 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom styles for Markdown in AI chat */
+.prose code {
+  @apply bg-gray-100 dark:bg-gray-800 px-1 py-0.5 rounded;
+}
 
+.prose h1, .prose h2, .prose h3, .prose h4 {
+  @apply text-primary dark:text-primary-foreground font-bold;
+}
+
+.prose h1 {
+  @apply text-xl mt-4 mb-2;
+}
+
+.prose h2 {
+  @apply text-lg mt-3 mb-2;
+}
+
+.prose h3 {
+  @apply text-base mt-2 mb-1;
+}
+
+.prose ul, .prose ol {
+  @apply my-2;
+}
+
+.prose p {
+  @apply my-1.5;
+}
+
+.prose strong {
+  @apply font-semibold text-primary dark:text-primary-foreground;
+}
+
+.prose a {
+  @apply text-blue-600 dark:text-blue-400 hover:underline;
+}
+
+.dark .prose * {
+  @apply text-gray-200;
+}
+
+.dark .prose strong {
+  @apply text-white;
+}
 
 @layer base {
     :root {
