@@ -61,7 +61,7 @@ const EXAMPLE_QUESTIONS = [
   "Analyze my current skincare routine",
   "How should I layer my products for maximum effectiveness?",
   "What ingredients in my products help with acne?",
-  "What are the latest skincare trends for 2024?",
+  "What are the latest skincare trends for 2025?",
   "Show me an image of a skincare routine checklist",
   "What's the best way to treat combination skin?"
 ];
@@ -496,7 +496,17 @@ export function AISkincare() {
             
             // Handle different source formats
             if (typeof source === 'object' && source !== null) {
-              if ('uri' in source && typeof source.uri === 'string') {
+              // Handle the Gemini sourceType format
+              if ('sourceType' in source && source.sourceType === 'url' && 'url' in source) {
+                return {
+                  uri: source.url,
+                  title: 'title' in source && typeof source.title === 'string' 
+                    ? source.title 
+                    : new URL(source.url).hostname
+                };
+              }
+              // Handle standard uri format
+              else if ('uri' in source && typeof source.uri === 'string') {
                 const uri = source.uri;
                 let title;
                 try {
@@ -507,7 +517,9 @@ export function AISkincare() {
                   title = "Unknown Source";
                 }
                 return { uri, title };
-              } else if ('citation' in source && typeof source.citation === 'string') {
+              } 
+              // Handle citation format
+              else if ('citation' in source && typeof source.citation === 'string') {
                 const citationUrl = source.citation;
                 try {
                   return {
