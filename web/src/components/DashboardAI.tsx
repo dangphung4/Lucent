@@ -276,7 +276,11 @@ const DashboardAI = () => {
                 </div>
                 {message.role === 'user' && (
                   <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center">
-                    <span className="text-white text-xs font-medium">You</span>
+                    {currentUser?.photoURL ? (
+                      <img src={currentUser?.photoURL} alt="User" className="h-4 w-4 rounded-full" />
+                    ) : (
+                      <span className="text-white text-xs font-medium">{currentUser?.displayName?.charAt(0)?.toUpperCase() || '?'}</span>
+                    )}
                   </div>
                 )}
               </div>
