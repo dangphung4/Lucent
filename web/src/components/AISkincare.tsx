@@ -40,6 +40,7 @@ interface UserData {
     displayName: string;
     email: string;
     username?: string;
+    photoURL?: string;
   };
   products: Product[];
   routines: Routine[];
@@ -1129,7 +1130,11 @@ export function AISkincare() {
                     </div>
                     {message.role === 'user' && (
                       <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center">
-                        <span className="text-white text-xs font-medium">You</span>
+                      {userData.profile?.photoURL ? (
+                        <img src={userData.profile.photoURL} alt="User" className="h-4 w-4 rounded-full" />
+                      ) : (
+                        <span className="text-white text-xs font-medium">{userData.profile.displayName.charAt(0)}</span>
+                      )}
                       </div>
                     )}
                   </div>
