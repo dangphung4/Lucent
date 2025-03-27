@@ -362,9 +362,9 @@ export function AISkincare() {
       const result = await generateText({
           model,
           messages: [
-              // Add a system message with the system prompt
+              // Instead of system message, use a user message with instructions
               {
-                  role: 'system',
+                  role: 'user',
                   content: systemPrompt
               },
               // Add all the converted user/assistant messages
@@ -372,7 +372,7 @@ export function AISkincare() {
           ],
           temperature: 0.7,
           maxTokens: 1000,
-          providerOptions
+          providerOptions: providerOptions
       }) as unknown as ExtendedResult;
 
       // Extract the text response
