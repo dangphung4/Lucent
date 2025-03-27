@@ -12,16 +12,18 @@ import {
   Zap,
   PillBottle,
   CircleDashed,
-  Pipette
+  Pipette,
+  Bot
 } from "lucide-react";
 import DashboardHeader from "./DashboardHeader";
 import DashboardOverview, { ProductStats } from "./DashboardOverview";
 import DashboardProducts from "./DashboardProducts";
 import DashboardRoutines from "./DashboardRoutines";
 import DashboardProgress from "./DashboardProgress";
+import DashboardAI from "./DashboardAI";
 
 /**
- * Dashboard component - Main dashboard view with tabs for overview, products, routines, and progress
+ * Dashboard component - Main dashboard view with tabs for overview, products, routines, progress, and AI
  * This component has been refactored to use smaller, more focused components to improve performance
  */
 export function Dashboard() {
@@ -223,7 +225,7 @@ export function Dashboard() {
           className="w-full"
         >
           <div className="bg-card rounded-xl shadow-lg border p-1 mb-8">
-            <TabsList className="grid grid-cols-4 w-full">
+            <TabsList className="grid grid-cols-5 w-full">
               <TabsTrigger
                 value="overview"
                 className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -247,6 +249,13 @@ export function Dashboard() {
                 className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >
                 Progress
+              </TabsTrigger>
+              <TabsTrigger
+                value="ai"
+                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Bot className="h-3.5 w-3.5 mr-1" />
+                AI
               </TabsTrigger>
             </TabsList>
           </div>
@@ -279,6 +288,10 @@ export function Dashboard() {
 
           <TabsContent value="progress" className="mt-0">
             <DashboardProgress currentUserId={currentUser?.uid} />
+          </TabsContent>
+
+          <TabsContent value="ai" className="mt-0">
+            <DashboardAI />
           </TabsContent>
         </Tabs>
       </div>
