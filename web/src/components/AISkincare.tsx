@@ -41,9 +41,9 @@ const EXAMPLE_QUESTIONS = [
 ];
 
 /**
- * DashboardAI component - AI chatbot powered by Google Gemini for skincare advice
+ * AISkincare component - Standalone AI chatbot page powered by Google Gemini for skincare advice
  */
-const DashboardAI = () => {
+export function AISkincare() {
   const { currentUser } = useAuth();
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: 'Hi there! I\'m your skincare AI assistant. I can help answer questions about your skincare routine, product recommendations, and more. What would you like to know?' }
@@ -262,157 +262,151 @@ const DashboardAI = () => {
   };
 
   return (
-    <div className="md:space-y-6 h-[calc(100vh-130px)] md:h-auto flex flex-col">
-      {/* Header Section - Hide on mobile to save space */}
-      <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-500/40 via-purple-400/30 to-background border border-purple-500/40 dark:border-purple-700/30 p-4 md:p-6 hidden md:block">
-        <div className="absolute inset-0 bg-grid-pattern opacity-15"></div>
-        <div className="relative flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
-          <div className="flex-1 space-y-2">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/30 text-purple-700 dark:text-purple-400 text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-purple-500/40">
-              <Bot className="h-4 w-4" />
-              AI Skincare Assistant
+    <div className="min-h-screen bg-background pb-16 md:pb-8">
+      <div className="container mx-auto px-4 py-4 md:py-8 max-w-7xl">
+        {/* Hero Section - Enhanced for standalone page */}
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-500/40 via-purple-400/30 to-background border border-purple-500/40 dark:border-purple-700/30 p-4 md:p-8 mb-6">
+          <div className="absolute inset-0 bg-grid-pattern opacity-15"></div>
+          <div className="relative flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
+            <div className="flex-1 space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/30 text-purple-700 dark:text-purple-400 text-sm font-medium mb-2 shadow-md backdrop-blur-sm border border-purple-500/40">
+                <Bot className="h-4 w-4" />
+                AI Skincare Assistant
+              </div>
+              <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2 text-purple-700 dark:text-purple-300">
+                Your Personal Skincare AI
+              </h1>
+              <p className="text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-3 rounded-lg border border-purple-500/30 shadow-sm text-lg">
+                Ask questions about your skincare routine, get personalized product recommendations, or learn about ingredients that work best for your skin concerns.
+              </p>
             </div>
-            <h2 className="text-2xl font-bold tracking-tight mb-2 text-purple-700 dark:text-purple-300">
-              Your Personal Skincare AI
-            </h2>
-            <p className="text-muted-foreground max-w-xl backdrop-blur-sm bg-background/50 p-2 rounded-lg border border-purple-500/30 shadow-sm">
-              Ask questions about your skincare routine, get personalized product recommendations, or learn about skincare ingredients.
-            </p>
-          </div>
-          <div className="hidden md:block">
-            <div className="h-16 w-16 rounded-2xl bg-purple-500/40 flex items-center justify-center shadow-glow">
-              <Sparkles className="h-8 w-8 text-purple-700 dark:text-purple-300" />
+            <div className="hidden md:block">
+              <div className="h-24 w-24 rounded-2xl bg-purple-500/40 flex items-center justify-center shadow-glow">
+                <Sparkles className="h-12 w-12 text-purple-700 dark:text-purple-300" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Header - Simplified and smaller */}
-      <div className="flex items-center gap-2 p-3 md:hidden bg-gradient-to-r from-purple-500/40 to-purple-400/30 rounded-t-lg border-b border-purple-500/40">
-        <Bot className="h-5 w-5 text-purple-700 dark:text-purple-300" />
-        <h2 className="text-lg font-bold text-purple-700 dark:text-purple-300">
-          Your Skincare AI Assistant
-        </h2>
-      </div>
-
-      {/* Chat Interface */}
-      <Card className="border shadow-sm flex-1 flex flex-col overflow-hidden">
-        <CardContent className="p-0 flex flex-col h-full">
-          {/* Messages Container */}
-          <div 
-            ref={chatContainerRef}
-            className="overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 flex-1"
-          >
-            {messages.map((message, index) => (
+        <div className="md:space-y-6 flex flex-col">
+          {/* Chat Interface */}
+          <Card className="border shadow-md flex-1 flex flex-col overflow-hidden">
+            <CardContent className="p-0 flex flex-col h-full">
+              {/* Messages Container */}
               <div 
-                key={index} 
-                className={`flex items-start gap-3 ${message.role === 'assistant' ? 'justify-start' : 'justify-end'}`}
+                ref={chatContainerRef}
+                className="overflow-y-auto p-3 md:p-6 space-y-4 flex-1"
               >
-                {message.role === 'assistant' && (
-                  <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                    <Bot className="h-4 w-4 text-purple-700 dark:text-purple-400" />
-                  </div>
-                )}
-                <div 
-                  className={`max-w-[85%] p-3 rounded-lg ${
-                    message.role === 'assistant' 
-                      ? 'bg-card border border-border shadow-sm prose prose-sm dark:prose-invert max-w-none' 
-                      : 'bg-purple-500 text-white shadow'
-                  }`}
-                >
-                  {message.role === 'assistant' ? (
-                    <>
-                      <ReactMarkdown>{message.content}</ReactMarkdown>
-                      
-                      {/* Example Questions for first-time users */}
-                      {isFirstPrompt && index === 0 && (
-                        <div className="mt-4 space-y-2">
-                          <p className="font-medium">Try asking:</p>
-                          <div className="flex flex-col gap-2">
-                            {EXAMPLE_QUESTIONS.slice(0, 3).map((question, idx) => (
-                              <button
-                                key={idx}
-                                className="text-left px-3 py-2 bg-purple-100 dark:bg-purple-900/50 hover:bg-purple-200 dark:hover:bg-purple-800/50 rounded-lg text-sm transition-colors"
-                                onClick={() => handleQuestionClick(question)}
-                              >
-                                {question}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                {messages.map((message, index) => (
+                  <div 
+                    key={index} 
+                    className={`flex items-start gap-3 ${message.role === 'assistant' ? 'justify-start' : 'justify-end'}`}
+                  >
+                    {message.role === 'assistant' && (
+                      <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                        <Bot className="h-4 w-4 text-purple-700 dark:text-purple-400" />
+                      </div>
+                    )}
+                    <div 
+                      className={`max-w-[85%] p-3 rounded-lg ${
+                        message.role === 'assistant' 
+                          ? 'bg-card border border-border shadow-sm prose prose-sm dark:prose-invert max-w-none' 
+                          : 'bg-purple-500 text-white shadow'
+                      }`}
+                    >
+                      {message.role === 'assistant' ? (
+                        <>
+                          <ReactMarkdown>{message.content}</ReactMarkdown>
+                          
+                          {/* Example Questions for first-time users */}
+                          {isFirstPrompt && index === 0 && (
+                            <div className="mt-4 space-y-2">
+                              <p className="font-medium">Try asking:</p>
+                              <div className="flex flex-col gap-2">
+                                {EXAMPLE_QUESTIONS.slice(0, 3).map((question, idx) => (
+                                  <button
+                                    key={idx}
+                                    className="text-left px-3 py-2 bg-purple-100 dark:bg-purple-900/50 hover:bg-purple-200 dark:hover:bg-purple-800/50 rounded-lg text-sm transition-colors"
+                                    onClick={() => handleQuestionClick(question)}
+                                  >
+                                    {question}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <p className="whitespace-pre-wrap">{message.content}</p>
                       )}
-                    </>
-                  ) : (
-                    <p className="whitespace-pre-wrap">{message.content}</p>
-                  )}
-                </div>
-                {message.role === 'user' && (
-                  <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center">
-                    <span className="text-white text-xs font-medium">You</span>
+                    </div>
+                    {message.role === 'user' && (
+                      <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center">
+                        <span className="text-white text-xs font-medium">You</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="flex items-start gap-3">
+                    <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                      <Bot className="h-4 w-4 text-purple-700 dark:text-purple-400" />
+                    </div>
+                    <div className="max-w-[85%] p-3 rounded-lg bg-card border border-border shadow-sm flex items-center">
+                      <CircleDashed className="h-4 w-4 mr-2 animate-spin text-purple-500" />
+                      <span className="text-muted-foreground">Thinking...</span>
+                    </div>
                   </div>
                 )}
+                <div ref={messagesEndRef} />
               </div>
-            ))}
-            {isLoading && (
-              <div className="flex items-start gap-3">
-                <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                  <Bot className="h-4 w-4 text-purple-700 dark:text-purple-400" />
-                </div>
-                <div className="max-w-[85%] p-3 rounded-lg bg-card border border-border shadow-sm flex items-center">
-                  <CircleDashed className="h-4 w-4 mr-2 animate-spin text-purple-500" />
-                  <span className="text-muted-foreground">Thinking...</span>
+
+              {/* Input Area */}
+              <div className="border-t p-3 md:p-4 mt-auto">
+                <div className="flex gap-2">
+                  <Textarea
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask about your skincare routine..."
+                    className="min-h-[50px] md:min-h-[60px] resize-none"
+                  />
+                  <Button 
+                    onClick={handleSendMessage} 
+                    size="icon" 
+                    className="h-auto bg-purple-500 hover:bg-purple-600"
+                    disabled={isLoading || !input.trim()}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+            </CardContent>
+          </Card>
 
-          {/* Input Area */}
-          <div className="border-t p-3 md:p-4 mt-auto">
-            <div className="flex gap-2">
-              <Textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask about your skincare routine..."
-                className="min-h-[50px] md:min-h-[60px] resize-none"
-              />
-              <Button 
-                onClick={handleSendMessage} 
-                size="icon" 
-                className="h-auto bg-purple-500 hover:bg-purple-600"
-                disabled={isLoading || !input.trim()}
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Desktop Example Questions - Hide on mobile */}
-      <Card className="border shadow-sm hidden md:block mt-6">
-        <CardContent className="p-4">
-          <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-purple-500" />
-            <span>Example Questions</span>
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {EXAMPLE_QUESTIONS.map((question, idx) => (
-              <Button 
-                key={idx} 
-                variant="outline" 
-                className="justify-start h-auto py-2 px-3 text-left whitespace-normal font-normal"
-                onClick={() => setInput(question)}
-              >
-                {question}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+          {/* Desktop Example Questions */}
+          <Card className="border shadow-sm hidden md:block mt-6">
+            <CardContent className="p-4">
+              <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-purple-500" />
+                <span>Example Questions</span>
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {EXAMPLE_QUESTIONS.map((question, idx) => (
+                  <Button 
+                    key={idx} 
+                    variant="outline" 
+                    className="justify-start h-auto py-2 px-3 text-left whitespace-normal font-normal"
+                    onClick={() => setInput(question)}
+                  >
+                    {question}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default DashboardAI; 
+} 

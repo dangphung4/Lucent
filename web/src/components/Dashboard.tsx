@@ -12,18 +12,16 @@ import {
   Zap,
   PillBottle,
   CircleDashed,
-  Pipette,
-  Bot
+  Pipette
 } from "lucide-react";
 import DashboardHeader from "./DashboardHeader";
 import DashboardOverview, { ProductStats } from "./DashboardOverview";
 import DashboardProducts from "./DashboardProducts";
 import DashboardRoutines from "./DashboardRoutines";
 import DashboardProgress from "./DashboardProgress";
-import DashboardAI from "./DashboardAI";
 
 /**
- * Dashboard component - Main dashboard view with tabs for overview, products, routines, progress, and AI
+ * Dashboard component - Main dashboard view with tabs for overview, products, routines, and progress
  * This component has been refactored to use smaller, more focused components to improve performance
  */
 export function Dashboard() {
@@ -216,7 +214,7 @@ export function Dashboard() {
         onEditProfile={handleEditProfile}
       />
 
-      <div className="container max-w-7xl mx-auto px-4 -mt-10 md:-mt-18 relative z-10">
+      <div className="container mx-auto px-4 max-w-7xl -mt-10 md:-mt-18 relative z-10">
         {/* Dashboard Tabs */}
         <Tabs
           defaultValue="overview"
@@ -224,38 +222,31 @@ export function Dashboard() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <div className="bg-card rounded-xl shadow-lg border p-1 mb-8">
-            <TabsList className="grid grid-cols-5 w-full">
+          <div className="bg-card rounded-xl shadow-lg border p-1 mb-4 md:mb-8">
+            <TabsList className="grid grid-cols-4 w-full">
               <TabsTrigger
                 value="overview"
-                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs md:text-base"
               >
                 Overview
               </TabsTrigger>
               <TabsTrigger
                 value="products"
-                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs md:text-base"
               >
                 Products
               </TabsTrigger>
               <TabsTrigger
                 value="routines"
-                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs md:text-base"
               >
                 Routines
               </TabsTrigger>
               <TabsTrigger
                 value="progress"
-                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-xs md:text-base"
               >
                 Progress
-              </TabsTrigger>
-              <TabsTrigger
-                value="ai"
-                className="rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Bot className="h-3.5 w-3.5 mr-1" />
-                AI
               </TabsTrigger>
             </TabsList>
           </div>
@@ -288,10 +279,6 @@ export function Dashboard() {
 
           <TabsContent value="progress" className="mt-0">
             <DashboardProgress currentUserId={currentUser?.uid} />
-          </TabsContent>
-
-          <TabsContent value="ai" className="mt-0">
-            <DashboardAI />
           </TabsContent>
         </Tabs>
       </div>
