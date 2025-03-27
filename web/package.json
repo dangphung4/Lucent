@@ -11,6 +11,8 @@
     "generate-pwa-assets": "pwa-assets-generator"
   },
   "dependencies": {
+    "@ai-sdk/google": "^1.2.3",
+    "@google/generative-ai": "^0.24.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^4.1.2",
     "@radix-ui/react-accordion": "^1.2.3",
@@ -39,7 +41,9 @@
     "@radix-ui/react-toggle": "^1.1.2",
     "@radix-ui/react-toggle-group": "^1.1.2",
     "@radix-ui/react-tooltip": "^1.1.8",
+    "@tailwindcss/typography": "^0.5.16",
     "@uploadthing/react": "^7.3.0",
+    "ai": "^4.2.6",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
@@ -55,6 +59,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
+    "react-markdown": "^10.1.0",
     "react-resizable-panels": "^2.1.7",
     "react-router-dom": "^7.2.0",
     "recharts": "^2.15.1",
