@@ -12,10 +12,11 @@ import {
   Link as LinkIcon
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getUserProducts, getUserRoutines, Product, Routine } from "@/lib/db";
 import ReactMarkdown from 'react-markdown';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+import { generateText, CoreMessage } from 'ai';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -73,6 +74,98 @@ const EXAMPLE_IMAGE_PROMPTS = [
   "Show me a diagram of skin layers and how products penetrate",
   "Create a before/after illustration of hydrated vs dehydrated skin"
 ];
+
+// Create a custom Google provider with API key
+const customGoogle = createGoogleGenerativeAI({
+  apiKey: import.meta.env.VITE_GEMINI_API_KEY
+});
+
+// Add a fix for the AI SDK message format conversion
+const convertToSDKMessage = (message: Message): CoreMessage => {
+  return {
+    role: message.role === 'user' ? 'user' : 'assistant',
+    content: message.content
+  } as CoreMessage;
+};
+
+// Helper function to extract URLs from response text
+const extractURLsFromText = (text: string): Source[] => {
+  // URLs often appear inside square or round brackets, or preceded by "source:" or "from:"
+  const urlRegex = /(?:\[|\(|\bsource:|\bfrom:|\bhttps?:\/\/)[^\s[\]()<>"']+(?:(?:\([\w\d]+\)|[\w\d]+\.[!\w\d]+)+(?:[/\w\d#%&()=?:;,.@+~-]*[/\w\d#%&()=?:~-])?)/ig;
+  const matches = text.match(urlRegex) || [];
+  
+  // Process matched URLs to clean them up
+  const sources: Source[] = [];
+  const urlSet = new Set<string>(); // To keep track of unique URLs
+  
+  for (const match of matches) {
+    try {
+      // Clean up the URL - remove brackets, punctuation at the end, etc.
+      let cleanUrl = match.replace(/^\[|\]$|\($|\)$|^source:|^from:/i, '').trim();
+      
+      // Ensure URL has protocol
+      if (!cleanUrl.startsWith('http')) {
+        cleanUrl = 'https://' + cleanUrl;
+      }
+      
+      // Remove trailing punctuation that might have been captured
+      cleanUrl = cleanUrl.replace(/[.,;:)]$/, '');
+      
+      // Try to create a URL object to validate
+      try {
+        new URL(cleanUrl);
+        
+        // Only add if URL is unique
+        if (!urlSet.has(cleanUrl)) {
+          urlSet.add(cleanUrl);
+          sources.push({
+            uri: cleanUrl,
+            title: new URL(cleanUrl).hostname
+          });
+        }
+      } catch {
+        // Not a valid URL, skip it
+        console.log("Invalid URL extracted:", cleanUrl);
+      }
+    } catch (error) {
+      console.log("Error processing URL from text:", match, error);
+    }
+  }
+  
+  return sources;
+};
+
+// Add necessary types for the provider metadata
+interface GroundingMetadata {
+  searchEntryPoint?: {
+    renderedContent?: string;
+  };
+  webSearchQueries?: string[];
+}
+
+interface GoogleMetadata {
+  citationMetadata?: {
+    citations?: Array<{
+      uri: string;
+      title?: string;
+    }>;
+  };
+  groundingMetadata?: GroundingMetadata;
+  safetyRatings?: Array<{
+    category?: string;
+    probability?: string;
+    probabilityScore?: number;
+    severity?: string;
+    severityScore?: number;
+  }>;
+}
+
+// Extended result type to include experimental properties
+interface ExtendedResult extends ReturnType<typeof generateText> {
+  experimental_providerMetadata?: {
+    google?: GoogleMetadata;
+  };
+}
 
 /**
  * AISkincare component - Standalone AI chatbot page powered by Google Gemini for skincare advice
@@ -185,43 +278,8 @@ export function AISkincare() {
       setInput('');
       setIsFirstPrompt(false);
 
-      // Determine which model to use based on the active tab
-      const modelName = activeTab === 'chat' 
-        ? 'gemini-1.5-pro-latest' 
-        : 'gemini-2.0-flash-exp';
-
-      // Initialize Gemini API
-      const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      const genAI = new GoogleGenerativeAI(geminiApiKey);
-      
-      // Configure model based on active tab and settings
-      const modelOptions: Record<string, unknown> = {};
-      
-      // Always enable web search for chat
-      if (activeTab === 'chat') {
-        modelOptions.useSearchGrounding = true;
-        modelOptions.dynamicRetrievalConfig = {
-          mode: 'MODE_DYNAMIC',
-          dynamicThreshold: 0.8
-        };
-      }
-      
-      // If we're generating images
-      if (activeTab === 'image') {
-        modelOptions.responseModalities = ['TEXT', 'IMAGE'];
-      }
-      
-      const model = genAI.getGenerativeModel({ 
-        model: modelName,
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 1000,
-        },
-        ...modelOptions
-      });
-
-      // Create detailed context from user data (only for chat)
-      const userContext = activeTab === 'chat' ? `
+      // Create detailed context from user data
+      const userContext = `
         User Information:
         - Skin Type: ${userData.skinType}
         - Skin Concerns: ${userData.skinConcerns.join(', ')}
@@ -238,75 +296,86 @@ export function AISkincare() {
           ).join('\n')}
           `;
         }).join('\n\n')}
-      ` : '';
+      `;
 
-      // Prepare chat history
-      const chatHistory = messages.slice(1).map(msg => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.content }]
-      }));
+      // Construct the system prompt
+      const systemPrompt = activeTab === 'chat'
+        ? `You are a skincare AI assistant that helps users with their skincare routines, product recommendations, and skincare advice. 
+          
+          Here is detailed information about the current user:
+          ${userContext}
+          
+          When giving advice:
+          1. Be specific and personalized based on the user's skin type and concerns
+          2. Refer to their current products and routines when relevant
+          3. Focus on evidence-based skincare advice
+          4. Always clarify when you're giving general advice vs. personalized recommendations
+          5. Avoid making claims about treating medical conditions
+          6. Format your responses using Markdown for clarity - use headings, lists, and emphasis
+          7. When analyzing routines, comment on product order, potential interactions, and missing steps
+          8. Keep your responses concise and mobile-friendly - use short paragraphs and bullet points
+          9. Use web search to provide the most up-to-date information about skincare trends and research`
+        : `You are an AI assistant that generates helpful skincare-related images based on user prompts. 
+           Create visually appealing and informative images that help users understand skincare concepts.
+           
+           Guidelines for image generation:
+           1. Create clean, professional designs with clear visual hierarchy
+           2. Use color schemes that are pleasing and appropriate for skincare (soft blues, greens, pinks)
+           3. Include helpful labels and annotations where appropriate
+           4. Make the images educational and informative
+           5. Avoid creating images that make medical claims
+           
+           Also provide a short text description of what you've created.`;
 
-      // Add system prompt and user context at the beginning of the chat
-      const systemPrompt = {
-        role: "user" as const,
-        parts: [{ 
-          text: activeTab === 'chat' 
-            ? `You are a skincare AI assistant that helps users with their skincare routines, product recommendations, and skincare advice. 
-            
-            Here is detailed information about the current user:
-            ${userContext}
-            
-            When giving advice:
-            1. Be specific and personalized based on the user's skin type and concerns
-            2. Refer to their current products and routines when relevant
-            3. Focus on evidence-based skincare advice
-            4. Always clarify when you're giving general advice vs. personalized recommendations
-            5. Avoid making claims about treating medical conditions
-            6. Format your responses using Markdown for clarity - use headings, lists, and emphasis
-            7. When analyzing routines, comment on product order, potential interactions, and missing steps
-            8. Keep your responses concise and mobile-friendly - use short paragraphs and bullet points
-            9. Use web search to provide the most up-to-date information about skincare trends and research
-            
-            Now respond to the user's messages in a friendly, helpful tone.`
-            : `You are an AI assistant that generates helpful skincare-related images based on user prompts. 
-               Create visually appealing and informative images that help users understand skincare concepts.
-               
-               Guidelines for image generation:
-               1. Create clean, professional designs with clear visual hierarchy
-               2. Use color schemes that are pleasing and appropriate for skincare (soft blues, greens, pinks)
-               3. Include helpful labels and annotations where appropriate
-               4. Make the images educational and informative
-               5. Avoid creating images that make medical claims
-               
-               Also provide a short text description of what you've created.`
-        }]
-      };
+      // Convert previous messages to the format expected by AI SDK
+      const convertedMessages = messages.slice(1).map(convertToSDKMessage);
+      
+      // Add the latest user message as a new message
+      convertedMessages.push({
+        role: 'user',
+        content: input
+      } as CoreMessage);
 
-      // Add system response acknowledging the context
-      const systemResponse = {
-        role: "model" as const,
-        parts: [{ text: activeTab === 'chat' 
-          ? "I understand the user's profile and will provide personalized skincare advice with proper formatting."
-          : "I'll create helpful skincare-related images based on your prompts."
-        }]
-      };
+      // Create model configuration based on active tab
+      let model;
+      let providerOptions = {};
+      
+      if (activeTab === 'chat') {
+        // Use web search for chat - ALWAYS search, not dynamic
+        model = customGoogle('gemini-2.0-flash-exp', {
+          useSearchGrounding: true,
+          // Always trigger search, not just when the model thinks it's necessary
+          dynamicRetrievalConfig: {
+            mode: 'MODE_UNSPECIFIED' // This mode always triggers retrieval
+          }
+        });
+      } else {
+        // Use image generation for the image tab
+        model = customGoogle('gemini-2.0-flash-exp');
+        providerOptions = {
+          google: { responseModalities: ['TEXT', 'IMAGE'] }
+        };
+      }
 
-      // Create chat history with system prompt
-      const fullChatHistory = [systemPrompt, systemResponse, ...chatHistory];
+      // Generate response using AI SDK - fix to avoid passing both prompt and messages
+      const result = await generateText({
+        model,
+        messages: [
+          // Add a system message with the system prompt
+          {
+            role: 'system',
+            content: systemPrompt
+          },
+          // Add all the converted user/assistant messages
+          ...convertedMessages
+        ],
+        temperature: 0.7,
+        maxTokens: 1000,
+        providerOptions
+      }) as ExtendedResult;
 
-      // Add the latest user message
-      fullChatHistory.push({
-        role: "user" as const,
-        parts: [{ text: input }]
-      });
-
-      // Get response from Gemini
-      const result = await model.generateContent({
-        contents: fullChatHistory,
-      });
-
-      const response = result.response;
-      const aiMessageContent = response.text();
+      // Extract the text response
+      const aiMessageContent = result.text;
       
       // Create the assistant message
       const assistantMessage: Message = { 
@@ -314,78 +383,299 @@ export function AISkincare() {
         content: aiMessageContent 
       };
       
-      // Check if there are images in the response (for image generation)
-      if (activeTab === 'image' && response.candidates?.[0]?.content?.parts) {
-        const parts = response.candidates[0].content.parts;
-        
-        // Define a proper type guard
-        interface ImagePart {
-          inlineData: {
-            mimeType: string;
-            data: string;
-          };
-        }
-
-        const isImagePart = (part: unknown): part is ImagePart => {
-          if (typeof part !== 'object' || part === null) return false;
-          
-          const maybePart = part as Record<string, unknown>;
-          if (!('inlineData' in maybePart)) return false;
-          
-          const inlineData = maybePart.inlineData;
-          if (typeof inlineData !== 'object' || inlineData === null) return false;
-          
-          const maybeInlineData = inlineData as Record<string, unknown>;
-          return (
-            'mimeType' in maybeInlineData && 
-            typeof maybeInlineData.mimeType === 'string' &&
-            'data' in maybeInlineData && 
-            typeof maybeInlineData.data === 'string'
-          );
+      // Enhanced metadata extraction to include all search grounding information
+      interface GoogleMetadata {
+        citationMetadata?: {
+          citations?: Array<{
+            uri: string;
+            title?: string;
+          }>;
         };
-        
-        const imageFiles = parts
-          .filter(isImagePart)
-          .filter(part => part.inlineData.mimeType.startsWith('image/'))
-          .map(part => ({
-            data: new Uint8Array(
-              atob(part.inlineData.data)
-                .split('')
-                .map(char => char.charCodeAt(0))
-            ),
-            mimeType: part.inlineData.mimeType
-          }));
-          
-        if (imageFiles.length > 0) {
-          assistantMessage.files = imageFiles;
-        }
+        groundingMetadata?: {
+          webSearchQueries?: string[];
+          searchEntryPoint?: {
+            renderedContent?: string;
+          };
+          groundingSupports?: Array<{
+            segment?: {
+              text?: string;
+              startIndex?: number;
+              endIndex?: number;
+            };
+            groundingChunkIndices?: number[];
+            confidenceScores?: number[];
+          }>;
+        };
+        safetyRatings?: Array<{
+          category?: string;
+          probability?: string;
+          probabilityScore?: number;
+          severity?: string;
+          severityScore?: number;
+        }>;
       }
       
-      // Add sources and search metadata if available (for web search)
-      if (response.candidates?.[0]?.citationMetadata) {
-        const citationMetadata = response.candidates[0].citationMetadata;
+      // Log the full provider metadata for debugging
+      console.log("Google provider metadata:", result.providerMetadata?.google);
+      console.log("Result object:", result);
+      
+      if (result.providerMetadata?.google) {
+        const googleMetadata = result.providerMetadata.google as GoogleMetadata;
         
-        // Use a type assertion since the Google API model might not exactly match TypeScript types
-        if ('citations' in citationMetadata) {
-          const citations = (citationMetadata as unknown as { citations: Array<{ uri: string, title?: string }> }).citations;
-          
-          assistantMessage.sources = citations.map((citation) => ({
+        // Extract citation metadata
+        if (googleMetadata.citationMetadata?.citations) {
+          assistantMessage.sources = googleMetadata.citationMetadata.citations.map((citation) => ({
             uri: citation.uri,
             title: citation.title || new URL(citation.uri).hostname
           }));
         }
-      }
-      
-      // Extract search metadata if available
-      if (response.candidates?.[0]?.groundingMetadata) {
-        const groundingMetadata = response.candidates[0].groundingMetadata;
         
-        if (groundingMetadata && 'webSearchQueries' in groundingMetadata) {
+        // Extract search queries and other grounding metadata
+        if (googleMetadata.groundingMetadata) {
           assistantMessage.searchMetadata = {
-            webSearchQueries: (groundingMetadata as unknown as { webSearchQueries: string[] }).webSearchQueries
+            webSearchQueries: googleMetadata.groundingMetadata.webSearchQueries || []
           };
         }
+        
+        // If sources are in the result object (AI SDK v4.2+), use them directly
+        if (result.sources && result.sources.length > 0) {
+          // Define interfaces for possible source formats
+          interface UriSource {
+            uri: string;
+            title?: string;
+          }
+          
+          interface CitationSource {
+            citation: string;
+          }
+          
+          assistantMessage.sources = result.sources.map(source => {
+            // The AI SDK v4.2 uses a different format for sources
+            // Check if it has the expected structure
+            if ('uri' in source) {
+              const uriSource = source as UriSource;
+              return {
+                uri: uriSource.uri,
+                title: uriSource.title || new URL(uriSource.uri).hostname
+              };
+            } 
+            // Handle AI SDK format where citation might be handled differently
+            else if ('citation' in source) {
+              const citationSource = source as CitationSource;
+              const citationUrl = citationSource.citation || '';
+              try {
+                return {
+                  uri: citationUrl,
+                  title: new URL(citationUrl).hostname
+                };
+              } catch {
+                // Ignore error and use fallback
+                return {
+                  uri: citationUrl,
+                  title: 'Citation Source'
+                };
+              }
+            }
+            // Fallback with empty values
+            return {
+              uri: '',
+              title: 'Unknown Source'
+            };
+          }).filter(source => source.uri !== ''); // Remove any empty sources
+        }
       }
+
+      // Extract and log direct sources from result
+      if (result.sources) {
+        console.log("Direct sources from result:", result.sources, typeof result.sources);
+        
+        try {
+          // Directly assign sources from result object
+          const sourcesFromResult = Array.isArray(result.sources) ? result.sources.map(source => {
+            console.log("Processing source:", source, typeof source);
+            
+            // Handle different source formats
+            if (typeof source === 'object' && source !== null) {
+              if ('uri' in source && typeof source.uri === 'string') {
+                const uri = source.uri;
+                let title;
+                try {
+                  title = 'title' in source && typeof source.title === 'string' 
+                    ? source.title 
+                    : new URL(uri).hostname;
+                } catch {
+                  title = "Unknown Source";
+                }
+                return { uri, title };
+              } else if ('citation' in source && typeof source.citation === 'string') {
+                const citationUrl = source.citation;
+                try {
+                  return {
+                    uri: citationUrl,
+                    title: new URL(citationUrl).hostname
+                  };
+                } catch {
+                  return {
+                    uri: citationUrl,
+                    title: 'Citation Source'
+                  };
+                }
+              }
+            }
+            
+            // Fallback for string sources
+            if (typeof source === 'string') {
+              try {
+                return {
+                  uri: source,
+                  title: new URL(source).hostname
+                };
+              } catch {
+                return {
+                  uri: source,
+                  title: 'Source'
+                };
+              }
+            }
+            
+            // Unknown source format - return a structured error
+            console.log("Unknown source format:", source);
+            return {
+              uri: "https://unknown-source.com",
+              title: "Unknown Source Format"
+            };
+          }) : [];
+          
+          if (sourcesFromResult.length > 0) {
+            console.log("Processed sources from result:", sourcesFromResult);
+            assistantMessage.sources = sourcesFromResult as Source[];
+          } else {
+            console.log("No valid sources found in result.sources array");
+          }
+        } catch (error) {
+          console.error("Error processing sources:", error);
+        }
+      } else {
+        console.log("No sources available in the result object");
+      }
+      
+      // Check for experimental provider metadata with search results
+      try {
+        // Access the result's metadata and use a type assertion for the experimental property
+        const googleMetadataStandard = result.providerMetadata?.google as GoogleMetadata | undefined;
+        const resultWithExperimental = result as any; // Use any for accessing non-standard properties
+        const googleMetadataExperimental = resultWithExperimental?.experimental_providerMetadata?.google as GoogleMetadata | undefined;
+        
+        const renderedContent = 
+          googleMetadataStandard?.groundingMetadata?.searchEntryPoint?.renderedContent ||
+          googleMetadataExperimental?.groundingMetadata?.searchEntryPoint?.renderedContent;
+        
+        if (renderedContent) {
+          console.log("Found search entry point content:", renderedContent.substring(0, 100) + "...");
+          
+          // Create a temporary DOM element to parse the HTML
+          const tempDiv = document.createElement('div');
+          tempDiv.innerHTML = renderedContent;
+          
+          // Extract links from the rendered content
+          const links = tempDiv.querySelectorAll('a');
+          const searchSources: Source[] = [];
+          
+          links.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href) {
+              try {
+                // Check if it's a redirect URL from Google
+                const url = new URL(href);
+                // Get the actual destination URL if available
+                let finalUrl = href;
+                let title = link.textContent || url.hostname;
+                
+                // For Google redirect URLs, try to extract the final destination
+                if (url.hostname.includes('google.com') && url.pathname.includes('redirect')) {
+                  finalUrl = href; // Use the redirect URL as fallback
+                  // The text content is often the search query
+                  title = link.textContent || "Search Result";
+                }
+                
+                searchSources.push({
+                  uri: finalUrl,
+                  title: title
+                });
+                
+                console.log("Extracted link from search results:", finalUrl, title);
+              } catch (e) {
+                console.error("Failed to process search result link:", href, e);
+              }
+            }
+          });
+          
+          if (searchSources.length > 0) {
+            console.log("Extracted search sources:", searchSources);
+            assistantMessage.sources = searchSources;
+            
+            // Also extract search queries
+            const webSearchQueries = 
+              googleMetadataStandard?.groundingMetadata?.webSearchQueries ||
+              googleMetadataExperimental?.groundingMetadata?.webSearchQueries;
+              
+            if (webSearchQueries && Array.isArray(webSearchQueries)) {
+              assistantMessage.searchMetadata = {
+                webSearchQueries
+              };
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error processing search entry point:", error);
+      }
+      
+      // Extract images if available
+      if (result.files && result.files.length > 0) {
+        console.log("Files in response:", result.files);
+        
+        // The AI SDK returns files that may have various properties
+        // We need to safely handle them and convert to our Message format
+        const processedFiles = await Promise.all(
+          result.files.map(async (file) => {
+            // Try to extract ArrayBuffer from file
+            let buffer: ArrayBuffer;
+            
+            if ('blob' in file && file.blob instanceof Blob) {
+              buffer = await file.blob.arrayBuffer();
+            } else {
+              // Fallback to empty buffer if we can't get data
+              console.warn('File data not available in expected format', file);
+              buffer = new ArrayBuffer(0);
+            }
+            
+            return {
+              data: new Uint8Array(buffer),
+              mimeType: file.mimeType
+            };
+          })
+        );
+        
+        assistantMessage.files = processedFiles;
+      }
+
+      // Fallback source extraction if no sources are provided by the API
+      if (!assistantMessage.sources || assistantMessage.sources.length === 0) {
+        console.log("No sources assigned to message, attempting to extract from text");
+        
+        // Try to extract URLs from the response text
+        const extractedSources = extractURLsFromText(aiMessageContent);
+        
+        if (extractedSources.length > 0) {
+          console.log("Extracted sources from text:", extractedSources);
+          assistantMessage.sources = extractedSources;
+        }
+      }
+
+      // Final check - log what's being added to the message
+      console.log("Final assistant message with sources:", 
+        assistantMessage.sources ? assistantMessage.sources.length : 0, 
+        "sources being added to the messages array");
 
       // Add AI response to messages
       setMessages(prev => [...prev, assistantMessage]);
@@ -433,7 +723,25 @@ export function AISkincare() {
   };
 
   const renderSources = (sources: Source[], searchMetadata?: { webSearchQueries?: string[] }) => {
-    if (!sources || sources.length === 0) return null;
+    // Log what we're receiving for debugging
+    console.log("Sources in renderSources:", sources);
+    console.log("Search metadata in renderSources:", searchMetadata);
+    
+    // Only return null if there are literally NO sources
+    if (!sources || (Array.isArray(sources) && sources.length === 0)) {
+      // Add debug message in development
+      if (import.meta.env.DEV) {
+        return (
+          <div className="mt-4 p-3 border border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-800/30 rounded-md">
+            <p className="text-sm text-red-700 dark:text-red-400 font-medium">Debug: No sources received</p>
+            <pre className="text-xs mt-2 overflow-auto max-h-40 p-2 bg-white dark:bg-black/40 rounded border border-red-200 dark:border-red-800/30">
+              {JSON.stringify({ sources, searchMetadata }, null, 2)}
+            </pre>
+          </div>
+        );
+      }
+      return null;
+    }
     
     return (
       <div className="mt-4 space-y-3 border-t pt-3 border-purple-200/30 dark:border-purple-800/30">
@@ -457,11 +765,11 @@ export function AISkincare() {
           </div>
         )}
         
-        {/* Sources section */}
+        {/* Sources section - more prominent */}
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm font-medium text-purple-700 dark:text-purple-400">
+          <div className="flex items-center gap-2 text-sm font-semibold text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/40 px-2 py-1 rounded-md">
             <LinkIcon className="h-4 w-4" />
-            <span>Sources:</span>
+            <span>Web Sources:</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {sources.map((source, idx) => (
@@ -470,9 +778,9 @@ export function AISkincare() {
                 href={source.uri}
                 target="_blank"
                 rel="noopener noreferrer" 
-                className="flex items-center gap-2 p-2 rounded-md hover:bg-purple-100/50 dark:hover:bg-purple-900/30 transition-colors group text-sm border border-purple-200/50 dark:border-purple-800/30"
+                className="flex items-center gap-2 p-3 rounded-md bg-purple-50/50 dark:bg-purple-900/10 hover:bg-purple-100/80 dark:hover:bg-purple-900/30 transition-colors group text-sm border border-purple-200/50 dark:border-purple-800/30"
               >
-                <div className="flex-shrink-0 bg-purple-100 dark:bg-purple-900/50 h-6 w-6 rounded-md flex items-center justify-center">
+                <div className="flex-shrink-0 bg-purple-200 dark:bg-purple-800/50 h-6 w-6 rounded-md flex items-center justify-center">
                   <span className="text-xs font-medium text-purple-700 dark:text-purple-400">{idx + 1}</span>
                 </div>
                 <div className="flex-1 overflow-hidden">
@@ -487,6 +795,18 @@ export function AISkincare() {
             ))}
           </div>
         </div>
+
+        {/* Debug information in development mode */}
+        {import.meta.env.DEV && (
+          <details className="mt-4 border border-purple-200 dark:border-purple-800/30 rounded-md">
+            <summary className="cursor-pointer p-2 bg-purple-50 dark:bg-purple-900/20 text-xs font-medium">
+              Debug: Source Information
+            </summary>
+            <div className="p-2 text-xs overflow-auto max-h-40">
+              <pre>{JSON.stringify({ sources, searchMetadata }, null, 2)}</pre>
+            </div>
+          </details>
+        )}
       </div>
     );
   };
@@ -537,8 +857,8 @@ export function AISkincare() {
           <div className="flex items-center px-4 py-2 rounded-lg bg-purple-100/50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/30 mb-4">
             <Search className="h-4 w-4 text-purple-700 dark:text-purple-400 mr-2" />
             <span className="text-sm text-muted-foreground">
-              <span className="font-medium text-purple-700 dark:text-purple-400">Web search is enabled</span> - 
-              I will search the web to provide the most up-to-date skincare information
+              <span className="font-medium text-purple-700 dark:text-purple-400">Web search is ALWAYS enabled</span> - 
+              Every response will include web search results with linked sources
             </span>
           </div>
         )}
