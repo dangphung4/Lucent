@@ -13,7 +13,7 @@ import {
   Link as LinkIcon
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
-import { getUserProducts, getUserRoutines, Product, Routine } from "@/lib/db";
+import { getUserProducts, getUserRoutines, getUserProfile, Product, Routine } from "@/lib/db";
 import ReactMarkdown from 'react-markdown';
 import { Tabs, TabsList, TabsTrigger } from './ui/tabs';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
@@ -36,6 +36,11 @@ interface Message {
 }
 
 interface UserData {
+  profile: {
+    displayName: string;
+    email: string;
+    username?: string;
+  };
   products: Product[];
   routines: Routine[];
   skinConcerns: string[];
@@ -181,6 +186,11 @@ export function AISkincare() {
   const [isFirstPrompt, setIsFirstPrompt] = useState(true);
   const [activeTab, setActiveTab] = useState<'chat' | 'image'>('chat');
   const [userData, setUserData] = useState<UserData>({
+    profile: {
+      displayName: '',
+      email: '',
+      username: ''
+    },
     products: [],
     routines: [],
     skinConcerns: [],
@@ -198,15 +208,74 @@ export function AISkincare() {
 
     const fetchUserData = async () => {
       try {
+        // Get user profile
+        const profile = await getUserProfile(currentUser.uid);
+        console.log("Retrieved user profile:", profile);
+        console.log("Current user info:", currentUser);
+        
         // Get user products
         const products = await getUserProducts(currentUser.uid);
         
         // Get user routines
         const routines = await getUserRoutines(currentUser.uid);
         
-        // Use default skin concerns and type since we don't have those in the User type
-        const skinConcerns = ['acne', 'dryness'];
-        const skinType = 'combination';
+        // Extract skin concerns from products - look at product descriptions and ingredients
+        let skinConcerns: string[] = ['acne', 'dryness']; // Default concerns
+        const skinConcernsSet = new Set<string>();
+        
+        // Look for keywords in product descriptions
+        products.forEach(product => {
+          const description = product.description?.toLowerCase() || '';
+          const keywords = [
+            { word: 'acne', concern: 'acne' },
+            { word: 'pimple', concern: 'acne' },
+            { word: 'breakout', concern: 'acne' },
+            { word: 'dry', concern: 'dryness' },
+            { word: 'flaky', concern: 'dryness' },
+            { word: 'hydration', concern: 'dryness' },
+            { word: 'wrinkle', concern: 'aging' },
+            { word: 'fine line', concern: 'aging' },
+            { word: 'aging', concern: 'aging' },
+            { word: 'hyperpigmentation', concern: 'dark spots' },
+            { word: 'dark spot', concern: 'dark spots' },
+            { word: 'melasma', concern: 'dark spots' },
+            { word: 'sensitive', concern: 'sensitivity' },
+            { word: 'redness', concern: 'redness' },
+            { word: 'inflammation', concern: 'redness' },
+            { word: 'oily', concern: 'oiliness' }
+          ];
+          
+          keywords.forEach(({ word, concern }) => {
+            if (description.includes(word)) {
+              skinConcernsSet.add(concern);
+            }
+          });
+        });
+        
+        // If we found any concerns from products, use those
+        if (skinConcernsSet.size > 0) {
+          skinConcerns = Array.from(skinConcernsSet);
+        }
+        
+        // Try to determine skin type from products
+        let skinType = 'combination'; // Default type
+        const oilyProducts = products.filter(p => 
+          p.description?.toLowerCase().includes('oily') || 
+          p.description?.toLowerCase().includes('oil control')
+        ).length;
+        
+        const dryProducts = products.filter(p => 
+          p.description?.toLowerCase().includes('dry') || 
+          p.description?.toLowerCase().includes('hydrating')
+        ).length;
+        
+        if (oilyProducts > dryProducts * 2) {
+          skinType = 'oily';
+        } else if (dryProducts > oilyProducts * 2) {
+          skinType = 'dry';
+        } else if (oilyProducts > 0 && dryProducts > 0) {
+          skinType = 'combination';
+        }
         
         // Create detailed routine information
         const routineDetails = await Promise.all(routines.map(async (routine) => {
@@ -231,11 +300,22 @@ export function AISkincare() {
         
         // Set user data
         setUserData({
+          profile: {
+            displayName: profile?.displayName || currentUser.displayName || 'Shams Abbas',
+            email: profile?.email || currentUser.email || '',
+            username: profile?.username
+          },
           products,
           routines,
           skinConcerns,
           skinType,
           routineDetails
+        });
+        
+        console.log("Final userData.profile set:", {
+          displayName: profile?.displayName || currentUser.displayName || 'Shams Abbas',
+          email: profile?.email || currentUser.email || '',
+          username: profile?.username
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -283,11 +363,18 @@ export function AISkincare() {
       // Create detailed context from user data
       const userContext = `
         User Information:
+        - Name: ${userData.profile.displayName}
         - Skin Type: ${userData.skinType}
         - Skin Concerns: ${userData.skinConcerns.join(', ')}
         
         Current Products (${userData.products.length}):
-        ${userData.products.map(p => `- ${p.name} by ${p.brand} (${p.category}): ${p.status}`).join('\n')}
+        ${userData.products.map(p => {
+          const ingredients = p.ingredients ? `Contains: ${p.ingredients.slice(0, 5).join(', ')}${p.ingredients.length > 5 ? '...' : ''}` : '';
+          const description = p.description ? `Description: ${p.description.substring(0, 100)}${p.description.length > 100 ? '...' : ''}` : '';
+          return `- ${p.name} by ${p.brand} (${p.category || 'Unknown Category'}): ${p.status}
+            ${ingredients ? `  ${ingredients}` : ''}
+            ${description ? `  ${description}` : ''}`;
+        }).join('\n')}
         
         Detailed Skincare Routines:
         ${userData.routineDetails.map(routine => {
@@ -298,6 +385,11 @@ export function AISkincare() {
           ).join('\n')}
           `;
         }).join('\n\n')}
+        
+        Personal Information:
+        - The user has been using these products for varied amounts of time
+        - Some products may be new additions to their routine
+        - The user's main focus areas appear to be: ${userData.skinConcerns.slice(0, 3).join(', ')}
       `;
 
       // Construct the system prompt
