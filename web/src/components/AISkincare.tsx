@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from "./ui/card";
 import { Button } from "./ui/button";
@@ -375,7 +376,7 @@ export function AISkincare() {
       }) as unknown as ExtendedResult;
 
       // Extract the text response
-      const aiMessageContent = result.text;
+      const aiMessageContent = (await result).text;
       
       // Create the assistant message
       const assistantMessage: Message = { 
@@ -416,14 +417,12 @@ export function AISkincare() {
       }
       
       // Log the full provider metadata for debugging
-      console.log("Google provider metadata:", result.providerMetadata?.google);
+      console.log("Google provider metadata:", (await result).providerMetadata?.google);
       console.log("Result object:", result);
-      
-      if (result.providerMetadata?.google) {
-        const googleMetadata = result.providerMetadata.google as GoogleMetadata;
-        
+      if ((await result)?.providerMetadata?.google) {
+        const googleMetadata = (await result).providerMetadata?.google as GoogleMetadata;
         // Extract citation metadata
-        if (googleMetadata.citationMetadata?.citations) {
+        if (googleMetadata?.citationMetadata?.citations) {
           assistantMessage.sources = googleMetadata.citationMetadata.citations.map((citation) => ({
             uri: citation.uri,
             title: citation.title || new URL(citation.uri).hostname
@@ -438,7 +437,7 @@ export function AISkincare() {
         }
         
         // If sources are in the result object (AI SDK v4.2+), use them directly
-        if (result.sources && result.sources.length > 0) {
+        if ((await result).sources && (await result).sources.length > 0) {
           // Define interfaces for possible source formats
           interface UriSource {
             uri: string;
@@ -449,7 +448,7 @@ export function AISkincare() {
             citation: string;
           }
           
-          assistantMessage.sources = result.sources.map(source => {
+          assistantMessage.sources = (await result).sources.map(source => {
             // The AI SDK v4.2 uses a different format for sources
             // Check if it has the expected structure
             if ('uri' in source) {
@@ -486,12 +485,12 @@ export function AISkincare() {
       }
 
       // Extract and log direct sources from result
-      if (result.sources) {
-        console.log("Direct sources from result:", result.sources, typeof result.sources);
+      if ((await result).sources) {
+        console.log("Direct sources from result:", (await result).sources, typeof (await result).sources);
         
         try {
           // Directly assign sources from result object
-          const sourcesFromResult = Array.isArray(result.sources) ? result.sources.map(source => {
+          const sourcesFromResult = Array.isArray((await result).sources) ? (await result).sources.map(source => {
             console.log("Processing source:", source, typeof source);
             
             // Handle different source formats
@@ -574,7 +573,7 @@ export function AISkincare() {
       // Check for experimental provider metadata with search results
       try {
         // Access the result's metadata and use a type assertion for the experimental property
-        const googleMetadataStandard = result.providerMetadata?.google as GoogleMetadata | undefined;
+        const googleMetadataStandard = (await result).providerMetadata?.google as GoogleMetadata | undefined;
         const resultWithExperimental = result as any; // Use any for accessing non-standard properties
         const googleMetadataExperimental = resultWithExperimental?.experimental_providerMetadata?.google as GoogleMetadata | undefined;
         
@@ -643,13 +642,13 @@ export function AISkincare() {
       }
       
       // Extract images if available
-      if (result.files && result.files.length > 0) {
-        console.log("Files in response:", result.files);
+      if ((await result).files && (await result).files.length > 0) {
+        console.log("Files in response:", (await result).files);
         
         // The AI SDK returns files that may have various properties
         // We need to safely handle them and convert to our Message format
         const processedFiles = await Promise.all(
-          result.files.map(async (file) => {
+          (await result).files.map(async (file) => {
             // Try to extract ArrayBuffer from file
             let buffer: ArrayBuffer;
             
