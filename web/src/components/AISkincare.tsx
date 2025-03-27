@@ -304,7 +304,8 @@ export function AISkincare() {
           profile: {
             displayName: profile?.displayName || currentUser.displayName || 'Shams Abbas',
             email: profile?.email || currentUser.email || '',
-            username: profile?.username
+            username: profile?.username,
+            photoURL: profile?.photoURL || currentUser.photoURL || undefined
           },
           products,
           routines,
@@ -316,7 +317,8 @@ export function AISkincare() {
         console.log("Final userData.profile set:", {
           displayName: profile?.displayName || currentUser.displayName || 'Shams Abbas',
           email: profile?.email || currentUser.email || '',
-          username: profile?.username
+          username: profile?.username,
+          photoURL: profile?.photoURL || currentUser.photoURL || undefined
         });
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -1129,9 +1131,9 @@ export function AISkincare() {
                       )}
                     </div>
                     {message.role === 'user' && (
-                      <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center">
+                      <div className="h-8 w-8 rounded-full bg-purple-500 flex items-center justify-center overflow-hidden">
                       {userData.profile?.photoURL ? (
-                        <img src={userData.profile.photoURL} alt="User" className="h-4 w-4 rounded-full" />
+                        <img src={userData.profile.photoURL} alt="User" className="h-8 w-8 object-cover" />
                       ) : (
                         <span className="text-white text-xs font-medium">{userData.profile.displayName.charAt(0)}</span>
                       )}
