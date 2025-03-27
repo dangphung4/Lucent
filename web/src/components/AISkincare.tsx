@@ -649,19 +649,37 @@ export function AISkincare() {
         // We need to safely handle them and convert to our Message format
         const processedFiles = await Promise.all(
           (await result).files.map(async (file) => {
-            // Try to extract ArrayBuffer from file
-            let buffer: ArrayBuffer;
+            let data: Uint8Array;
             
-            if ('blob' in file && file.blob instanceof Blob) {
-              buffer = await file.blob.arrayBuffer();
-            } else {
-              // Fallback to empty buffer if we can't get data
+            // Check if file has base64Data (Gemini format)
+            if ('base64Data' in file && typeof file.base64Data === 'string') {
+              // Convert base64 to Uint8Array
+              try {
+                const base64 = file.base64Data.replace(/^data:[^;]+;base64,/, '');
+                const binaryString = atob(base64);
+                const len = binaryString.length;
+                data = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                  data[i] = binaryString.charCodeAt(i);
+                }
+              } catch (e) {
+                console.error("Error converting base64 to Uint8Array:", e);
+                data = new Uint8Array(0);
+              }
+            }
+            // Fallback to blob if available (AI SDK format)
+            else if ('blob' in file && file.blob instanceof Blob) {
+              const buffer = await file.blob.arrayBuffer();
+              data = new Uint8Array(buffer);
+            } 
+            // Last resort: empty array
+            else {
               console.warn('File data not available in expected format', file);
-              buffer = new ArrayBuffer(0);
+              data = new Uint8Array(0);
             }
             
             return {
-              data: new Uint8Array(buffer),
+              data,
               mimeType: file.mimeType
             };
           })
