@@ -192,6 +192,15 @@ export function LandingPage() {
                 <div className="flex items-center p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
                   <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mr-2 text-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
+                      <path d="M12 6v6l4 2"></path>
+                    </svg>
+                  </div>
+                  <span className="text-xs md:text-sm font-medium">AI-Powered Advice</span>
+                </div>
+                <div className="flex items-center p-2 md:p-3 rounded-xl bg-card/30 backdrop-blur-sm border border-primary/10 hover:border-primary/20 transition-all hover:shadow-md">
+                  <div className="h-8 w-8 md:h-10 md:w-10 rounded-full bg-primary/10 flex items-center justify-center mr-2 text-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 0C1.46 6.7 1.33 10.28 4 13l8 8 8-8c2.67-2.72 2.54-6.3.42-8.42z"></path>
                     </svg>
                   </div>
@@ -339,19 +348,15 @@ export function LandingPage() {
                     strokeLinejoin="round"
                     className="text-primary"
                   >
-                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
-                    <rect x="9" y="3" width="6" height="4" rx="2"></rect>
-                    <path d="M9 14h.01"></path>
-                    <path d="M13 14h.01"></path>
-                    <path d="M9 18h.01"></path>
-                    <path d="M13 18h.01"></path>
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
+                    <path d="M12 6v6l4 2"></path>
                   </svg>
                 </div>
                 <CardTitle className="text-xl font-bold">
-                  Product Tracking
+                  AI Skincare Assistant
                 </CardTitle>
                 <CardDescription className="text-muted-foreground/90">
-                  Log all your skincare products and track when you use them
+                  Get personalized skincare advice powered by advanced AI
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -371,7 +376,7 @@ export function LandingPage() {
                     >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    <span className="font-medium">Track product details</span>
+                    <span className="font-medium">Personalized recommendations</span>
                   </li>
                   <li className="flex items-center">
                     <svg
@@ -388,7 +393,7 @@ export function LandingPage() {
                     >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    <span className="font-medium">Log usage frequency</span>
+                    <span className="font-medium">Routine analysis & optimization</span>
                   </li>
                   <li className="flex items-center">
                     <svg
@@ -405,7 +410,7 @@ export function LandingPage() {
                     >
                       <polyline points="20 6 9 17 4 12"></polyline>
                     </svg>
-                    <span className="font-medium">Rate effectiveness</span>
+                    <span className="font-medium">Ingredient insights & safety</span>
                   </li>
                 </ul>
               </CardContent>
@@ -888,15 +893,13 @@ export function LandingPage() {
                   <div className="relative">
                     <div className="mb-4 mx-auto w-16 h-16 text-primary">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
+                        <path d="M12 6v6l4 2"></path>
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold mb-3 text-foreground">Create Your Routines</h3>
+                    <h3 className="text-xl font-bold mb-3 text-foreground">Get AI Insights</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Build personalized morning and evening routines with your products in the optimal order
+                      Chat with our AI assistant to get personalized skincare advice, routine optimization, and ingredient analysis
                     </p>
                   </div>
                 </div>
@@ -1205,8 +1208,31 @@ export function LandingPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground leading-relaxed">
-                  "This app has completely transformed my skincare routine. I
-                  can finally track what works and what doesn't!"
+                  "The AI assistant is like having a personal skincare expert at your fingertips. It analyzes my routine and suggests improvements I never would have thought of!"
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="group overflow-hidden transition-all hover:shadow-xl border-gray-200/50 dark:border-gray-800/50 relative bg-gradient-to-b from-background to-primary/5">
+              <CardHeader>
+                <div className="flex items-center gap-4 mb-2">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary font-semibold relative">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-primary/5 rounded-xl"></div>
+                    <span className="relative">M</span>
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg font-bold">
+                      Michael R.
+                    </CardTitle>
+                    <CardDescription className="text-muted-foreground/90">
+                      Beauty Blogger
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground leading-relaxed">
+                  "The ingredient analysis feature is incredible! It helps me understand what each product does and how they work together. Game-changer for my skincare routine."
                 </p>
               </CardContent>
             </Card>
@@ -1236,30 +1262,6 @@ export function LandingPage() {
               </CardContent>
             </Card>
 
-            <Card className="group overflow-hidden transition-all hover:shadow-xl border-gray-200/50 dark:border-gray-800/50 relative bg-gradient-to-b from-background to-primary/5 md:col-span-2 lg:col-span-1">
-              <CardHeader>
-                <div className="flex items-center gap-4 mb-2">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary font-semibold relative">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-primary/5 rounded-xl"></div>
-                    <span className="relative">M</span>
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg font-bold">
-                      Michelle L.
-                    </CardTitle>
-                    <CardDescription className="text-muted-foreground/90">
-                      Dermatologist
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground leading-relaxed">
-                  "I recommend this app to all my patients. It helps them stay
-                  consistent and track their progress over time."
-                </p>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </section>
