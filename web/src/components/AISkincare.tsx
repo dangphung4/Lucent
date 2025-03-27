@@ -359,20 +359,20 @@ export function AISkincare() {
 
       // Generate response using AI SDK - fix to avoid passing both prompt and messages
       const result = await generateText({
-        model,
-        messages: [
-          // Add a system message with the system prompt
-          {
-            role: 'system',
-            content: systemPrompt
-          },
-          // Add all the converted user/assistant messages
-          ...convertedMessages
-        ],
-        temperature: 0.7,
-        maxTokens: 1000,
-        providerOptions
-      }) as ExtendedResult;
+          model,
+          messages: [
+              // Add a system message with the system prompt
+              {
+                  role: 'system',
+                  content: systemPrompt
+              },
+              // Add all the converted user/assistant messages
+              ...convertedMessages
+          ],
+          temperature: 0.7,
+          maxTokens: 1000,
+          providerOptions
+      }) as unknown as ExtendedResult;
 
       // Extract the text response
       const aiMessageContent = result.text;
