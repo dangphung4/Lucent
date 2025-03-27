@@ -187,6 +187,7 @@ export function AISkincare() {
     skinType: 'combination',
     routineDetails: []
   });
+  const [fullScreenImage, setFullScreenImage] = useState<{url: string, alt: string} | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -739,14 +740,91 @@ export function AISkincare() {
     const blob = new Blob([file.data], { type: file.mimeType });
     const url = URL.createObjectURL(blob);
     
+    const handleImageClick = () => {
+      setFullScreenImage({url, alt: "Generated skincare image"});
+    };
+    
+    const handleDownload = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `skincare-image-${new Date().getTime()}.${file.mimeType.split('/')[1] || 'png'}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+    
     return (
-      <div className="mt-4">
-        <img 
-          src={url} 
-          alt="Generated image" 
-          className="rounded-lg max-w-full shadow-md"
-          onLoad={() => URL.revokeObjectURL(url)} 
-        />
+      <div className="mt-4 relative group">
+        <div 
+          className="cursor-zoom-in overflow-hidden rounded-lg"
+          onClick={handleImageClick}
+        >
+          <img 
+            src={url} 
+            alt="Generated image" 
+            className="rounded-lg max-w-full shadow-md transition-transform group-hover:scale-[1.01]"
+            onLoad={() => {
+              // Don't revoke URL here as we need it for fullscreen and download
+              // We'll revoke when component unmounts
+            }} 
+          />
+        </div>
+        
+        <button
+          onClick={handleDownload}
+          className="absolute bottom-2 right-2 bg-purple-500 hover:bg-purple-600 text-white p-2 rounded-full shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+          aria-label="Download image"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+        </button>
+      </div>
+    );
+  };
+
+  // Add fullscreen image modal component
+  const renderFullScreenModal = () => {
+    if (!fullScreenImage) return null;
+    
+    return (
+      <div 
+        className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+        onClick={() => setFullScreenImage(null)}
+      >
+        <div className="relative max-w-6xl max-h-screen overflow-auto">
+          <button 
+            className="absolute top-4 right-4 bg-white/10 hover:bg-white/20 p-2 rounded-full text-white"
+            onClick={() => setFullScreenImage(null)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          
+          <img 
+            src={fullScreenImage.url} 
+            alt={fullScreenImage.alt} 
+            className="max-w-full max-h-[calc(100vh-2rem)]" 
+          />
+          
+          <a 
+            href={fullScreenImage.url} 
+            download={`skincare-image-${new Date().getTime()}.png`}
+            className="absolute bottom-4 right-4 bg-purple-500 hover:bg-purple-600 text-white p-3 rounded-full shadow-lg flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+          </a>
+        </div>
       </div>
     );
   };
@@ -842,6 +920,9 @@ export function AISkincare() {
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-8">
+      {/* Render the full screen modal if an image is selected */}
+      {renderFullScreenModal()}
+      
       <div className="container mx-auto px-4 py-4 md:py-8 max-w-7xl">
         {/* Hero Section - Enhanced for standalone page */}
         <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-500/40 via-purple-400/30 to-background border border-purple-500/40 dark:border-purple-700/30 p-4 md:p-8 mb-6">
