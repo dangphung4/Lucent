@@ -6,7 +6,7 @@ import { Switch } from './ui/switch';
 import { Label } from './ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useTheme } from '../lib/ThemeProvider';
-import { Moon, Sun, Monitor, User, Bell, LogOut, Key, Download, Trash2, Check, ChevronRight, Loader2, Image, X, Plus, ChevronsUpDown, Sparkles, Settings as SettingsIcon } from 'lucide-react';
+import { User, LogOut, Key, Download, Trash2, Check, ChevronRight, Loader2, Image, X, Plus, ChevronsUpDown, Sparkles, Settings as SettingsIcon, Camera, Palette, Heart, Bell, Sun, Moon, Monitor } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Separator } from './ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
@@ -180,10 +180,9 @@ export function Settings() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
   };
-
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
       <div className="container max-w-5xl mx-auto px-4 py-8">
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
@@ -191,11 +190,11 @@ export function Settings() {
           transition={{ duration: 0.5 }}
           className="flex items-center gap-3 mb-8"
         >
-          <div className="p-2 rounded-lg bg-primary/10">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10">
             <SettingsIcon className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold">Settings</h1>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Settings</h1>
             <p className="text-muted-foreground">Manage your account and preferences</p>
           </div>
         </motion.div>
@@ -237,10 +236,10 @@ export function Settings() {
                 className="space-y-6"
               >
                 {/* Profile Section */}
-                <Card className="border-none shadow-lg overflow-hidden">
-                  <CardHeader className="bg-gradient-to-r from-primary/5 to-primary/10 border-b">
+                <Card className="border-none shadow-lg overflow-hidden bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
+                  <CardHeader className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-b">
                     <CardTitle className="flex items-center gap-2">
-                      <div className="p-2 rounded-lg bg-primary/10">
+                      <div className="p-2 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10">
                         <User className="h-5 w-5 text-primary" />
                       </div>
                       Profile Information
@@ -254,21 +253,22 @@ export function Settings() {
                       {/* Profile Picture & Basic Info */}
                       <div className="flex flex-col items-center gap-6">
                         <div className="relative group">
-                          <Avatar className="h-24 w-24 border-4 border-primary/10 ring-4 ring-background">
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300" />
+                          <Avatar className="h-24 w-24 border-4 border-primary/20 ring-4 ring-background relative">
                             {photoURL ? (
                               <AvatarImage src={photoURL} alt={displayName} />
                             ) : (
-                              <AvatarFallback className="bg-primary/10 text-primary text-2xl font-semibold">
+                              <AvatarFallback className="bg-gradient-to-br from-primary/20 to-primary/10 text-primary text-2xl font-semibold">
                                 {displayName.charAt(0)}
                               </AvatarFallback>
                             )}
                           </Avatar>
                           <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Image className="h-6 w-6 text-white" />
+                            <Camera className="h-6 w-6 text-white" />
                           </div>
                         </div>
                         <div className="text-center">
-                          <h3 className="text-xl font-semibold">{displayName || defaultDisplayName}</h3>
+                          <h3 className="text-xl font-semibold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">{displayName || defaultDisplayName}</h3>
                           <p className="text-muted-foreground">{currentUser?.email}</p>
                         </div>
                       </div>
@@ -276,19 +276,22 @@ export function Settings() {
                       {/* Profile Form Fields */}
                       <div className="grid gap-6">
                         <div className="space-y-2">
-                          <Label htmlFor="displayName" className="text-sm font-medium">Display Name</Label>
+                          <Label htmlFor="displayName" className="text-sm font-medium flex items-center gap-2">
+                            <User className="h-4 w-4 text-primary" />
+                            Display Name
+                          </Label>
                           <Input 
                             id="displayName" 
                             value={displayName} 
                             onChange={(e) => setDisplayName(e.target.value)}
                             placeholder="Your display name"
-                            className="h-11"
+                            className="h-11 bg-background/50 backdrop-blur-sm"
                           />
                         </div>
                         
                         <div className="space-y-2">
                           <Label htmlFor="photoURL" className="text-sm font-medium flex items-center gap-2">
-                            <Image className="h-4 w-4" />
+                            <Image className="h-4 w-4 text-primary" />
                             Profile Picture URL
                           </Label>
                           <Input 
@@ -299,7 +302,7 @@ export function Settings() {
                               validatePhotoURL(e.target.value);
                             }}
                             placeholder="https://example.com/your-photo.jpg"
-                            className={cn("h-11", photoURLError && "border-red-500")}
+                            className={cn("h-11 bg-background/50 backdrop-blur-sm", photoURLError && "border-red-500")}
                           />
                           {photoURLError && (
                             <p className="text-xs text-red-500">{photoURLError}</p>
@@ -307,7 +310,10 @@ export function Settings() {
                         </div>
                         
                         <div className="space-y-2">
-                          <Label htmlFor="username" className="text-sm font-medium">Username</Label>
+                          <Label htmlFor="username" className="text-sm font-medium flex items-center gap-2">
+                            <Palette className="h-4 w-4 text-primary" />
+                            Username
+                          </Label>
                           <Input 
                             id="username" 
                             value={username} 
@@ -316,7 +322,7 @@ export function Settings() {
                               validateUsername(e.target.value);
                             }}
                             placeholder="Choose a unique username"
-                            className={cn("h-11", usernameError && "border-red-500")}
+                            className={cn("h-11 bg-background/50 backdrop-blur-sm", usernameError && "border-red-500")}
                           />
                           {usernameError ? (
                             <p className="text-xs text-red-500">{usernameError}</p>
@@ -328,12 +334,15 @@ export function Settings() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor="skinType" className="text-sm font-medium">Skin Type</Label>
+                          <Label htmlFor="skinType" className="text-sm font-medium flex items-center gap-2">
+                            <Heart className="h-4 w-4 text-primary" />
+                            Skin Type
+                          </Label>
                           <select
                             id="skinType"
                             value={skinType}
                             onChange={(e) => setSkinType(e.target.value as typeof skinType)}
-                            className="w-full h-11 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            className="w-full h-11 rounded-md border border-input bg-background/50 backdrop-blur-sm px-3 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                           >
                             <option value="combination">Combination</option>
                             <option value="oily">Oily</option>
@@ -345,7 +354,7 @@ export function Settings() {
                       </div>
 
                       {/* Skin Concerns Section */}
-                      <div className="space-y-4 bg-gradient-to-br from-background to-muted/50 p-6 rounded-xl border">
+                      <div className="space-y-4 bg-gradient-to-br from-background/50 to-primary/5 p-6 rounded-xl border backdrop-blur-sm">
                         <div className="flex items-center justify-between">
                           <Label className="text-base font-medium flex items-center gap-2">
                             <Badge variant="outline" className="text-xs py-0 px-2 bg-primary/10">Concerns</Badge>
@@ -388,7 +397,7 @@ export function Settings() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className={`group flex items-center justify-between p-3 rounded-lg border ${badgeStyle} transition-all hover:bg-opacity-20`}
+                                className={`group flex items-center justify-between p-3 rounded-lg border ${badgeStyle} transition-all hover:bg-opacity-20 backdrop-blur-sm`}
                               >
                                 <span className="text-sm font-medium">{concern}</span>
                                 <Button
@@ -416,7 +425,7 @@ export function Settings() {
                                 type="button"
                                 variant="outline"
                                 role="combobox"
-                                className="w-full justify-between border-dashed hover:border-primary hover:text-primary transition-colors h-11"
+                                className="w-full justify-between border-dashed hover:border-primary hover:text-primary transition-colors h-11 bg-background/50 backdrop-blur-sm"
                               >
                                 <span className="flex items-center gap-2">
                                   <Plus className="h-4 w-4" />
@@ -491,7 +500,7 @@ export function Settings() {
                         </div>
 
                         {/* Info Box */}
-                        <div className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 mt-4">
+                        <div className="flex items-start gap-3 p-4 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 mt-4 backdrop-blur-sm">
                           <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" />
                           <div className="space-y-1">
                             <p className="text-sm font-medium text-primary">
@@ -511,14 +520,14 @@ export function Settings() {
                           Account Actions
                         </h3>
                         <div className="grid gap-3">
-                          <Button variant="outline" className="w-full justify-between group hover:border-primary/50 transition-all h-11">
+                          <Button variant="outline" className="w-full justify-between group hover:border-primary/50 transition-all h-11 bg-background/50 backdrop-blur-sm">
                             <div className="flex items-center gap-2">
                               <Key className="h-4 w-4 text-muted-foreground" />
                               <span>Change Password</span>
                             </div>
                             <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                           </Button>
-                          <Button variant="outline" className="w-full justify-between group hover:border-primary/50 transition-all h-11">
+                          <Button variant="outline" className="w-full justify-between group hover:border-primary/50 transition-all h-11 bg-background/50 backdrop-blur-sm">
                             <div className="flex items-center gap-2">
                               <Download className="h-4 w-4 text-muted-foreground" />
                               <span>Export Your Data</span>
