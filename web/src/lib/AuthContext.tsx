@@ -19,7 +19,13 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  updateUserData: (data: { displayName?: string; photoURL?: string; username?: string; skinType?: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive' }) => Promise<void>;
+  updateUserData: (data: { 
+    displayName?: string; 
+    photoURL?: string; 
+    username?: string; 
+    skinType?: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive';
+    skinConcerns?: string[];
+  }) => Promise<void>;
   userProfile: DbUser | null;
 }
 
@@ -106,10 +112,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const updateUserData = async (data: { displayName?: string; photoURL?: string; username?: string; skinType?: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive' }) => {
+  const updateUserData = async (data: { 
+    displayName?: string; 
+    photoURL?: string; 
+    username?: string; 
+    skinType?: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive';
+    skinConcerns?: string[];
+  }) => {
     if (!currentUser) throw new Error('No user is signed in');
     
-    const { displayName, photoURL, username, skinType } = data;
+    const { displayName, photoURL, username, skinType, skinConcerns } = data;
     
     // Update Firebase Auth profile
     if (displayName || photoURL) {
@@ -131,6 +143,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
     if (skinType !== undefined) {
       updateData.skinType = skinType; // Always update skin type if provided
+    }
+    if (skinConcerns !== undefined) {
+      updateData.skinConcerns = skinConcerns; // Always update skin concerns if provided
     }
     
     await updateUserProfile(currentUser.uid, updateData);

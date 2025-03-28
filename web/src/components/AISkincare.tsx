@@ -247,42 +247,46 @@ export function AISkincare() {
         const routines = await getUserRoutines(currentUser.uid);
         console.log("Fetched routines:", routines);
 
-        // Extract skin concerns from products - look at product descriptions and ingredients
-        let skinConcerns: string[] = ["acne", "dryness"]; // Default concerns
-        const skinConcernsSet = new Set<string>();
+        // Use the user's actual skin concerns from their profile
+        let skinConcerns: string[] = profile?.skinConcerns || [];
 
-        // Look for keywords in product descriptions
-        products.forEach((product) => {
-          const description = product.description?.toLowerCase() || "";
-          const keywords = [
-            { word: "acne", concern: "acne" },
-            { word: "pimple", concern: "acne" },
-            { word: "breakout", concern: "acne" },
-            { word: "dry", concern: "dryness" },
-            { word: "flaky", concern: "dryness" },
-            { word: "hydration", concern: "dryness" },
-            { word: "wrinkle", concern: "aging" },
-            { word: "fine line", concern: "aging" },
-            { word: "aging", concern: "aging" },
-            { word: "hyperpigmentation", concern: "dark spots" },
-            { word: "dark spot", concern: "dark spots" },
-            { word: "melasma", concern: "dark spots" },
-            { word: "sensitive", concern: "sensitivity" },
-            { word: "redness", concern: "redness" },
-            { word: "inflammation", concern: "redness" },
-            { word: "oily", concern: "oiliness" },
-          ];
+        // If no concerns are set, try to infer them from products
+        if (skinConcerns.length === 0) {
+          const skinConcernsSet = new Set<string>();
 
-          keywords.forEach(({ word, concern }) => {
-            if (description.includes(word)) {
-              skinConcernsSet.add(concern);
-            }
+          // Look for keywords in product descriptions
+          products.forEach((product) => {
+            const description = product.description?.toLowerCase() || "";
+            const keywords = [
+              { word: "acne", concern: "acne" },
+              { word: "pimple", concern: "acne" },
+              { word: "breakout", concern: "acne" },
+              { word: "dry", concern: "dryness" },
+              { word: "flaky", concern: "dryness" },
+              { word: "hydration", concern: "dryness" },
+              { word: "wrinkle", concern: "aging" },
+              { word: "fine line", concern: "aging" },
+              { word: "aging", concern: "aging" },
+              { word: "hyperpigmentation", concern: "dark spots" },
+              { word: "dark spot", concern: "dark spots" },
+              { word: "melasma", concern: "dark spots" },
+              { word: "sensitive", concern: "sensitivity" },
+              { word: "redness", concern: "redness" },
+              { word: "inflammation", concern: "redness" },
+              { word: "oily", concern: "oiliness" },
+            ];
+
+            keywords.forEach(({ word, concern }) => {
+              if (description.includes(word)) {
+                skinConcernsSet.add(concern);
+              }
+            });
           });
-        });
 
-        // If we found any concerns from products, use those
-        if (skinConcernsSet.size > 0) {
-          skinConcerns = Array.from(skinConcernsSet);
+          // If we found any concerns from products, use those
+          if (skinConcernsSet.size > 0) {
+            skinConcerns = Array.from(skinConcernsSet);
+          }
         }
 
         // Create detailed routine information

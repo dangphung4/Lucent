@@ -8,6 +8,21 @@ import { storage } from './firebase';
 
 const db = getFirestore(app);
 
+// Common skin concerns that users can select from
+export const COMMON_SKIN_CONCERNS = [
+  'acne & breakouts',
+  'aging & fine lines',
+  'dark spots & hyperpigmentation',
+  'dryness & dehydration',
+  'oiliness & large pores',
+  'redness & sensitivity',
+  'uneven texture',
+  'sun damage',
+  'eczema & rosacea'
+] as const;
+
+export type CommonSkinConcern = typeof COMMON_SKIN_CONCERNS[number];
+
 export interface User {
   id: string;
   displayName: string;
@@ -18,7 +33,7 @@ export interface User {
   userId: string;
   username?: string; // Optional username for profile URL
   skinType?: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive'; // Optional skin type with default
-  skinConcerns?: string[]; // Optional skin concerns with default
+  skinConcerns?: string[]; // Array of skin concerns, can include both common and custom concerns
 }
 
 export interface Product {

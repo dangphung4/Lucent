@@ -6,15 +6,18 @@ import { Switch } from './ui/switch';
 import { Label } from './ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { useTheme } from '../lib/ThemeProvider';
-import { Moon, Sun, Monitor, User, Bell, LogOut, Key, Download, Trash2, Check, ChevronRight, Loader2, Image } from 'lucide-react';
+import { Moon, Sun, Monitor, User, Bell, LogOut, Key, Download, Trash2, Check, ChevronRight, Loader2, Image, X, Plus, ChevronsUpDown, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Separator } from './ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Badge } from './ui/badge';
 import { useLocation } from 'react-router-dom';
 import { Input } from './ui/input';
-import { isUsernameAvailable } from '../lib/db';
+import { isUsernameAvailable, COMMON_SKIN_CONCERNS } from '../lib/db';
 import { toast } from 'sonner';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from './ui/command';
+import { cn } from '../lib/utils';
 
 export function Settings() {
   const { currentUser, updateUserData, userProfile, logOut } = useAuth();
@@ -320,19 +323,162 @@ export function Settings() {
                       </div>
                     </div>
 
-                    {/* section for skin concerns will show up as badges, and can have multiple */}
-                    <div className="space-y-2">
-                      <Label htmlFor="skinConcerns">Skin Concerns</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {skinConcerns.map((concern, index) => (
-                          <Badge key={index} variant="outline" className="bg-green-500/10 text-green-500 hover:bg-green-500/20">
-                            {concern}
-                          </Badge>
-                        ))}
+                    {/* Skin Concerns Section */}
+                    <div className="space-y-4 bg-gradient-to-br from-background to-muted/50 p-6 rounded-lg border">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="skinConcerns" className="text-base font-medium flex items-center gap-2">
+                          <Badge variant="outline" className="text-xs py-0 px-2 bg-primary/10">Concerns</Badge>
+                          Skin Concerns
+                        </Label>
+                        <Badge variant="secondary" className="bg-primary/10 text-primary">
+                          {skinConcerns.length} Selected
+                        </Badge>
+                      </div>
+                      
+                      {/* Selected Concerns */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {skinConcerns.map((concern, index) => {
+                          let badgeStyle = "";
+                          if (concern.includes("acne")) {
+                            badgeStyle = "bg-red-500/10 text-red-500 border-red-500/20";
+                          } else if (concern.includes("aging")) {
+                            badgeStyle = "bg-blue-500/10 text-blue-500 border-blue-500/20";
+                          } else if (concern.includes("dark spots")) {
+                            badgeStyle = "bg-amber-500/10 text-amber-500 border-amber-500/20";
+                          } else if (concern.includes("dryness")) {
+                            badgeStyle = "bg-orange-500/10 text-orange-500 border-orange-500/20";
+                          } else if (concern.includes("oiliness")) {
+                            badgeStyle = "bg-green-500/10 text-green-500 border-green-500/20";
+                          } else if (concern.includes("redness")) {
+                            badgeStyle = "bg-rose-500/10 text-rose-500 border-rose-500/20";
+                          } else if (concern.includes("texture")) {
+                            badgeStyle = "bg-indigo-500/10 text-indigo-500 border-indigo-500/20";
+                          } else if (concern.includes("sun")) {
+                            badgeStyle = "bg-yellow-500/10 text-yellow-600 border-yellow-500/20";
+                          } else if (concern.includes("eczema")) {
+                            badgeStyle = "bg-pink-500/10 text-pink-500 border-pink-500/20";
+                          } else {
+                            badgeStyle = "bg-purple-500/10 text-purple-500 border-purple-500/20";
+                          }
+
+                          return (
+                            <div
+                              key={index}
+                              className={`group flex items-center justify-between p-2 rounded-lg border ${badgeStyle} transition-all hover:bg-opacity-20`}
+                            >
+                              <span className="text-sm font-medium">{concern}</span>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => {
+                                  const newConcerns = skinConcerns.filter((_, i) => i !== index);
+                                  setSkinConcerns(newConcerns);
+                                }}
+                                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background/50"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+
+                      {/* Add Concern Button */}
+                      <div className="flex flex-col sm:flex-row gap-2 mt-4">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              role="combobox"
+                              className="w-full justify-between border-dashed hover:border-primary hover:text-primary transition-colors"
+                            >
+                              <span className="flex items-center gap-2">
+                                <Plus className="h-4 w-4" />
+                                Add skin concern
+                              </span>
+                              <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[300px] p-0" align="start">
+                            <Command>
+                              <CommandInput placeholder="Search skin concerns..." className="h-9" />
+                              <CommandEmpty className="p-4 text-sm text-muted-foreground">
+                                No matching concerns found.
+                              </CommandEmpty>
+                              <CommandGroup className="max-h-[300px] overflow-auto">
+                                {COMMON_SKIN_CONCERNS.map((concern: string) => {
+                                  let badgeStyle = "";
+                                  if (concern.includes("acne")) {
+                                    badgeStyle = "text-red-500";
+                                  } else if (concern.includes("aging")) {
+                                    badgeStyle = "text-blue-500";
+                                  } else if (concern.includes("dark spots")) {
+                                    badgeStyle = "text-amber-500";
+                                  } else if (concern.includes("dryness")) {
+                                    badgeStyle = "text-orange-500";
+                                  } else if (concern.includes("oiliness")) {
+                                    badgeStyle = "text-green-500";
+                                  } else if (concern.includes("redness")) {
+                                    badgeStyle = "text-rose-500";
+                                  } else if (concern.includes("texture")) {
+                                    badgeStyle = "text-indigo-500";
+                                  } else if (concern.includes("sun")) {
+                                    badgeStyle = "text-yellow-600";
+                                  } else if (concern.includes("eczema")) {
+                                    badgeStyle = "text-pink-500";
+                                  } else {
+                                    badgeStyle = "text-purple-500";
+                                  }
+
+                                  return (
+                                    <CommandItem
+                                      key={concern}
+                                      value={concern}
+                                      onSelect={() => {
+                                        if (!skinConcerns.includes(concern)) {
+                                          setSkinConcerns([...skinConcerns, concern]);
+                                        }
+                                      }}
+                                      className="flex items-center gap-2"
+                                    >
+                                      <div className={cn(
+                                        "h-4 w-4 rounded-full border flex items-center justify-center",
+                                        skinConcerns.includes(concern) ? badgeStyle : "text-muted-foreground"
+                                      )}>
+                                        {skinConcerns.includes(concern) && (
+                                          <Check className="h-3 w-3" />
+                                        )}
+                                      </div>
+                                      <span className={cn(
+                                        "font-medium",
+                                        skinConcerns.includes(concern) && badgeStyle
+                                      )}>
+                                        {concern}
+                                      </span>
+                                    </CommandItem>
+                                  );
+                                })}
+                              </CommandGroup>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+
+                      {/* Info Box */}
+                      <div className="flex items-start gap-2 p-4 rounded-lg bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 mt-4">
+                        <Sparkles className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-primary">
+                            Personalized Recommendations
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Select your skin concerns to get tailored product recommendations and skincare advice. Our AI assistant will analyze your concerns and suggest the most effective products and routines for your unique needs.
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    
-                    
                     
                     <div className="flex justify-end">
                       <Button 
