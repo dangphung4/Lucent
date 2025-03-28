@@ -18,6 +18,7 @@ export interface User {
   userId: string;
   username?: string; // Optional username for profile URL
   skinType?: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive'; // Optional skin type with default
+  skinConcerns?: string[]; // Optional skin concerns with default
 }
 
 export interface Product {
@@ -186,7 +187,8 @@ export const updateUserProfile = async (userId: string, data: Partial<User>): Pr
         createdAt: new Date(),
         lastLoginAt: new Date(),
         username: data.username,
-        skinType: data.skinType || 'combination' // Default to combination only for new users
+        skinType: data.skinType || 'combination', // Default to combination only for new users
+        skinConcerns: data.skinConcerns || [] // Default to empty array for new users
       };
       
       await setDoc(userRef, newUserData);

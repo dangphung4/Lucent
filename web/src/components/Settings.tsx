@@ -36,7 +36,8 @@ export function Settings() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [usernameError, setUsernameError] = useState('');
   const [photoURLError, setPhotoURLError] = useState('');
-  
+  const [skinConcerns, setSkinConcerns] = useState<string[]>([]);
+
   // Get first name from email or use "there" as fallback
   const firstName = currentUser?.email?.split('@')[0] || 'there';
   const defaultDisplayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
@@ -50,6 +51,7 @@ export function Settings() {
       if (userProfile) {
         setUsername(userProfile.username || '');
         setSkinType(userProfile.skinType || 'combination');
+        setSkinConcerns(userProfile.skinConcerns || []);
       }
     }
   }, [currentUser, userProfile, defaultDisplayName]);
@@ -317,6 +319,20 @@ export function Settings() {
                         </p>
                       </div>
                     </div>
+
+                    {/* section for skin concerns will show up as badges, and can have multiple */}
+                    <div className="space-y-2">
+                      <Label htmlFor="skinConcerns">Skin Concerns</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {skinConcerns.map((concern, index) => (
+                          <Badge key={index} variant="outline" className="bg-green-500/10 text-green-500 hover:bg-green-500/20">
+                            {concern}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    
                     
                     <div className="flex justify-end">
                       <Button 

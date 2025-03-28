@@ -17,13 +17,20 @@ import {
   getUserProducts,
   getUserRoutines,
   getUserProfile,
+  getUserJournalEntries,
+  getUserProgressLogs,
   Product,
   Routine,
+  JournalEntry,
+  ProgressLog,
 } from "@/lib/db";
 import ReactMarkdown from "react-markdown";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText, CoreMessage } from "ai";
+import { SkinAnalysis } from "./SkinAnalysis";
+import { IngredientAnalysis } from "./IngredientAnalysis";
+import { SkincareProgress } from "./SkincareProgress";
 
 interface Message {
   role: "user" | "assistant";
@@ -188,6 +195,7 @@ interface ExtendedResult extends ReturnType<typeof generateText> {
  */
 export function AISkincare() {
   const { currentUser } = useAuth();
+  console.log("Current user:", currentUser);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -215,6 +223,8 @@ export function AISkincare() {
     url: string;
     alt: string;
   } | null>(null);
+  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+  const [progressLogs, setProgressLogs] = useState<ProgressLog[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
@@ -227,12 +237,15 @@ export function AISkincare() {
       try {
         // Get user profile
         const profile = await getUserProfile(currentUser.uid);
+        console.log("Fetched profile:", profile);
 
         // Get user products
         const products = await getUserProducts(currentUser.uid);
+        console.log("Fetched products:", products);
 
         // Get user routines
         const routines = await getUserRoutines(currentUser.uid);
+        console.log("Fetched routines:", routines);
 
         // Extract skin concerns from products - look at product descriptions and ingredients
         let skinConcerns: string[] = ["acne", "dryness"]; // Default concerns
@@ -298,7 +311,7 @@ export function AISkincare() {
         );
 
         // Set user data with profile information
-        setUserData({
+        const userData = {
           profile: {
             displayName: profile?.displayName || currentUser.displayName || "User",
             email: profile?.email || currentUser.email || "",
@@ -308,15 +321,37 @@ export function AISkincare() {
           products,
           routines,
           skinConcerns,
-          skinType: profile?.skinType || "combination", // Use skin type from profile
+          skinType: profile?.skinType || "combination",
           routineDetails,
-        });
+        };
+        console.log("Setting userData:", userData);
+        setUserData(userData);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
 
     fetchUserData();
+  }, [currentUser]);
+
+  // Add useEffect to fetch journal entries and progress logs
+  useEffect(() => {
+    if (!currentUser?.uid) return;
+
+    const fetchAdditionalData = async () => {
+      try {
+        const entries = await getUserJournalEntries(currentUser.uid);
+        console.log("Fetched journal entries:", entries);
+        const logs = await getUserProgressLogs(currentUser.uid);
+        console.log("Fetched progress logs:", logs);
+        setJournalEntries(entries);
+        setProgressLogs(logs);
+      } catch (error) {
+        console.error("Error fetching additional data:", error);
+      }
+    };
+
+    fetchAdditionalData();
   }, [currentUser]);
 
   // Scroll to bottom when messages change
@@ -1139,6 +1174,21 @@ export function AISkincare() {
         )}
 
         <div className="md:space-y-6 flex flex-col">
+          {/* Analysis Section - New */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            <SkinAnalysis
+              products={userData.products}
+              routines={userData.routines}
+              skinType={userData.skinType}
+              skinConcerns={userData.skinConcerns}
+            />
+            <IngredientAnalysis products={userData.products} />
+            <SkincareProgress
+              journalEntries={journalEntries}
+              progressLogs={progressLogs}
+            />
+          </div>
+
           {/* Chat Interface */}
           <Card className="border shadow-md flex-1 flex flex-col overflow-hidden">
             <CardContent className="p-0 flex flex-col h-full">
