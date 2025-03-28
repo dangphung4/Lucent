@@ -32,6 +32,7 @@ export function Settings() {
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
   const [photoURL, setPhotoURL] = useState('');
+  const [skinType, setSkinType] = useState<'oily' | 'dry' | 'combination' | 'normal' | 'sensitive'>('combination');
   const [isUpdating, setIsUpdating] = useState(false);
   const [usernameError, setUsernameError] = useState('');
   const [photoURLError, setPhotoURLError] = useState('');
@@ -48,6 +49,7 @@ export function Settings() {
       
       if (userProfile) {
         setUsername(userProfile.username || '');
+        setSkinType(userProfile.skinType || 'combination');
       }
     }
   }, [currentUser, userProfile, defaultDisplayName]);
@@ -143,7 +145,8 @@ export function Settings() {
       await updateUserData({
         displayName,
         photoURL,
-        username: username || undefined
+        username: username || undefined,
+        skinType: skinType || 'combination'
       });
       
       toast.success('Profile updated successfully');
@@ -293,6 +296,25 @@ export function Settings() {
                             Your profile will be available at /profile/{username}
                           </p>
                         )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="skinType">Skin Type</Label>
+                        <select
+                          id="skinType"
+                          value={skinType}
+                          onChange={(e) => setSkinType(e.target.value as typeof skinType)}
+                          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        >
+                          <option value="combination">Combination</option>
+                          <option value="oily">Oily</option>
+                          <option value="dry">Dry</option>
+                          <option value="normal">Normal</option>
+                          <option value="sensitive">Sensitive</option>
+                        </select>
+                        <p className="text-xs text-muted-foreground">
+                          This helps us provide personalized skincare recommendations
+                        </p>
                       </div>
                     </div>
                     

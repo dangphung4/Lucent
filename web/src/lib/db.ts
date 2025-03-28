@@ -17,6 +17,7 @@ export interface User {
   lastLoginAt: Date;
   userId: string;
   username?: string; // Optional username for profile URL
+  skinType?: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive'; // Optional skin type with default
 }
 
 export interface Product {
@@ -156,7 +157,40 @@ export const createUserProfile = async (user: User): Promise<void> => {
 export const updateUserProfile = async (userId: string, data: Partial<User>): Promise<void> => {
   try {
     const userRef = doc(db, 'users', userId);
-    await updateDoc(userRef, data);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      // Get existing data
+      const existingData = userSnap.data() as User;
+      
+      // Merge existing data with updates, preserving existing values for undefined fields
+      const updateData = {
+        ...existingData,
+        ...data,
+        // Ensure these fields are always set
+        id: userId,
+        userId: userId,
+        lastLoginAt: new Date(),
+      };
+      
+      // Update existing document
+      await updateDoc(userRef, updateData);
+    } else {
+      // Create new document with default values
+      const newUserData: User = {
+        id: userId,
+        userId: userId,
+        displayName: data.displayName || '',
+        email: data.email || '',
+        photoURL: data.photoURL || '',
+        createdAt: new Date(),
+        lastLoginAt: new Date(),
+        username: data.username,
+        skinType: data.skinType || 'combination' // Default to combination only for new users
+      };
+      
+      await setDoc(userRef, newUserData);
+    }
   } catch (error) {
     console.error('Error updating user profile:', error);
     throw error;

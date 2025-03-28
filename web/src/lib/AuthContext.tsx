@@ -19,7 +19,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
-  updateUserData: (data: { displayName?: string; photoURL?: string; username?: string }) => Promise<void>;
+  updateUserData: (data: { displayName?: string; photoURL?: string; username?: string; skinType?: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive' }) => Promise<void>;
   userProfile: DbUser | null;
 }
 
@@ -57,17 +57,59 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const signUp = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    
+    // Create initial user document in Firestore
+    const initialUserData: DbUser = {
+      id: user.uid,
+      userId: user.uid,
+      displayName: user.displayName || email.split('@')[0],
+      email: user.email || '',
+      photoURL: user.photoURL || '',
+      createdAt: new Date(),
+      lastLoginAt: new Date(),
+      username: undefined,
+      skinType: 'combination'
+    };
+    
+    await updateUserProfile(user.uid, initialUserData);
   };
 
   const signInWithGoogle = async () => {
-    await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    
+    // Check if user document exists
+    const existingProfile = await getUserProfile(user.uid);
+    
+    if (!existingProfile) {
+      // Create initial user document in Firestore
+      const initialUserData: DbUser = {
+        id: user.uid,
+        userId: user.uid,
+        displayName: user.displayName || user.email?.split('@')[0] || '',
+        email: user.email || '',
+        photoURL: user.photoURL || '',
+        createdAt: new Date(),
+        lastLoginAt: new Date(),
+        username: undefined,
+        skinType: 'combination'
+      };
+      
+      await updateUserProfile(user.uid, initialUserData);
+    } else {
+      // Update last login time for existing user
+      await updateUserProfile(user.uid, {
+        lastLoginAt: new Date()
+      });
+    }
   };
 
-  const updateUserData = async (data: { displayName?: string; photoURL?: string; username?: string }) => {
+  const updateUserData = async (data: { displayName?: string; photoURL?: string; username?: string; skinType?: 'oily' | 'dry' | 'combination' | 'normal' | 'sensitive' }) => {
     if (!currentUser) throw new Error('No user is signed in');
     
-    const { displayName, photoURL, username } = data;
+    const { displayName, photoURL, username, skinType } = data;
     
     // Update Firebase Auth profile
     if (displayName || photoURL) {
@@ -77,12 +119,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
     }
     
-    // Update Firestore profile
-    await updateUserProfile(currentUser.uid, {
+    // Update Firestore profile - handle undefined values according to User interface
+    const updateData: Partial<DbUser> = {
       displayName: displayName || currentUser.displayName || '',
       photoURL: photoURL || currentUser.photoURL || '',
-      username: username
-    });
+    };
+
+    // Only include optional fields if they have values
+    if (username !== undefined) {
+      updateData.username = username || undefined;
+    }
+    if (skinType !== undefined) {
+      updateData.skinType = skinType; // Always update skin type if provided
+    }
+    
+    await updateUserProfile(currentUser.uid, updateData);
     
     // Refresh user profile
     const updatedProfile = await getUserProfile(currentUser.uid);

@@ -272,28 +272,6 @@ export function AISkincare() {
           skinConcerns = Array.from(skinConcernsSet);
         }
 
-        // Try to determine skin type from products
-        let skinType = "combination"; // Default type
-        const oilyProducts = products.filter(
-          (p) =>
-            p.description?.toLowerCase().includes("oily") ||
-            p.description?.toLowerCase().includes("oil control")
-        ).length;
-
-        const dryProducts = products.filter(
-          (p) =>
-            p.description?.toLowerCase().includes("dry") ||
-            p.description?.toLowerCase().includes("hydrating")
-        ).length;
-
-        if (oilyProducts > dryProducts * 2) {
-          skinType = "oily";
-        } else if (dryProducts > oilyProducts * 2) {
-          skinType = "dry";
-        } else if (oilyProducts > 0 && dryProducts > 0) {
-          skinType = "combination";
-        }
-
         // Create detailed routine information
         const routineDetails = await Promise.all(
           routines.map(async (routine) => {
@@ -319,11 +297,10 @@ export function AISkincare() {
           })
         );
 
-        // Set user data
+        // Set user data with profile information
         setUserData({
           profile: {
-            displayName:
-              profile?.displayName || currentUser.displayName || "Shams Abbas",
+            displayName: profile?.displayName || currentUser.displayName || "User",
             email: profile?.email || currentUser.email || "",
             username: profile?.username,
             photoURL: profile?.photoURL || currentUser.photoURL || undefined,
@@ -331,7 +308,7 @@ export function AISkincare() {
           products,
           routines,
           skinConcerns,
-          skinType,
+          skinType: profile?.skinType || "combination", // Use skin type from profile
           routineDetails,
         });
       } catch (error) {
