@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Database utilities for Firestore
 
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, getDocs, where, deleteDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, query, getDocs, where, deleteDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { app } from './firebase';
 import { ref, listAll, getDownloadURL, getMetadata } from 'firebase/storage';
 import { storage } from './firebase';
@@ -133,6 +133,25 @@ export interface ProgressPhoto {
   url: string;
   hasLog: boolean;
   logId?: string;
+}
+
+export interface WishlistItem {
+  productId: string;
+  addedAt: Date;
+  productType?: string;
+  brand?: string;
+  name?: string;
+  imageUrl?: string;
+  price?: number;
+  category?: string;
+}
+
+export interface Wishlist {
+  id: string;
+  userId: string;
+  items: WishlistItem[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 /**
@@ -710,6 +729,173 @@ export const getProgressLogByPhotoPath = async (userId: string, photoStoragePath
     } as ProgressLog;
   } catch (error) {
     console.error('Error getting progress log by photo path:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get the user's wishlist
+ */
+export const getUserWishlist = async (userId: string): Promise<Wishlist | null> => {
+  try {
+    // We use the userId as the wishlist id for simplicity
+    const wishlistRef = doc(db, 'wishlists', userId);
+    const wishlistSnap = await getDoc(wishlistRef);
+    
+    if (wishlistSnap.exists()) {
+      const data = wishlistSnap.data();
+      return {
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+        items: data.items?.map((item: any) => ({
+          ...item,
+          addedAt: item.addedAt?.toDate() || new Date(),
+        })) || [],
+      } as Wishlist;
+    } else {
+      // Create empty wishlist for first-time users
+      const newWishlist: Wishlist = {
+        id: userId,
+        userId,
+        items: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      await setDoc(wishlistRef, newWishlist);
+      return newWishlist;
+    }
+  } catch (error) {
+    console.error('Error getting user wishlist:', error);
+    return null;
+  }
+};
+
+/**
+ * Add a product to wishlist
+ */
+export const addToWishlist = async (userId: string, product: {
+  productId: string;
+  brand?: string;
+  name?: string;
+  imageUrl?: string;
+  price?: number;
+  category?: string;
+  productType?: string;
+}): Promise<void> => {
+  try {
+    const wishlistRef = doc(db, 'wishlists', userId);
+    const wishlistSnap = await getDoc(wishlistRef);
+    
+    // Create base wishlist item
+    const wishlistItem: WishlistItem = {
+      productId: product.productId,
+      addedAt: new Date(),
+    };
+    
+    // Only add properties that are defined to avoid Firestore errors
+    if (product.brand) wishlistItem.brand = product.brand;
+    if (product.name) wishlistItem.name = product.name;
+    if (product.imageUrl) wishlistItem.imageUrl = product.imageUrl;
+    if (product.price !== undefined) wishlistItem.price = product.price;
+    if (product.category) wishlistItem.category = product.category;
+    if (product.productType) wishlistItem.productType = product.productType;
+    
+    if (wishlistSnap.exists()) {
+      // Update existing wishlist
+      await updateDoc(wishlistRef, {
+        items: arrayUnion(wishlistItem),
+        updatedAt: new Date()
+      });
+    } else {
+      // Create new wishlist
+      const newWishlist: Wishlist = {
+        id: userId,
+        userId,
+        items: [wishlistItem],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      await setDoc(wishlistRef, newWishlist);
+    }
+  } catch (error) {
+    console.error('Error adding to wishlist:', error);
+    throw error;
+  }
+};
+
+/**
+ * Remove a product from wishlist
+ */
+export const removeFromWishlist = async (userId: string, productId: string): Promise<void> => {
+  try {
+    const wishlistRef = doc(db, 'wishlists', userId);
+    const wishlistSnap = await getDoc(wishlistRef);
+    
+    if (wishlistSnap.exists()) {
+      const wishlist = wishlistSnap.data() as Wishlist;
+      
+      // Find the specific item to remove
+      const itemToRemove = wishlist.items.find(item => item.productId === productId);
+      
+      if (itemToRemove) {
+        // Create a clean version of the item with no undefined values
+        const cleanItem: WishlistItem = {
+          productId: itemToRemove.productId,
+          addedAt: itemToRemove.addedAt,
+        };
+        
+        // Only add properties that exist
+        if (itemToRemove.brand) cleanItem.brand = itemToRemove.brand;
+        if (itemToRemove.name) cleanItem.name = itemToRemove.name;
+        if (itemToRemove.imageUrl) cleanItem.imageUrl = itemToRemove.imageUrl;
+        if (itemToRemove.price !== undefined) cleanItem.price = itemToRemove.price;
+        if (itemToRemove.category) cleanItem.category = itemToRemove.category;
+        if (itemToRemove.productType) cleanItem.productType = itemToRemove.productType;
+        
+        // Remove the item and update
+        await updateDoc(wishlistRef, {
+          items: arrayRemove(cleanItem),
+          updatedAt: new Date()
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error removing from wishlist:', error);
+    throw error;
+  }
+};
+
+/**
+ * Check if a product is in the wishlist
+ */
+export const isInWishlist = async (userId: string, productId: string): Promise<boolean> => {
+  try {
+    const wishlist = await getUserWishlist(userId);
+    
+    if (!wishlist) return false;
+    
+    return wishlist.items.some(item => item.productId === productId);
+  } catch (error) {
+    console.error('Error checking wishlist:', error);
+    return false;
+  }
+};
+
+/**
+ * Clear the wishlist
+ */
+export const clearWishlist = async (userId: string): Promise<void> => {
+  try {
+    const wishlistRef = doc(db, 'wishlists', userId);
+    await updateDoc(wishlistRef, {
+      items: [],
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    console.error('Error clearing wishlist:', error);
     throw error;
   }
 };
