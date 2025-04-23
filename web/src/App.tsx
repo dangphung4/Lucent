@@ -15,6 +15,7 @@ import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { TermsOfService } from './components/TermsOfService';
 import { AboutUs } from './components/AboutUs';
 import { AISkincare } from './components/AISkincare';
+import { Marketplace } from './components/Marketplace';
 
 // Protected route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -126,6 +127,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <AISkincare />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/marketplace"
+                element={
+                  <ProtectedRoute>
+                    <Marketplace />
                   </ProtectedRoute>
                 }
               />
