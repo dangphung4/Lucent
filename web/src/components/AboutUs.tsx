@@ -312,6 +312,37 @@ export function AboutUs() {
         </div>
       </section>
 
+      {/* Dang's Project Section - Highlight another project */}
+      <section className="py-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background pointer-events-none"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="max-w-3xl mx-auto text-center space-y-6"
+          >
+            <div className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary backdrop-blur-sm border border-primary/20 shadow-glow mb-2">
+              From Dang
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/70">
+              Check Out My Other Project!
+            </h2>
+            <p className="text-lg text-muted-foreground leading-relaxed backdrop-blur-sm bg-background/50 p-4 rounded-lg border border-primary/10 shadow-sm">
+              I also helped build <a href="https://chardle.com/" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80 transition-colors font-semibold">Chardle</a> — a fun, daily word puzzle game inspired by Wordle, but with a twist! If you enjoy word games, give it a try and see how many you can solve. <span className="inline-block ml-1 animate-bounce">🎮</span>
+            </p>
+            <a
+              href="https://chardle.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-2 px-8 py-3 rounded-full bg-gradient-to-r from-primary to-primary/80 text-white font-semibold shadow-lg hover:from-primary/90 hover:to-primary/70 transition-all text-lg animate-pulse-slow"
+            >
+              Visit Chardle.com
+            </a>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Features Section - Enhanced with animations and card effects */}
       <section className="py-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-muted/30"></div>
